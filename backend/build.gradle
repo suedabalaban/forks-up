@@ -26,6 +26,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.7.3'
     implementation 'com.auth0:mvc-auth-commons:1.9.2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'com.auth0:java-jwt:4.4.0'
 }
 
 tasks.named('test') {
