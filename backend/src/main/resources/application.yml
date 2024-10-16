@@ -4,9 +4,3 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/testdb
-
-okta:
-  oauth2:
-    issuer: https://dev-gf0mtdiw8skudwps.us.auth0.com/
-    client-id: 0X5OBMjMCUu4kSc61QpzUTMQ4pBIdjCA
-    client-secret: 0TtzBDgHj2SSK2ERTsdhUO87r_2N7o2GSy9RNidGTSnoAkOyP14MmhkAinq-MeiO

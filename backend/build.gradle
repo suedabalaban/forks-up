@@ -20,13 +20,11 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation 'com.okta.spring:okta-spring-boot-starter:3.0.5'
+	implementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.7.3'
-    implementation 'com.auth0:mvc-auth-commons:1.9.2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	implementation 'com.auth0:java-jwt:4.4.0'
+	implementation 'com.google.firebase:firebase-admin:9.3.0'
 }
 
 tasks.named('test') {
