@@ -24,10 +24,8 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7); // "Bearer " kısmını çıkar
             try {
-                // Token'ı doğrula
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
                 String uid = decodedToken.getUid();
-                // Kullanıcı bilgilerini burada ayarlayabilirsiniz (örneğin, SecurityContext'e ekleme)
             } catch (FirebaseAuthException e) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Geçersiz token.");
                 return; // Eğer token geçersizse, isteği burada sonlandır
