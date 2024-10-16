@@ -4,3 +4,45 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/testdb
+
+# TODO make environment variable
+firebase:
+  type: service_account
+  project_id: forks-up
+  private_key_id: 335c30c024f2f0c435e09a6f0b4c101f95a7350b
+  private_key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDcFvBN8OVmvxwQ
+    RReFlu90eVLFRotU0sA9eHZUUEbT6X2rCnNgZOlgCm04pqOrficRNX7nk1Ckz3Hk
+    kII8hJnqTDvl0AsbLaJJYydlnKlptAbPUaK1cLjLr1Aa6xX2HmDDsi64mxdMiQ6z
+    T+wX+e+AwnywVYYMXu9ejSq9axRokiYHloApxTA45Xk7jbkpAeNNL/yhWx7vaHHG
+    6FS47IriAR50DV6ZOZqFkyfzKkJ9vdxbaH3fwqigmV21pN6DO47qSZ1jPsnLVZqk
+    t4hOQSiQMquJPmL2SX9FLbSB6RpXcQWv68Gy4mUJ3XbBAKTnIEprBrJwcQaL7byV
+    P8Cq5WofAgMBAAECggEAY+4EYRcySZMXTmnYkr7j7XoSs2Di7XodcCusan7ikeBP
+    v2Po3Aklj4Zcbh73bGvEmEM2YjYYpSRNfa6Be7HnYqMHhUKPcGEpcPHU1wWpREXJ
+    28Mgwgoy1cS9deNsnsnPPLvAC/DbRNRsOM1ekMpaTRfBXp0OVrqaK8+j6speQ1XU
+    0+iUg1KI1GNtzUft6SM9PN03QNOCoEm0JqeXGeJgaw6YHD65+8Z2BpqfMJoAdgmz
+    LL9+ie6B9r0BVU04QlFM6Pc0tuBHsRBnSY1ZfiXnynRlzHLEp5IlZz59vKPuvw4s
+    gCdvQ6fxKYctIanKLV0D4r4kIdj74XJPk/AL/DWehQKBgQDy2z1TlbmuO6gBHRzN
+    iXFdsGssYZbiS2nVSbm9LsbCsCm4G3VJ0+rlYnBQXw7i3YlUMrnTNIw8J3TpqXWo
+    gnRmbdC821dbZ3l+m2LK4Cw7SfdAhoxCpEmtOJky/W18s1VpppNN0lLFxntZAfgB
+    U77fJP+UuUJ73BFcRp7WvEoUBQKBgQDoAEQ6/DHF+Nmrv71jUYqKHGbDP9VGniIL
+    P1CIlVCPApI7tLSJ1pd4dEwMeSFL2Mc4+dHE+CREhJxVXbdUZLUdiDgDEUvslj9p
+    rRLmSm5dqJ3CMkDmLnhO2hN+OcWElre8JAQQnymNLOIR1QzHST7VCeIC/5+s+J27
+    aH9I4gli0wKBgQDc0ahThgKNgETkrlnwMZbY/36TnjCZlsSmYSD3+b5Ua+WjN6RP
+    +tbMt9Mz4RsiARnLa0w31MHmOGI/zAvlqqi4MgXokvA9djqsehE8MtVFG54sF6sV
+    NVignqP+Dx0sk8uIAyRRUHpexniFmBqu6jzVnUifLExdXt6SLsxiqFYbGQKBgQCj
+    YMyr3T4P9JcVZAmzD5FIgYe8qA9Bk8rVsNi91qjMjTr94Nvi1cQFh6CmiAbyqs5h
+    SUx4MWcY+Wo+k6ivPdxt16faQSv+iDBP8xoEIxZlzoCKaWlasA75OInRsk1uedUa
+    ISLbsbpJOPpbJHXDQcmFrVgEVI/V957cg1JfuQ5zEQKBgBUkxZZQ/28/aTvuZYCB
+    nNO0OLpBiIkCjWCshHKEgIVHxK44MOVe6lrd2JkLj2oPZtHCA5x1PzqhYzDkUhW5
+    8iAMxhwb9T/kjVjoJXHwBcfO3ZB05HftlwFi5R+77uxN0JHEuao2PJRWYynfHseP
+    cjgH0Q0BDMNvsfZEGs80oZ2G
+    -----END PRIVATE KEY-----
+  client_email: firebase-adminsdk-4zto3@forks-up.iam.gserviceaccount.com
+  client_id: 100326760202216577122
+  auth_uri: https://accounts.google.com/o/oauth2/auth
+  token_uri: https://oauth2.googleapis.com/token
+  auth_provider_x509_cert_url: https://www.googleapis.com/oauth2/v1/certs
+  client_x509_cert_url: https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-4zto3%40forks-up.iam.gserviceaccount.com
+  universe_domain: googleapis.com

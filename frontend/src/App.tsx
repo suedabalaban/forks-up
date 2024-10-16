@@ -36,10 +36,6 @@ const App: React.FC = () => {
     };
 
     const fetchPrivateData = async () => {
-        if (!token) {
-            alert("Please log in first!");
-            return;
-        }
 
         try {
             const res = await axios.get("http://localhost:8080/private", {
@@ -50,7 +46,7 @@ const App: React.FC = () => {
             setResponse(res.data);
         } catch (error) {
             console.error("Error fetching private data", error);
-            setResponse("Access denied or insufficient permissions.");
+            setResponse(`Access denied or insufficient permissions: ${error}`,);
         }
     };
 
@@ -61,12 +57,12 @@ const App: React.FC = () => {
             <br /><br />
             <button onClick={fetchPrivateData}>Fetch Private Data</button>
             <br /><br />
-            <div style={{ border: "1px solid black", padding: "10px", width: "400px" }}>
+            <div >
                 <h3>Response:</h3>
                 <p>{response}</p>
             </div>
             {token && (
-                <div style={{ marginTop: "20px", border: "1px solid black", padding: "10px", width: "400px" }}>
+                <div >
                     <h3>JWT Token:</h3>
                     <p>{token}</p>
                 </div>

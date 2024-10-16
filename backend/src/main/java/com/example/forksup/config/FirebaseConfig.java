@@ -6,7 +6,9 @@ import com.google.firebase.FirebaseOptions;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -15,8 +17,11 @@ public class FirebaseConfig {
 
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
+        ClassPathResource resource = new ClassPathResource("forks-up-firebase-adminsdk-4zto3-335c30c024.json");
+
+        File file = resource.getFile();
         FileInputStream serviceAccount =
-                new FileInputStream("../../resources/forks-up-firebase-adminsdk-4zto3-335c30c024.json");
+                new FileInputStream(file);
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
