@@ -7,10 +7,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Component
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
@@ -18,23 +21,21 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
-        String token = request.getHeader("Authorization");
-        System.out.println(token);
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // "Bearer " kısmını çıkar
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
             try {
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
                 String uid = decodedToken.getUid();
+
+                // Kimlik doğrulama başarılı, güvenlik bağlamını ayarla
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(uid, null, new ArrayList<>());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (FirebaseAuthException e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Geçersiz token.");
-                return; // Eğer token geçersizse, isteği burada sonlandır
+                // Token doğrulama hatası
+                SecurityContextHolder.clearContext();
             }
-        } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header gerekli.");
-            return; // Authorization header yoksa isteği sonlandır
         }
-        filterChain.doFilter(request, response); // Filtre zincirine devam et
+        filterChain.doFilter(request, response);
     }
-    
 }

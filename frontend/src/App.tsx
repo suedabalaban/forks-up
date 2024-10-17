@@ -140,7 +140,7 @@ const App: React.FC = () => {
 
     const fetchPrivateData = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/private", {
+            const res = await axios.get("http://localhost:8080/api/private/forks-up", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
