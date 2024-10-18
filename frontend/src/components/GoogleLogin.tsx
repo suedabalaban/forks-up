@@ -22,7 +22,7 @@ const GoogleLogin: React.FC<{ setMessage: (message: string) => void }> = ({ setM
             <img
                 src="https://img.icons8.com/?size=100&id=17949&format=png&color=000000"
                 alt="Google logo"
-                className="h-6 w-6  mr-2"/>
+                className="h-6 w-6 mr-2"/>
             Login with Google
         </button>
     );

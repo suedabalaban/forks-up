@@ -1,16 +1,16 @@
 import {Link, useNavigate} from "react-router-dom";
 import EmailSignUp from "../components/EmailSignUp";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import GoogleLogin from "../components/GoogleLogin";
 import {ArrowLeft} from "lucide-react";
 
 const SignUp = () => {
     const [message, setMessage] = useState<string>("");
-    const navigate = useNavigate(); // useNavigate kancasını kullanarak yönlendirme işlemi
 
-    const handleGoBack = () => {
-        navigate("/"); // Ana sayfaya yönlendir
-    };
+    const navigate = useNavigate();
+
+    const handleGoBack = () => {navigate("/");};
+
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-100">
@@ -18,7 +18,7 @@ const SignUp = () => {
                 onClick={handleGoBack}
                 className="absolute top-4 left-4 flex items-center text-gray-600 hover:text-gray-800 transition duration-200"
             >
-                <ArrowLeft className="mr-2"/> {/* Sol tarafta simge */}
+                <ArrowLeft className="mr-2"/>
                 Back
             </button>
             <div className="bg-white shadow-2xl rounded-lg p-8 w-full max-w-md space-y-6">

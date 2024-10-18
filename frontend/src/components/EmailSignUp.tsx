@@ -21,7 +21,6 @@ const EmailSignUp: React.FC<{ setMessage: (message: string) => void }> = ({ setM
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 console.log('User created:', userCredential.user);
-                navigate('/user');
             })
             .catch((error) => {
                 console.error('Error during sign-up:', error);
