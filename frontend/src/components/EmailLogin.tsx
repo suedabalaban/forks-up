@@ -1,63 +1,62 @@
-import React from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from './firebaseconfig'; 
+import React, { useState } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import {auth} from "./firebaseconfig";
+import {ArrowLeft, ArrowRight, Lock, Mail} from "lucide-react";
 
-interface EmailLoginProps {
-    isRegistering: boolean;
-    email: string;
-    password: string;
-    setEmail: (email: string) => void;
-    setPassword: (password: string) => void;
-    setMessage: (message: string) => void;
-    setIsRegistering: (registering: boolean) => void;
-    sendVerificationEmail: () => Promise<void>;
-}
+const EmailLogin: React.FC<{ setMessage: (message: string) => void }> = ({ setMessage }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
-const EmailLogin: React.FC<EmailLoginProps> = ({
-    isRegistering,
-    email,
-    password,
-    setEmail,
-    setPassword,
-    setMessage,
-    setIsRegistering,
-    sendVerificationEmail,
-}) => {
-    const handleLogin = async () => {
-        try {
-            if (isRegistering) {
-                await createUserWithEmailAndPassword(auth, email, password);
-                await sendVerificationEmail();
-            } else {
-                await signInWithEmailAndPassword(auth, email, password);
-                setMessage("Login successful!");
-            }
-        } catch (error) {
-            console.error("Error logging in", error);
-            setMessage("Failed to log in. Please try again.");
-        }
+    // E-posta ve şifre ile giriş işlemi
+    const handleEmailLogin = (e: any) => {
+        e.preventDefault();
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                console.log('Logged in with email:', userCredential.user);
+                navigate('/user'); // Girişten sonra /user sayfasına yönlendir
+            })
+            .catch((error) => {
+                console.error('Error during email sign-in:', error);
+                setMessage(error.message); // Hata varsa göster
+            });
     };
 
     return (
-        <div>
-            <h2>{isRegistering ? "Register" : "Login"}</h2>
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-            />
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-            />
-            <button onClick={handleLogin}>{isRegistering ? "Register" : "Login"}</button>
-            <button onClick={() => setIsRegistering(!isRegistering)}>
-                {isRegistering ? "Switch to Login" : "Switch to Register"}
+        <form onSubmit={handleEmailLogin} className="space-y-4">
+
+            <div className="relative">
+
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20}/>
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                />
+            </div>
+            <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20}/>
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                />
+            </div>
+            <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 ease-in-out flex items-center justify-center"
+            >
+                Login
+                <ArrowRight className="ml-2" size={20}/>
             </button>
-        </div>
+        </form>
     );
 };
 

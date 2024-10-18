@@ -5,12 +5,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/private/forks-up")
-public class ForksUpController {
+@RequestMapping("/api/public")
+public class PublicController {
 
     @GetMapping("")
-    public String getPrivate() {
-        return "Private u need access token babe";
+    public String getTest() {
+        return "kayitli kullaniciyim ama email dogrulamam yok gorebilirim";
     }
 
 }
