@@ -2,24 +2,22 @@ import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import {auth} from "./firebaseconfig";
-import {ArrowLeft, ArrowRight, Lock, Mail} from "lucide-react";
+import {ArrowRight, Lock, Mail} from "lucide-react";
 
 const EmailLogin: React.FC<{ setMessage: (message: string) => void }> = ({ setMessage }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    // E-posta ve şifre ile giriş işlemi
     const handleEmailLogin = (e: any) => {
         e.preventDefault();
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 console.log('Logged in with email:', userCredential.user);
-                navigate('/user'); // Girişten sonra /user sayfasına yönlendir
             })
             .catch((error) => {
                 console.error('Error during email sign-in:', error);
-                setMessage(error.message); // Hata varsa göster
+                setMessage(error.message);
             });
     };
 

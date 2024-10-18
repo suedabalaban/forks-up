@@ -1,7 +1,9 @@
-export const Home = () => {
+const Home= () => {
     return (
         <h2 className="bg-gradient-to-br from-blue-100 to-purple-100 flex-grow flex items-center justify-center">
             Unsigned Home Page
         </h2>
-    )
+    );
 }
+
+export default Home;
