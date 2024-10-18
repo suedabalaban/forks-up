@@ -3,4 +3,6 @@ spring:
     name: forksup
   data:
     mongodb:
-      uri: mongodb://localhost:27017/testdb
+      uri: mongodb://myUser:myPassword@138.3.251.32:27017/test
+      username: myUser
+      password: myPassword
