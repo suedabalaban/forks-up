@@ -6,7 +6,7 @@ import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
 import {useEffect, useState} from "react";
 import {onAuthStateChanged} from "firebase/auth";
-import {auth} from "./components/firebaseconfig";
+import {auth} from "./config/firebaseconfig";
 
 const App: React.FC = () => {
     return (

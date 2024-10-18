@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { User, onAuthStateChanged, signOut } from 'firebase/auth';
-import {auth} from "../components/firebaseconfig";
+import {auth} from "../config/firebaseconfig";
 
 const Layout: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);

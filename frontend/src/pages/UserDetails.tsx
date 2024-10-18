@@ -1,4 +1,4 @@
-import {auth} from "../components/firebaseconfig";
+import {auth} from "../config/firebaseconfig";
 
 export const UserDetails = () => {
     return (
