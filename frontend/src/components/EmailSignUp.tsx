@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
 import { auth } from "../config/firebaseconfig";
 import { Mail, Lock } from 'lucide-react';
 
@@ -8,7 +7,6 @@ const EmailSignUp: React.FC<{ setMessage: (message: string) => void }> = ({ setM
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const navigate = useNavigate();
 
     const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

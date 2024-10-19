@@ -1,5 +1,5 @@
 import React from 'react';
-import { GoogleAuthProvider, signInWithPopup, getRedirectResult } from 'firebase/auth';
+import { signInWithPopup, getRedirectResult } from 'firebase/auth';
 import { auth, googleProvider} from '../config/firebaseconfig'; 
 
 const GoogleLogin: React.FC<{ setMessage: (message: string) => void }> = ({ setMessage }) => {

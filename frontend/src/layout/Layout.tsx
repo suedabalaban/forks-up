@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import {auth} from "../config/firebaseconfig";
+import {UserRound} from "lucide-react";
 
 const Layout: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -32,13 +33,17 @@ const Layout: React.FC = () => {
                         <li className="flex flex-row">
                             <button
                                 onClick={handleLogout}
-                                className="text-black h-10 border border-black pl-5 pr-5 hover:bg-purple-300 transition duration-300"
+                                className="text-black h-10 border border-black pl-3 pr-3 hover:bg-purple-300 transition duration-300"
                             >
                                 Log Out
                             </button>
+                            {
+                                user.photoURL ?
+                                    <img src={user?.photoURL!} alt="User" className="ml-5 h-10 rounded-full"/>
+                                    :
+                                    <UserRound className="ml-5 h-10 w-10 p-1  border-2 border-black rounded-full"/>
 
-                            <img src={user?.photoURL!} alt="User" className="ml-5 h-10 rounded-full" />
-
+                            }
                         </li>
                     ) : (
                         <>
@@ -51,7 +56,7 @@ const Layout: React.FC = () => {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/signup">
+                                <Link to="/sign-up">
                                     <button
                                         className="mr-3 ml-3 text-black h-10 pl-5 pr-5 hover:bg-purple-300 transition duration-300"
                                     >

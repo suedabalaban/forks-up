@@ -7,18 +7,25 @@ import Home from "./pages/Home";
 import {useEffect, useState} from "react";
 import {onAuthStateChanged} from "firebase/auth";
 import {auth} from "./config/firebaseconfig";
+import LoginLayout from "./layout/LoginLayout";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const App: React.FC = () => {
     return (
         <>
             <Routes>
+
                 <Route path="/" element={<Layout />}>
                     <Route path="/" element={<Home />} />
                     <Route path="/user" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
                 </Route>
 
-                <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-                <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} />
+                <Route path="/" element={<LoginLayout/>}>
+                    <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                    <Route path="/sign-up" element={<PublicRoute><SignUp /></PublicRoute>} />
+                    <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+                </Route>
+
             </Routes>
         </>
     );
