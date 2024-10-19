@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import EmailLogin from "../components/EmailLogin";
 import { Link, useNavigate, Navigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { auth } from "../components/firebaseconfig";
+import { auth } from "../config/firebaseconfig";
 import { onAuthStateChanged } from "firebase/auth";
 
 const Login = () => {

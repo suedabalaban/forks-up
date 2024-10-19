@@ -1,18 +1,37 @@
 import React from 'react';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from './firebaseconfig'; 
+import { GoogleAuthProvider, signInWithPopup, getRedirectResult } from 'firebase/auth';
+import { auth, googleProvider} from '../config/firebaseconfig'; 
 
 const GoogleLogin: React.FC<{ setMessage: (message: string) => void }> = ({ setMessage }) => {
+    googleProvider.setCustomParameters({
+        prompt: "select_account"
+    });
+
     const handleGoogleLogin = async () => {
-        const provider = new GoogleAuthProvider();
         try {
-            await signInWithPopup(auth, provider);
+            await signInWithPopup(auth, googleProvider);
             setMessage("Google login successful!");
         } catch (error) {
             console.error("Error logging in with Google", error);
             setMessage("Failed to log in with Google. Please try again.");
         }
     };
+
+    React.useEffect(() => {
+        const fetchRedirectResult = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result) {
+                    setMessage("Google login successful!");
+                }
+            } catch (error) {
+                console.error("Error getting redirect result", error);
+                setMessage("Failed to log in with Google. Please try again.");
+            }
+        };
+        
+        fetchRedirectResult();
+    }, [setMessage]);
 
     return (
         <button

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import {auth} from "./firebaseconfig";
+import {auth} from "../config/firebaseconfig";
 import {ArrowRight, Lock, Mail} from "lucide-react";
 
 const EmailLogin: React.FC<{ setMessage: (message: string) => void }> = ({ setMessage }) => {
