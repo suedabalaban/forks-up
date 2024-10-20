@@ -11,7 +11,7 @@ const LoginLayout: React.FC = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-100">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-100 to-blue-100">
 
             <div className="bg-white shadow-2xl rounded-lg p-8 w-full max-w-md space-y-4">
                 <Button

@@ -3,6 +3,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import {auth} from "../config/firebaseconfig";
 import {UserRound} from "lucide-react";
+import Button from "@mui/material/Button";
 
 const Layout: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -17,11 +18,14 @@ const Layout: React.FC = () => {
     }, []);
 
     const handleLogout = async () => {
-        try {
-            await signOut(auth);
-            navigate('/');
-        } catch (error) {
-            console.error('Error signing out: ', error);
+        const confirmLogout = window.confirm("Are you sure you want to log out?");
+        if (confirmLogout) {
+            try {
+                await signOut(auth);
+                navigate('/');
+            } catch (error) {
+                console.error('Error signing out: ', error);
+            }
         }
     };
 
@@ -31,12 +35,13 @@ const Layout: React.FC = () => {
                 <ul className="flex items-center justify-end pr-1">
                     {user ? (
                         <li className="flex flex-row">
-                            <button
+                            <Button
+                                variant={"outlined"}
+                                className={"h-10"}
                                 onClick={handleLogout}
-                                className="text-black h-10 border border-black pl-3 pr-3 hover:bg-purple-300 transition duration-300"
                             >
                                 Log Out
-                            </button>
+                            </Button>
                             {
                                 user.photoURL ?
                                     <img src={user?.photoURL!} alt="User" className="ml-5 h-10 rounded-full"/>
@@ -48,20 +53,23 @@ const Layout: React.FC = () => {
                     ) : (
                         <>
                             <li>
-                                <Link to="/login">
-                                    <button className="text-black h-10 border border-black pl-5 pr-5 hover:bg-purple-300 transition duration-300"
+                                <Link to="/login" className={"mr-3"}>
+                                    <Button
+                                        variant={"outlined"}
+                                        className={"h-10"}
                                     >
-                                        Login
-                                    </button>
+                                        Log In
+                                    </Button>
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/sign-up">
-                                    <button
-                                        className="mr-3 ml-3 text-black h-10 pl-5 pr-5 hover:bg-purple-300 transition duration-300"
+                                <Link to="/sign-up" className={"mr-3"}>
+                                    <Button
+                                        variant={"text"}
+                                        className={"h-10"}
                                     >
                                         Sign Up
-                                    </button>
+                                    </Button>
                                 </Link>
                             </li>
                         </>

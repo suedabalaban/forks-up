@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { signInWithPopup, getRedirectResult } from 'firebase/auth';
 import { auth, googleProvider} from '../config/firebaseconfig'; 
 
@@ -17,7 +17,7 @@ const GoogleLoginButton: React.FC<{ setMessage: (message: string) => void }> = (
         }
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchRedirectResult = async () => {
             try {
                 const result = await getRedirectResult(auth);

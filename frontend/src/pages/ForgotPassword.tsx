@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {Link} from "react-router-dom";
-import {ArrowRight, Mail} from "lucide-react";
+import {Mail} from "lucide-react";
 import {sendPasswordResetEmail} from "firebase/auth";
 import {auth} from "../config/firebaseconfig";
 import Button from "@mui/material/Button";
