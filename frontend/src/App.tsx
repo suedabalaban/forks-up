@@ -9,21 +9,23 @@ import {onAuthStateChanged} from "firebase/auth";
 import {auth} from "./config/firebaseconfig";
 import LoginLayout from "./layout/LoginLayout";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const App: React.FC = () => {
     return (
         <>
             <Routes>
 
-                <Route path="/" element={<Layout />}>
+                <Route path="/" element={<Layout />} >
                     <Route path="/" element={<Home />} />
                     <Route path="/user" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
                 </Route>
 
-                <Route path="/" element={<LoginLayout/>}>
-                    <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-                    <Route path="/sign-up" element={<PublicRoute><SignUp /></PublicRoute>} />
-                    <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+                <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>} >
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/sign-up" element={<SignUp />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                 </Route>
 
             </Routes>

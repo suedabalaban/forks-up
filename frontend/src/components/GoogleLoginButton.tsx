@@ -2,7 +2,7 @@ import React from 'react';
 import { signInWithPopup, getRedirectResult } from 'firebase/auth';
 import { auth, googleProvider} from '../config/firebaseconfig'; 
 
-const GoogleLogin: React.FC<{ setMessage: (message: string) => void }> = ({ setMessage }) => {
+const GoogleLoginButton: React.FC<{ setMessage: (message: string) => void }> = ({ setMessage }) => {
     googleProvider.setCustomParameters({
         prompt: "select_account"
     });
@@ -47,4 +47,4 @@ const GoogleLogin: React.FC<{ setMessage: (message: string) => void }> = ({ setM
     );
 };
 
-export default GoogleLogin;
+export default GoogleLoginButton;
