@@ -2,7 +2,7 @@ import {Link} from "react-router-dom";
 import React, {useState} from "react";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import {ArrowRight, Lock, Mail} from "lucide-react";
-import {createUserWithEmailAndPassword} from "firebase/auth";
+import {createUserWithEmailAndPassword, sendEmailVerification} from "firebase/auth";
 import {auth} from "../config/firebaseconfig";
 import Button from "@mui/material/Button";
 
@@ -23,6 +23,15 @@ const SignUp = () => {
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 console.log('User created:', userCredential.user);
+                sendEmailVerification(userCredential.user).then(
+                    () => {
+                        setMessage("Account created successfully. Please check your email to verify your account.");
+                    }
+                ).catch((error) => {
+                    console.error('Error during sign-up:', error);
+                    setMessage(error.message);
+                })
+                setMessage("Account created successfully. Please check your email to verify your account.");
             })
             .catch((error) => {
                 console.error('Error during sign-up:', error);
