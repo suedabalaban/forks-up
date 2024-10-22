@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/api/recipes/**").permitAll()
                         .requestMatchers("/api/public/**").hasRole("USER")
                         .requestMatchers("/api/private/**").hasRole("VERIFIED")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
