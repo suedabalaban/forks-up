@@ -18,10 +18,12 @@ public class RecipeController {
 
     // Find recipe by their ObjectId
     @GetMapping("/{id}")
-    public Recipe getRecipeById(@PathVariable("id") String id) {
+    public ResponseEntity<Recipe> getRecipeById(@PathVariable("id") String id) {
         ObjectId idObj = new ObjectId(id);
         Recipe r = recipeRepository.findById(idObj).orElse(null);
-        System.out.println(r.getSearchTerms());
-        return r;
+        if (r == null) {
+            new ResponseEntity<>(null, null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(r, null, HttpStatus.OK);
     }
 }
