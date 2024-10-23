@@ -16,14 +16,22 @@ public class RecipeController {
     @Autowired
     private RecipeRepository recipeRepository;
 
-    // Find recipe by their ObjectId
     @GetMapping("/{id}")
     public ResponseEntity<Recipe> getRecipeById(@PathVariable("id") String id) {
-        ObjectId idObj = new ObjectId(id);
-        Recipe r = recipeRepository.findById(idObj).orElse(null);
-        if (r == null) {
-            new ResponseEntity<>(null, null, HttpStatus.NOT_FOUND);
+        if (id == null || id.length() != 24) {
+            return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(r, null, HttpStatus.OK);
+        try {
+            ObjectId idObj = new ObjectId(id);
+            Recipe recipe = recipeRepository.findById(idObj).orElse(null);
+
+            if (recipe == null) {
+                return new ResponseEntity<>(null, null, HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(recipe, null, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);
+        }
     }
 }
