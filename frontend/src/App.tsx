@@ -16,12 +16,15 @@ const App: React.FC = () => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
-                 if (currentUser.metadata.creationTime === currentUser.metadata.lastSignInTime) {
+                const isFirstLogin = !localStorage.getItem(`userRegistered_${currentUser.uid}`);
+                 if ((currentUser.metadata.creationTime === currentUser.metadata.lastSignInTime) && isFirstLogin ) {
                      currentUser.getIdToken().then((token) => {
                          axios.put("http://localhost:8080/api/user", null , {
                              headers: {
                                  "Authorization": `Bearer ${token}`
                              }
+                         }).then(() => {
+                             localStorage.setItem(`userRegistered_${currentUser.uid}`, 'true');
                          }).catch((e) => {
                              console.error(e);
                          })
