@@ -24,8 +24,13 @@ public class UserService {
 
     public Boolean insertUser(User user) {
         try {
+            User u = userRepository.findUserByFirebaseId(user.getFirebaseId()).orElse(null);
+            if (u != null) {
+                return false;
+            }
             userRepository.insert(user);
         } catch (Exception e) {
+            System.out.println(e);
             return false;
         }
         return true;

@@ -5,9 +5,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-
-import java.util.List;
-
 @Document(collection = "users")
 public class User {
 
@@ -15,13 +12,22 @@ public class User {
     private ObjectId id;
 
     @Field("firebase_id")
-    private String firebase_id;
+    private String firebaseId;
 
     @Field("preferences")
     private Preferences preferences;
 
     @Field("ingredients")
     private Ingredients ingredients;
+
+    public User() {}
+
+    public User(ObjectId id, String firebaseId, Preferences preferences, Ingredients ingredients) {
+        this.id = id;
+        this.firebaseId = firebaseId;
+        this.preferences = preferences;
+        this.ingredients = ingredients;
+    }
 
     public ObjectId get_id() {
         return id;
@@ -31,12 +37,12 @@ public class User {
         this.id = id;
     }
 
-    public String getFirebase_id() {
-        return firebase_id;
+    public String getFirebaseId() {
+        return firebaseId;
     }
 
-    public void setFirebase_id(String firebase_id) {
-        this.firebase_id = firebase_id;
+    public void setFirebaseId(String firebaseId) {
+        this.firebaseId = firebaseId;
     }
 
     public Ingredients getIngredients() {

@@ -34,7 +34,9 @@ public class UserController {
     public ResponseEntity<String> createUser(HttpServletRequest request) {
         try {
             FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-            System.out.println(firebaseToken.getName());
+            if (!userService.insertUser(new User(null, firebaseToken.getUid(), null, null))) {
+                return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);
         }
