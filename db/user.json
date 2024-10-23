@@ -1,0 +1,26 @@
+{
+    "firebase_id" : "",
+    "preferences" : {
+        "dietary_restrictions" : {
+            "health_conscious" : [],
+            "allergies_intolerances" : [],
+            "lifestyle": []
+        },
+        "cuisines": [],
+        "preparation_time": "",
+    },
+    "ingredients": {
+        "proteins": {
+            "meat": {
+                "beef": [],
+                "pork": [],
+                "poultry": [],
+                "game": [],
+            },
+            "vegetables": [],
+            "fruits": [],
+            "grains": [],
+            "dairy": []
+        }
+    }
+}

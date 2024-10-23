@@ -3,6 +3,7 @@ package com.example.forksup.model;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
@@ -11,15 +12,25 @@ public class Recipe {
 
     @Id
     private ObjectId id;
-    private Long recipeId;  
+    @Field("id")
+    private Long recipeId;
+    @Field("name")
     private String name;
+    @Field("description")
     private String description;
+    @Field("ingredients")
     private List<String> ingredients;
+    @Field("ingredients_raw_str")
     private List<String> ingredientsRawStr;
+    @Field("serving_size")
     private String servingSize;
+    @Field("servings")
     private int servings;
+    @Field("steps")
     private List<String> steps;
+    @Field("tags")
     private List<String> tags;
+    @Field("search_terms")
     private List<String> searchTerms;
 
     // Constructors

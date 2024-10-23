@@ -1,8 +1,0 @@
-spring:
-  application:
-    name: forksup
-  data:
-    mongodb:
-      uri: mongodb://myUser:myPassword@138.3.251.32:27017/test
-      username: myUser
-      password: myPassword

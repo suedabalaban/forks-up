@@ -2,6 +2,7 @@ package com.example.forksup.config;
 
 
 import com.example.forksup.filter.FirebaseAuthenticationFilter;
+import org.junit.jupiter.api.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ public class SecurityConfig {
     private FirebaseAuthenticationFilter firebaseTokenFilter;
 
     @Bean
+    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
@@ -32,7 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .headers(headers -> headers
                         .frameOptions(frameOptions -> frameOptions.deny())
