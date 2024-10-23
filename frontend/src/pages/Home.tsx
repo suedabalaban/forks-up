@@ -1,7 +1,7 @@
 const Home= () => {
     return (
         <h2 className="bg-gradient-to-br from-blue-100 to-purple-100 flex-grow flex items-center justify-center">
-            Unsigned Home Page
+            Home Page
         </h2>
     );
 }

@@ -9,30 +9,40 @@ import java.util.List;
 
 @Document(collection = "recipes")
 public class Recipe {
+
     @Id
     private ObjectId id;
+
     @Field("id")
     private Long recipeId;
+
     @Field("name")
     private String name;
+
     @Field("description")
     private String description;
+
     @Field("ingredients")
     private List<String> ingredients;
+
     @Field("ingredients_raw_str")
     private List<String> ingredientsRawStr;
+
     @Field("serving_size")
     private String servingSize;
+
     @Field("servings")
     private int servings;
+
     @Field("steps")
     private List<String> steps;
+
     @Field("tags")
     private List<String> tags;
+
     @Field("search_terms")
     private List<String> searchTerms;
 
-    // Constructors
     public Recipe() {}
 
     public Recipe(ObjectId id, Long recipeId, String name, String description, List<String> ingredients, 
@@ -51,7 +61,6 @@ public class Recipe {
         this.searchTerms = searchTerms;
     }
 
-    // Getters and Setters
     public ObjectId getId() {
         return id;
     }
@@ -139,4 +148,5 @@ public class Recipe {
     public void setSearchTerms(List<String> searchTerms) {
         this.searchTerms = searchTerms;
     }
+
 }

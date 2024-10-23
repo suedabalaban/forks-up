@@ -65,6 +65,7 @@ const ForgotPassword: React.FC = () => {
                 </div>
             )}
 
+
             <div className="text-center flex flex-row justify-center space-x-1.5">
                 <h1 className="">
                     Remember the password?

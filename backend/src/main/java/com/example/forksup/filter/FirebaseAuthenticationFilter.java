@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,9 +35,11 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
             String token = authorizationHeader.substring(7);
             try {
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+                HttpSession session = request.getSession();
+                session.setAttribute("FirebaseToken", decodedToken);
+
                 String uid = decodedToken.getUid();
                 boolean emailVerified = decodedToken.isEmailVerified();
-
                 List<GrantedAuthority> authorities = new ArrayList<>();
                 authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
                 if (emailVerified) {
