@@ -10,8 +10,28 @@ import {auth} from "./config/firebaseconfig";
 import LoginLayout from "./layout/LoginLayout";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import axios from "axios";
 
 const App: React.FC = () => {
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                 if (currentUser.metadata.creationTime === currentUser.metadata.lastSignInTime) {
+                     currentUser.getIdToken().then((token) => {
+                         axios.put("http://localhost:8080/api/user", null , {
+                             headers: {
+                                 "Authorization": `Bearer ${token}`
+                             }
+                         }).catch((e) => {
+                             console.error(e);
+                         })
+                     });
+                 }
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+
     return (
         <>
             <Routes>
@@ -20,8 +40,6 @@ const App: React.FC = () => {
                     <Route path="/" element={<Home />} />
                     <Route path="/user" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
                 </Route>
-
-
 
                 <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>} >
                     <Route path="/login" element={<Login />} />

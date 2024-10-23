@@ -10,17 +10,10 @@
         "preparation_time": "",
     },
     "ingredients": {
-        "proteins": {
-            "meat": {
-                "beef": [],
-                "pork": [],
-                "poultry": [],
-                "game": [],
-            },
-            "vegetables": [],
-            "fruits": [],
-            "grains": [],
-            "dairy": []
-        }
+        "proteins": [],
+        "vegetables": [],
+        "fruits": [],
+        "grains": [],
+        "dairy": []
     }
 }
