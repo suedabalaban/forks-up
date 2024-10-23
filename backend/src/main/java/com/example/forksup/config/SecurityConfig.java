@@ -28,13 +28,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**", "/api/recipes/**").permitAll()
+                        .requestMatchers("/auth/**", "/api/recipes/**", "/api/user/**").permitAll()
                         .requestMatchers("/api/public/**").hasRole("USER")
                         .requestMatchers("/api/private/**").hasRole("VERIFIED")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .addFilterAt(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(firebaseTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .headers(headers -> headers
                         .frameOptions(frameOptions -> frameOptions.deny())

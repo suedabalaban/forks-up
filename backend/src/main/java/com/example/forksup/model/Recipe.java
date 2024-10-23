@@ -9,7 +9,6 @@ import java.util.List;
 
 @Document(collection = "recipes")
 public class Recipe {
-
     @Id
     private ObjectId id;
     @Field("id")

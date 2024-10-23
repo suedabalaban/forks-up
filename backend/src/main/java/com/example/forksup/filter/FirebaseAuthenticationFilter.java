@@ -22,7 +22,7 @@ import java.util.List;
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(
+    protected void doFilterInternal (
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain
@@ -42,12 +42,13 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                 if (emailVerified) {
                     authorities.add(new SimpleGrantedAuthority("ROLE_VERIFIED"));
                 }
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(uid, null, authorities);
 
-                // Set authentication with appropriate roles
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(uid, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (FirebaseAuthException e) {
                 SecurityContextHolder.clearContext();
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
         }
         filterChain.doFilter(request, response);
