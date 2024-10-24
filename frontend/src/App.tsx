@@ -11,20 +11,25 @@ import LoginLayout from "./layout/LoginLayout";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import axios from "axios";
+import SearchRecipes from "./pages/SearchRecipes";
+import Loading from "./pages/Loading";
 
 const App: React.FC = () => {
+    const [user, setUser] = useState<any>(null);
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if (currentUser) {
-                const isFirstLogin = !localStorage.getItem(`userRegistered_${currentUser.uid}`);
-                 if ((currentUser.metadata.creationTime === currentUser.metadata.lastSignInTime) || isFirstLogin ) {
-                     currentUser.getIdToken().then((token) => {
+            setUser(currentUser);
+            if (user) {
+                const isFirstLogin = !localStorage.getItem(`userRegistered_${user.uid}`);
+                 if ((user.metadata.creationTime === user.metadata.lastSignInTime) || isFirstLogin ) {
+                     user.getIdToken().then((token: any) => {
                          axios.put("http://localhost:8080/api/user", null , {
                              headers: {
                                  "Authorization": `Bearer ${token}`
                              }
                          }).then(() => {
-                             localStorage.setItem(`userRegistered_${currentUser.uid}`, 'true');
+                             localStorage.setItem(`userRegistered_${user.uid}`, 'true');
                          }).catch((e) => {
                              console.error(e);
                          })
@@ -33,7 +38,7 @@ const App: React.FC = () => {
             }
         });
         return () => unsubscribe();
-    }, []);
+    }, [user]);
 
     return (
         <>
@@ -42,6 +47,7 @@ const App: React.FC = () => {
                 <Route path="/" element={<Layout />} >
                     <Route path="/" element={<Home />} />
                     <Route path="/user" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
+                    <Route path="/search" element={<ProtectedRoute><SearchRecipes/></ProtectedRoute>}/>
                 </Route>
 
                 <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>} >
@@ -74,7 +80,7 @@ export const ProtectedRoute = ({ children}: any) => {
         return () => unsubscribe();
     }, []);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return  <Loading />;
 
     if (!user) return <Navigate to="/login" replace />;
 
@@ -94,7 +100,7 @@ export const PublicRoute = ({ children }: any) => {
         return () => unsubscribe();
     }, []);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <Loading />;
 
     if (user) return <Navigate to="/" replace />;
 
