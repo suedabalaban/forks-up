@@ -11,8 +11,6 @@ import com.example.forksup.repository.RecipeRepository;
 
 @Service
 public class RecipeService {
-    
-    private static final int MAX_RESULTS = 10;
 
     @Autowired
     private RecipeRepository recipeRepository;
