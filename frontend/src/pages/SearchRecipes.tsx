@@ -25,7 +25,7 @@ const SearchRecipes: React.FC = () => {
         setError(null);
 
         try {
-            const response = await fetch(`/api/recipes/search-regex/${searchTerm}`);
+            const response = await fetch(`http://localhost:8080/api/recipes/search-regex/${searchTerm}`);
             
             if (!response.ok) {
                 throw new Error('No recipes found');
