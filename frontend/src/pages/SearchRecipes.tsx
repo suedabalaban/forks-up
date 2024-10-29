@@ -6,7 +6,7 @@ type Recipe = {
     id: string;
     name: string;
     servings: number;
-    serving_size: string;
+    servingSize: string;
     ingredients?: string[];
     steps?: string[];
 };
