@@ -6,6 +6,12 @@ import com.example.forksup.service.RecipeService;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +27,9 @@ public class RecipeController {
 
     @Autowired
     private RecipeService recipeService;
+
+    @Autowired
+    private PagedResourcesAssembler<Recipe> pagedResourcesAssembler;
 
     @GetMapping("/{id}")
     public ResponseEntity<Recipe> getRecipeById(@PathVariable("id") String id) {
@@ -42,22 +51,33 @@ public class RecipeController {
     }
 
     //Criteria sınıfının regex() fonksiyonu kullanılarak yapılan arama
-    @GetMapping("/search-regex/{keyword}")
-public ResponseEntity<List<Recipe>> searchRecipesRegex(@PathVariable String keyword) {
-    try {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);
+    @GetMapping("/search-regex")
+    public ResponseEntity<PagedModel<EntityModel<Recipe>>> searchRecipesRegex(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        try {
+            // Boş veya null keyword kontrolü
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            // Sayfalama ayarlarını içeren Pageable nesnesi oluşturuluyor
+            Pageable pageable = PageRequest.of(page, size);
+
+            // RecipeService aracılığıyla regex araması gerçekleştirilip sonuçlar alınır
+            Page<Recipe> recipesPage = recipeService.searchRecipesByNameRegex(keyword, pageable);
+            PagedModel<EntityModel<Recipe>> pagedModel = pagedResourcesAssembler.toModel(recipesPage);            // Eğer sonuçlar boşsa NOT_FOUND durumuyla dönüş yap
+            if (recipesPage.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            // Başarılı durumunda, bulunan tarifleri içeren yanıt dönülür
+            return ResponseEntity.ok(pagedModel);
+        } catch (Exception e) {
+            // Beklenmeyen hata durumunda INTERNAL_SERVER_ERROR dönülür
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        
-        List<Recipe> recipes = recipeService.searchRecipesByNameRegex(keyword);
-        
-        if (recipes.isEmpty()) {
-            return new ResponseEntity<>(null, null, HttpStatus.NOT_FOUND);
-        }
-        
-        return new ResponseEntity<>(recipes, null, HttpStatus.OK);
-    } catch (Exception e) {
-        return new ResponseEntity<>(null, null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-}
 }

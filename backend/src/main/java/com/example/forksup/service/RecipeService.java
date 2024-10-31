@@ -3,6 +3,8 @@ package com.example.forksup.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +21,8 @@ public class RecipeService {
     private MongoTemplate mongoTemplate;
 
     //criteria.regex
-    public List<Recipe> searchRecipesByNameRegex(String keyword) {
-        return recipeRepository.findByNameRegex(keyword);
+    public Page<Recipe> searchRecipesByNameRegex(String keyword, Pageable pageable) {
+        return recipeRepository.findByNameRegex(keyword, pageable);
     }
 }
  

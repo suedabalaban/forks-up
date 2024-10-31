@@ -3,6 +3,9 @@ package com.example.forksup.implement;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.repository.CustomRecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -13,7 +16,6 @@ import java.util.List;
 @Repository
 public class CustomRecipeRepositoryImpl implements CustomRecipeRepository {
     private final MongoTemplate mongoTemplate;
-    private static final int MAX_RESULTS = 10;
 
     @Autowired
     public CustomRecipeRepositoryImpl(MongoTemplate mongoTemplate){
@@ -21,11 +23,12 @@ public class CustomRecipeRepositoryImpl implements CustomRecipeRepository {
     }
 
     @Override
-    public List<Recipe> findByNameRegex(String keyword){
+    public Page<Recipe> findByNameRegex(String keyword, Pageable pageable){
         Query query = new Query();
-        query.addCriteria(Criteria.where("name")
-                .regex(keyword, "i"));
-        query.limit(MAX_RESULTS);
-        return mongoTemplate.find(query, Recipe.class);
+        query.addCriteria(Criteria.where("name").regex(keyword, "i"));
+        query.with(pageable);
+        List<Recipe> recipes = mongoTemplate.find(query, Recipe.class);
+        long count = mongoTemplate.count(query, Recipe.class);
+        return new PageImpl<>(recipes, pageable, count);
     }
 }

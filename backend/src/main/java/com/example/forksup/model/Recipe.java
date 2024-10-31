@@ -29,7 +29,7 @@ public class Recipe {
     private List<String> ingredientsRawStr;
 
     @Field("serving_size")
-    private String servingSize;
+    private String serving_size;
 
     @Field("servings")
     private int servings;
@@ -46,7 +46,7 @@ public class Recipe {
     public Recipe() {}
 
     public Recipe(ObjectId id, Long recipeId, String name, String description, List<String> ingredients, 
-                  List<String> ingredientsRawStr, String servingSize, int servings, List<String> steps, 
+                  List<String> ingredientsRawStr, String serving_size, int servings, List<String> steps,
                   List<String> tags, List<String> searchTerms) {
         this.id = id;
         this.recipeId = recipeId;
@@ -54,7 +54,7 @@ public class Recipe {
         this.description = description;
         this.ingredients = ingredients;
         this.ingredientsRawStr = ingredientsRawStr;
-        this.servingSize = servingSize;
+        this.serving_size = serving_size;
         this.servings = servings;
         this.steps = steps;
         this.tags = tags;
@@ -109,12 +109,12 @@ public class Recipe {
         this.ingredientsRawStr = ingredientsRawStr;
     }
 
-    public String getServingSize() {
-        return servingSize;
+    public String getserving_size() {
+        return serving_size;
     }
 
-    public void setServingSize(String servingSize) {
-        this.servingSize = servingSize;
+    public void setserving_size(String serving_size) {
+        this.serving_size = serving_size;
     }
 
     public int getServings() {
