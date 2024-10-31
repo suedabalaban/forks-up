@@ -25,6 +25,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.7.3'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'com.google.firebase:firebase-admin:9.3.0'
+	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 }
 
 tasks.named('test') {
