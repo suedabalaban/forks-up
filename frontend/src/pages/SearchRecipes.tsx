@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import RecipeCard from '../components/RecipeCard';
 import { Search } from 'lucide-react';
 
@@ -6,7 +6,7 @@ type Recipe = {
     id: string;
     name: string;
     servings: number;
-    servingSize: string;
+    serving_size: string;
     ingredients?: string[];
     steps?: string[];
 };
@@ -16,28 +16,54 @@ const SearchRecipes: React.FC = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState(0);
+    const [size] = useState(10); // Sayfa başına sonuç sayısı
+    const [totalPages, setTotalPages] = useState(0);
 
-    const handleSearch = async (e: FormEvent) => {
-        e.preventDefault();
+    const fetchRecipes = async () => {
         if (!searchTerm.trim()) return;
-
+    
         setLoading(true);
         setError(null);
-
+    
         try {
-            const response = await fetch(`http://localhost:8080/api/recipes/search-regex/${searchTerm}`);
-            
+            const response = await fetch(`http://localhost:8080/api/recipes/search-regex?keyword=${searchTerm}&page=${page}&size=${size}`);
             if (!response.ok) {
                 throw new Error('No recipes found');
             }
-
-            const data: Recipe[] = await response.json();
-            setRecipes(data);
+    
+            const data = await response.json();
+            setRecipes(data._embedded.recipeList || []); // `recipeList` anahtarını kullanarak veri içeriğini ayıkla
+            setTotalPages(data.page.totalPages || 0); // `totalPages` anahtarını ayıkla
         } catch (err: any) {
             setError(err.message);
             setRecipes([]);
         } finally {
             setLoading(false);
+        }
+    };
+    
+
+    useEffect(() => {
+        if (searchTerm) fetchRecipes();
+    }, [page, searchTerm]); // `page` ve `searchTerm` değiştiğinde tekrar arama yapar
+
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault();
+        setPage(0); // Yeni aramada sayfayı sıfırlıyoruz
+        fetchRecipes();
+    };
+
+    // Sayfa numarasını değiştirme işlemleri
+    const goToNextPage = () => {
+        if (page < totalPages - 1) {
+            setPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    const goToPreviousPage = () => {
+        if (page > 0) {
+            setPage((prevPage) => prevPage - 1);
         }
     };
 
@@ -84,6 +110,26 @@ const SearchRecipes: React.FC = () => {
                     {recipes.map((recipe) => (
                         <RecipeCard key={recipe.id} recipe={recipe} />
                     ))}
+                </div>
+            )}
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex justify-center mt-8">
+                    <button
+                        onClick={goToPreviousPage}
+                        disabled={page === 0}
+                        className="px-4 py-2 mx-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50"
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={goToNextPage}
+                        disabled={page === totalPages - 1}
+                        className="px-4 py-2 mx-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50"
+                    >
+                        Next
+                    </button>
                 </div>
             )}
 

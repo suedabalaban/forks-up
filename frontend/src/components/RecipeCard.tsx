@@ -4,7 +4,7 @@ type Recipe = {
     id: string;
     name: string;
     servings: number;
-    servingSize: string;
+    serving_size: string;
     ingredients?: string[];
     steps?: string[];
 };
@@ -19,7 +19,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
             <h3 className="text-xl font-semibold text-gray-800 mb-2">{recipe.name}</h3>
             <div className="text-gray-600">
                 <p className="mb-1">Servings: {recipe.servings}</p>
-                <p className="mb-1">Serving Size: {recipe.servingSize}</p>
+                <p className="mb-1">Serving Size: {recipe.serving_size}</p>
                 <div className="mt-2">
                     <span className="text-sm font-medium text-gray-700">Ingredients: </span>
                     <span className="text-sm text-gray-600">{recipe.ingredients?.length || 0}</span>
