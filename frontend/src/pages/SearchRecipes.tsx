@@ -45,9 +45,9 @@ const SearchRecipes: React.FC = () => {
     
 
     useEffect(() => {
-        if (searchTerm) fetchRecipes();
-    }, [page, searchTerm]); // `page` ve `searchTerm` değiştiğinde tekrar arama yapar
-
+        fetchRecipes();
+    }, [page]);
+    
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
         setPage(0); // Yeni aramada sayfayı sıfırlıyoruz
