@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CustomRecipeRepository{
+public interface CustomRecipeRepository {
     Page<Recipe> findByNameRegex(String keyword, Pageable pageable);
 }

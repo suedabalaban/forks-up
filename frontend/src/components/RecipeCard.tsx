@@ -34,3 +34,4 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 };
 
 export default RecipeCard;
+    

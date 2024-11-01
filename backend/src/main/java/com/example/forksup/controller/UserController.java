@@ -1,6 +1,8 @@
 package com.example.forksup.controller;
 
 
+import com.example.forksup.exception.ResourceNotFoundException;
+import com.example.forksup.model.Recipe;
 import com.example.forksup.model.User;
 import com.example.forksup.repository.UserRepository;
 import com.example.forksup.service.UserService;
@@ -12,7 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -20,8 +26,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
-    @GetMapping( path = "/{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") String id) {
         User u =  userService.getUserById(id);
         if (u == null) {
@@ -32,15 +40,39 @@ public class UserController {
 
     @PutMapping(path = "")
     public ResponseEntity<String> createUser(HttpServletRequest request) {
-        try {
-            FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-            if (!userService.insertUser(new User(null, firebaseToken.getUid(), null, null))) {
-                return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);
-            }
-        } catch (Exception e) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        User u = userService.insertUser(new User(
+                null,
+                firebaseToken.getUid(),
+                null,
+                null,
+                null)
+        );
+        if (u == null) {
             return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(null, null, HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/favorite/{recipeId}")
+    public ResponseEntity<String> addFavorite(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        userService.addRecipeToFavorites(firebaseToken.getUid(), recipeId);
+        return new ResponseEntity<>(null, null, HttpStatus.OK);
+    }
+
+    @DeleteMapping( path = "/favorite/{recipeId}")
+    public ResponseEntity<String> removeFavorite(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        userService.removeRecipeFromFavorites(firebaseToken.getUid(), recipeId);
+        return new ResponseEntity<>(null, null, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/favorite/all")
+    public ResponseEntity<List<Recipe>> getFavorites(HttpServletRequest request) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        List<Recipe> recipes = userService.getFavoriteRecipes(firebaseToken.getUid());
+        return new ResponseEntity<>(recipes, null, HttpStatus.OK);
     }
 
 }

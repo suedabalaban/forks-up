@@ -374,3 +374,57 @@
     ]
   }
 }
+
+{
+  "dietary_restrictions": {
+    "health_conscious": ["string"],
+    "allergies_intolerances": ["string"],
+    "lifestyle": ["string"]
+  },
+  "cuisines": {
+    "asian": ["string"],
+    "european": ["string"],
+    "middle_eastern": ["string"],
+    "american": ["string"],
+    "african": ["string"],
+    "latin_american": ["string"]
+  },
+  "courses": {
+    "main_dishes": ["string"],
+    "appetizers_sides": ["string"],
+    "breakfast_brunch": ["string"],
+    "desserts": ["string"],
+    "beverages": ["string"]
+  },
+  "occasions": {
+    "holidays": ["string"],
+    "special_occasions": ["string"]
+  },
+  "cooking_methods": {
+    "techniques": ["string"],
+    "equipment": ["string"]
+  },
+  "preparation_time": ["string"],
+  "main_ingredients": {
+    "proteins": {
+      "meat": {
+        "beef": ["string"],
+        "pork": ["string"],
+        "poultry": ["string"],
+        "game": ["string"],
+        "other_meats": ["string"]
+      },
+      "seafood": {
+        "fish": ["string"],
+        "shellfish": ["string"],
+        "other_seafood": ["string"]
+      },
+      "plant_based": ["string"]
+    },
+    "vegetables": ["string"],
+    "fruits": ["string"],
+    "grains": ["string"],
+    "dairy": ["string"]
+  }
+}
+

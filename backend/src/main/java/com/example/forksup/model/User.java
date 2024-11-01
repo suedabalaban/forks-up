@@ -2,8 +2,11 @@ package com.example.forksup.model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.List;
 
 @Document(collection = "users")
 public class User {
@@ -20,13 +23,25 @@ public class User {
     @Field("ingredients")
     private Ingredients ingredients;
 
+    @DBRef
+    @Field("favorites")
+    private List<Recipe> favorites;
+
     public User() {}
 
-    public User(ObjectId id, String firebaseId, Preferences preferences, Ingredients ingredients) {
+    public User (
+            ObjectId id,
+            String firebaseId,
+            Preferences preferences,
+            Ingredients ingredients,
+            List<Recipe> favorites
+    )
+    {
         this.id = id;
         this.firebaseId = firebaseId;
         this.preferences = preferences;
         this.ingredients = ingredients;
+        this.favorites = favorites;
     }
 
     public ObjectId get_id() {
@@ -60,5 +75,9 @@ public class User {
     public void setPreferences(Preferences preferences) {
         this.preferences = preferences;
     }
+
+    public List<Recipe> getFavorites() {return favorites;}
+
+    public void setFavorites(List<Recipe> favorites) {this.favorites = favorites;}
 
 }

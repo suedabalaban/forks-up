@@ -17,3 +17,21 @@
         "dairy": []
     }
 }
+
+{
+    "user_id": "string",
+    "meal_plan": [
+        {
+            "date": "string",
+            "meals": [
+                {
+                    "meal_type": "string",
+                    "recipe_id": "integer",
+                    "serving_size": "string",
+                    "preparation_time": "string",
+                    "notes": "string" 
+                }
+            ]
+        }
+    ]
+}
