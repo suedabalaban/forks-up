@@ -11,11 +11,14 @@ type Recipe = {
 
 type RecipeCardProps = {
     recipe: Recipe;
+    onClick: () => void;
 };
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe , onClick}) => {
     return (
-        <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+        <div onClick = {onClick}
+             className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
+        >
             <h3 className="text-xl font-semibold text-gray-800 mb-2">{recipe.name}</h3>
             <div className="text-gray-600">
                 <p className="mb-1">Servings: {recipe.servings}</p>
