@@ -13,5 +13,8 @@ import java.util.List;
 @Repository
 public interface RecipeRepository extends MongoRepository<Recipe, ObjectId>, CustomRecipeRepository {
     @Query(value = "{ 'name': { $regex: ?0, $options: 'i' } }")
-    List<Recipe> searchByNameContaining(String keyword, Pageable pageable);
+    List<Recipe> findFirstPage(String keyword, Pageable pageable);
+
+    @Query(value = "{ 'name': { $regex: ?0, $options: 'i' }, '_id': { $gt: ?1 } }")
+    List<Recipe> findNextPage(String keyword, ObjectId lastId, Pageable pageable);
 }
