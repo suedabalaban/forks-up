@@ -41,7 +41,7 @@ public class UserService {
         return u;
     }
 
-    public User addRecipeToFavorites(String firebaseId, String recipeId) {
+    public void addRecipeToFavorites(String firebaseId, String recipeId) {
         User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
@@ -55,10 +55,9 @@ public class UserService {
             u.getFavorites().add(r);
             userRepository.save(u);
         }
-        return u;
     }
 
-    public User removeRecipeFromFavorites(String firebaseId, String recipeId) {
+    public void removeRecipeFromFavorites(String firebaseId, String recipeId) {
         User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
@@ -67,7 +66,6 @@ public class UserService {
         );
         u.getFavorites().remove(r);
         userRepository.save(u);
-        return u;
     }
 
     public List<Recipe> getFavoriteRecipes(String firebaseId) {
@@ -75,6 +73,18 @@ public class UserService {
                 new ResourceNotFoundException("User not found")
         );
         return u.getFavorites();
+    }
+
+    public void addIngredient(String firebaseId, String ingredientId) {
+        User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+    }
+
+    public void addIngredients(String firebaseId) {
+        User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
     }
 
 }

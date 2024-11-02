@@ -6,12 +6,11 @@ import com.example.forksup.service.RecipeService;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/recipes/")
@@ -22,9 +21,6 @@ public class RecipeController {
 
     @Autowired
     private RecipeService recipeService;
-
-    @Autowired
-    private PagedResourcesAssembler<Recipe> pagedResourcesAssembler;
 
     @GetMapping("/{id}")
     public ResponseEntity<Recipe> getRecipeById(@PathVariable("id") String id) {
@@ -45,25 +41,14 @@ public class RecipeController {
         }
     }
 
-    //Criteria sınıfının regex() fonksiyonu kullanılarak yapılan arama
-    @GetMapping("/search-regex")
-    public ResponseEntity<PagedModel<EntityModel<Recipe>>> searchRecipesRegex(
+    @GetMapping("/search")
+    public ResponseEntity<List<Recipe>> searchRecipesRegex(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        // Boş veya null keyword kontrolü
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        // RecipeService aracılığıyla regex araması gerçekleştirilip sonuçlar alınır
-        PagedModel<EntityModel<Recipe>> pagedModel = recipeService.searchRecipesByNameRegex(keyword, page, size);
-
-        // Eğer sonuçlar boşsa NOT_FOUND durumuyla dönüş yap
-        if (pagedModel.getContent().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        // Başarılı durumda, bulunan tarifleri içeren yanıt dönülür
-        return ResponseEntity.ok(pagedModel);
+        List<Recipe> recipes = recipeService.searchRecipesByNameRegex(keyword, page, size);
+        return new ResponseEntity<>(recipes, null, HttpStatus.OK);
     }
+
 }

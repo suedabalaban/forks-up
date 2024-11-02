@@ -61,10 +61,10 @@ public class Recipe {
         this.searchTerms = searchTerms;
     }
 
-    public ObjectId getId() {
-        return id;
+    public String get_id() {
+        return id != null ? id.toHexString() : null;
     }
-
+    
     public void setId(ObjectId id) {
         this.id = id;
     }

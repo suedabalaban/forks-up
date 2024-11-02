@@ -44,8 +44,8 @@ public class User {
         this.favorites = favorites;
     }
 
-    public ObjectId get_id() {
-        return id;
+    public String get_id() {
+        return id != null ? id.toHexString() : null;
     }
 
     public void set_id(ObjectId id) {

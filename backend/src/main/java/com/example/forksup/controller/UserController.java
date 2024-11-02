@@ -1,21 +1,15 @@
 package com.example.forksup.controller;
 
-
-import com.example.forksup.exception.ResourceNotFoundException;
+import com.example.forksup.model.Ingredients;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.model.User;
 import com.example.forksup.repository.UserRepository;
 import com.example.forksup.service.UserService;
 import com.google.firebase.auth.FirebaseToken;
 import jakarta.servlet.http.HttpServletRequest;
-import org.bson.types.ObjectId;
-import org.mockito.internal.matchers.Null;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -73,6 +67,13 @@ public class UserController {
         FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
         List<Recipe> recipes = userService.getFavoriteRecipes(firebaseToken.getUid());
         return new ResponseEntity<>(recipes, null, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/pantry")
+    public ResponseEntity<List<Ingredients>> getPantry(HttpServletRequest request) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        //
+        return null;
     }
 
 }
