@@ -33,7 +33,6 @@ const SearchRecipes: React.FC = () => {
             }
             const data = await response.json();
             setRecipes(data);
-            // If we received fewer items than pageSize, we've reached the end
             setHasMore(data.length === pageSize);
         } catch (err: any) {
             setRecipes([]);
@@ -43,7 +42,7 @@ const SearchRecipes: React.FC = () => {
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
-        setPage(0); // Reset page when performing new search
+        setPage(0); 
         fetchRecipes();
     };
 

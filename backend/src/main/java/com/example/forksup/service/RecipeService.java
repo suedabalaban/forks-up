@@ -2,8 +2,8 @@ package com.example.forksup.service;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +19,7 @@ public class RecipeService {
     @Autowired
     RecipeRepository recipeRepository;
 
+    @Cacheable(value = "recipeSearchCache", key = "#keyword + #page + #size")
     public List<Recipe> searchRecipesByNameRegex(String keyword, int page, int size) {
         if (page == 0) {
             return recipeRepository.findFirstPage(keyword,
@@ -32,7 +33,7 @@ public class RecipeService {
             return Collections.emptyList();
         }
 
-        ObjectId lastId = previousPage.get(previousPage.size() - 1).getObjectId();
+        ObjectId lastId = previousPage.getLast().getObjectId();
 
         return recipeRepository.findNextPage(keyword, lastId,
                 PageRequest.of(0, size, Sort.by("_id").ascending()));

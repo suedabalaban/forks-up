@@ -11,10 +11,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface RecipeRepository extends MongoRepository<Recipe, ObjectId>, CustomRecipeRepository {
-    @Query(value = "{ 'name': { $regex: ?0, $options: 'i' } }")
+public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
+
+    @Query(value = "{$text: {$search: ?0}}")
     List<Recipe> findFirstPage(String keyword, Pageable pageable);
 
-    @Query(value = "{ 'name': { $regex: ?0, $options: 'i' }, '_id': { $gt: ?1 } }")
+    @Query(value = "{$and: [{$text: {$search: ?0}}, {_id: {$gt: ?1}}]}")
     List<Recipe> findNextPage(String keyword, ObjectId lastId, Pageable pageable);
+
 }
