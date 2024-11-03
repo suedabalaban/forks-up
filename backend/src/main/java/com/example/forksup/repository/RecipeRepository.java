@@ -13,10 +13,7 @@ import java.util.List;
 @Repository
 public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
 
-    @Query(value = "{$text: {$search: ?0}}")
-    List<Recipe> findFirstPage(String keyword, Pageable pageable);
-
-    @Query(value = "{$and: [{$text: {$search: ?0}}, {_id: {$gt: ?1}}]}")
-    List<Recipe> findNextPage(String keyword, ObjectId lastId, Pageable pageable);
+    @Query("{ $text: { $search: ?0 } }")
+    List<Recipe> findByNameTextSearch(String keyword, Pageable pageable);
 
 }

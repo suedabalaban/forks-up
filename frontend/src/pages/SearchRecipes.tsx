@@ -18,7 +18,7 @@ const SearchRecipes: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(12);
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
     const [hasMore, setHasMore] = useState(true);
 
@@ -42,7 +42,7 @@ const SearchRecipes: React.FC = () => {
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
-        setPage(0); 
+        setPage(0);
         fetchRecipes();
     };
 

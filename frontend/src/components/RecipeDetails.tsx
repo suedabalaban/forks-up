@@ -13,6 +13,7 @@ type Recipe = {
     ingredients?: string[];
     ingredientsRawStr?: string[];
     steps?: string[];
+    description?: string;
 };
 
 type RecipeDetailsProps = {
@@ -75,7 +76,10 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe,handleClosePopup}) 
                         />
                     </button>
                 </h3>
-                <div className="flex flex-row mb-2">
+                <p className="text-m text-gray-500 mb-3">
+                    {recipe.description}
+                </p>
+                <div className="flex flex-row mb-3">
                     <p className="mr-1 font-semibold">Servings: {recipe.servings}</p>
                     {Array.from(Array(recipe.servings % 2 == 1 ? (recipe.servings - 1) / 2 : recipe.servings / 2), (e, i) => {
                         return <Users key={i}/>;

@@ -47,7 +47,7 @@ public class RecipeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        List<Recipe> recipes = recipeService.searchRecipesByNameRegex(keyword, page, size);
+        List<Recipe> recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
         return new ResponseEntity<>(recipes, null, HttpStatus.OK);
     }
 
