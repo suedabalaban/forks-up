@@ -48,6 +48,13 @@ public class UserController {
         return new ResponseEntity<>(null, null, HttpStatus.OK);
     }
 
+    @GetMapping("/favorite/{recipeId}")
+    public ResponseEntity<Boolean> isRecipeInFavorites(HttpServletRequest request, @PathVariable String recipeId) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        boolean isFavorite = userService.isRecipeInFavorites(firebaseToken.getUid(), recipeId);
+        return ResponseEntity.ok(isFavorite);
+    }
+
     @PutMapping(path = "/favorite/{recipeId}")
     public ResponseEntity<String> addFavorite(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
         FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");

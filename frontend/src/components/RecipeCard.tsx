@@ -1,10 +1,7 @@
-import React, {useState} from 'react';
-import {Star, UserRound, Users} from "lucide-react";
-import {auth} from "../config/firebaseconfig";
-import axios from "axios";
+import {UserRound, Users} from "lucide-react";
 
 type Recipe = {
-    _id: Object;
+    id: Object;
     name: string;
     servings: number;
     serving_size: string;
@@ -40,11 +37,11 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
                 </div>
                 <p className="mb-1 flex flex-row mt-2">
                     <p className="mr-1">Servings: {recipe.servings}</p>
-                    {Array.from(Array(recipe.servings % 2 == 1 ? (recipe.servings - 1) / 2 : recipe.servings / 2), (e, i) => {
+                    {Array.from(Array(recipe.servings % 2 === 1 ? (recipe.servings - 1) / 2 : recipe.servings / 2), (e, i) => {
                         return <Users key={i}/>;
                     })}
                     {
-                        recipe.servings % 2 == 1 && <UserRound/>
+                        recipe.servings % 2 === 1 && <UserRound/>
                     }
                 </p>
             </div>

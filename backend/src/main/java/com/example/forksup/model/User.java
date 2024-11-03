@@ -44,11 +44,11 @@ public class User {
         this.favorites = favorites;
     }
 
-    public String get_id() {
+    public String getId() {
         return id != null ? id.toHexString() : null;
     }
 
-    public void set_id(ObjectId id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 

@@ -1,12 +1,11 @@
-import React, {useState} from "react";
-import {Close} from "@mui/icons-material";
-import {Star, UserRound, Users} from "lucide-react";
-import {auth} from "../config/firebaseconfig";
+import React, { useState, useEffect } from "react";
+import { Close } from "@mui/icons-material";
+import { Star, UserRound, Users } from "lucide-react";
+import { auth } from "../config/firebaseconfig";
 import axios from "axios";
 
-
 type Recipe = {
-    _id: string;
+    id: string;
     name: string;
     servings: number;
     serving_size: string;
@@ -21,30 +20,46 @@ type RecipeDetailsProps = {
     handleClosePopup: () => void;
 };
 
-const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe,handleClosePopup}) => {
+const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup}) => {
     const [isFavorite, setIsFavorite] = useState(false);
+    console.log(recipe.id);
+    useEffect(() => {
+        auth.currentUser?.getIdToken().then((token) => {
+            axios.get(`http://localhost:8080/api/user/favorite/${recipe.id}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+                .then((response) => {
+                    setIsFavorite(response.data);
+                })
+                .catch((e) => {
+                    console.error("Error checking favorite status:", e);
+                });
+        });
+    }, [recipe.id]);
 
     const toggleFavorite = () => {
         if (isFavorite) {
             auth.currentUser?.getIdToken().then((token) => {
-                axios.delete("http://localhost:8080/api/user/favorite/"+recipe._id, {
+                axios.delete(`http://localhost:8080/api/user/favorite/${recipe.id}`, {
                     headers: {
                         "Authorization": `Bearer ${token}`
                     }
                 }).catch((e) => {
                     console.error(e);
-                })
-            })
+                });
+            });
         } else {
             auth.currentUser?.getIdToken().then((token) => {
-                axios.put("http://localhost:8080/api/user/favorite/"+recipe._id, null, {
+                axios.put(`http://localhost:8080/api/user/favorite/${recipe.id}`, null, {
                     headers: {
                         "Authorization": `Bearer ${token}`
                     }
                 }).catch((e) => {
                     console.error(e);
-                })
-            })
+                });
+            });
         }
         setIsFavorite(!isFavorite);
     };
@@ -81,11 +96,11 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe,handleClosePopup}) 
                 </p>
                 <div className="flex flex-row mb-3">
                     <p className="mr-1 font-semibold">Servings: {recipe.servings}</p>
-                    {Array.from(Array(recipe.servings % 2 == 1 ? (recipe.servings - 1) / 2 : recipe.servings / 2), (e, i) => {
+                    {Array.from(Array(recipe.servings % 2 === 1 ? (recipe.servings - 1) / 2 : recipe.servings / 2), (e, i) => {
                         return <Users key={i}/>;
                     })}
                     {
-                        recipe.servings % 2 == 1 && <UserRound/>
+                        recipe.servings % 2 === 1 && <UserRound/>
                     }
                 </div>
                 <p className="font-semibold">Serving Size: {recipe.serving_size.slice(2)}</p>
@@ -108,7 +123,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe,handleClosePopup}) 
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default RecipeDetails;

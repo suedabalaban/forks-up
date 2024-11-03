@@ -75,6 +75,17 @@ public class UserService {
         return u.getFavorites();
     }
 
+    public boolean isRecipeInFavorites(String firebaseId, String recipeId) {
+        User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        if (u.getFavorites() == null) {return false;}
+        Recipe r = recipeRepository.findById(new ObjectId(recipeId)).orElseThrow(() ->
+                new ResourceNotFoundException("Recipe not found")
+        );
+        return u.getFavorites().contains(r);
+    }
+
     public void addIngredient(String firebaseId, String ingredientId) {
         User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
