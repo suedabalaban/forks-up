@@ -6,7 +6,6 @@
     "@auth0/auth0-react": "^2.2.4",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
-    "@google/generative-ai": "^0.21.0",
     "@mui/icons-material": "^6.1.4",
     "@mui/material": "^6.1.4",
     "@testing-library/jest-dom": "^5.17.0",
