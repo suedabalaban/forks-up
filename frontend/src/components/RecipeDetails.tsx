@@ -3,17 +3,7 @@ import { Close } from "@mui/icons-material";
 import { Star, UserRound, Users } from "lucide-react";
 import { auth } from "../config/firebaseconfig";
 import axios from "axios";
-
-type Recipe = {
-    id: string;
-    name: string;
-    servings: number;
-    serving_size: string;
-    ingredients?: string[];
-    ingredientsRawStr?: string[];
-    steps?: string[];
-    description?: string;
-};
+import {Recipe} from "../model/Recipe";
 
 type RecipeDetailsProps = {
     recipe: Recipe;
@@ -22,7 +12,6 @@ type RecipeDetailsProps = {
 
 const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup}) => {
     const [isFavorite, setIsFavorite] = useState(false);
-    console.log(recipe.id);
     useEffect(() => {
         auth.currentUser?.getIdToken().then((token) => {
             axios.get(`http://localhost:8080/api/user/favorite/${recipe.id}`, {

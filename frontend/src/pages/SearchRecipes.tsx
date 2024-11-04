@@ -3,17 +3,7 @@ import RecipeCard from '../components/RecipeCard';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import RecipeDetails from "../components/RecipeDetails";
 import LoadingPage from "./Loading";
-
-type Recipe = {
-    id: string;
-    name: string;
-    servings: number;
-    serving_size: string;
-    ingredients?: string[];
-    ingredientsRawStr?: string[];
-    steps?: string[];
-    description: string;
-};
+import {Recipe} from "../model/Recipe";
 
 const SearchRecipes: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');

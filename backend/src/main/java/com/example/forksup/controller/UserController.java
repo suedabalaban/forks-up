@@ -1,6 +1,6 @@
 package com.example.forksup.controller;
 
-import com.example.forksup.model.Ingredients;
+import com.example.forksup.model.Ingredient;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.model.User;
 import com.example.forksup.repository.UserRepository;
@@ -77,7 +77,7 @@ public class UserController {
     }
 
     @GetMapping(path = "/pantry")
-    public ResponseEntity<List<Ingredients>> getPantry(HttpServletRequest request) {
+    public ResponseEntity<List<Ingredient>> getPantry(HttpServletRequest request) {
         FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
         //
         return null;

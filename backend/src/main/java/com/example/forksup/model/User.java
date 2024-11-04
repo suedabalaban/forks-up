@@ -21,7 +21,7 @@ public class User {
     private Preferences preferences;
 
     @Field("ingredients")
-    private Ingredients ingredients;
+    private List<Ingredient> ingredients;
 
     @DBRef
     @Field("favorites")
@@ -33,7 +33,7 @@ public class User {
             ObjectId id,
             String firebaseId,
             Preferences preferences,
-            Ingredients ingredients,
+            List<Ingredient> ingredients,
             List<Recipe> favorites
     )
     {
@@ -60,11 +60,11 @@ public class User {
         this.firebaseId = firebaseId;
     }
 
-    public Ingredients getIngredients() {
+    public List<Ingredient> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(Ingredients ingredients) {
+    public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
     }
 

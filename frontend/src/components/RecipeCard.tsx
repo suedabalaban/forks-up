@@ -1,15 +1,5 @@
 import {UserRound, Users} from "lucide-react";
-
-type Recipe = {
-    id: Object;
-    name: string;
-    servings: number;
-    serving_size: string;
-    ingredients?: string[];
-    ingredientsRawStr?: string[];
-    steps?: string[];
-    description: string;
-};
+import {Recipe} from "../model/Recipe";
 
 type RecipeCardProps = {
     recipe: Recipe;
@@ -32,7 +22,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
                     <span className="text-sm font-medium text-gray-700">Ingredients: </span>
                     <span
                         className="text-sm text-gray-600">
-                        {recipe.ingredients?.map((ingredient) => (ingredient + " | "))}
+                        {recipe.ingredients.map((ingredient) => (ingredient.name + " | "))}
                     </span>
                 </div>
                 <p className="mb-1 flex flex-row mt-2">

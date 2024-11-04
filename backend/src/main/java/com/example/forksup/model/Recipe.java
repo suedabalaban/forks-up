@@ -2,8 +2,8 @@ package com.example.forksup.model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -26,8 +26,9 @@ public class Recipe {
     @Field("description")
     private String description;
 
+    @DBRef
     @Field("ingredients")
-    private List<String> ingredients;
+    private List<Ingredient> ingredients;
 
     @Field("ingredients_raw_str")
     private List<String> ingredientsRawStr;
@@ -49,7 +50,7 @@ public class Recipe {
 
     public Recipe() {}
 
-    public Recipe(ObjectId id, Long recipeId, String name, String description, List<String> ingredients, 
+    public Recipe(ObjectId id, Long recipeId, String name, String description, List<Ingredient> ingredients,
                   List<String> ingredientsRawStr, String serving_size, int servings, List<String> steps,
                   List<String> tags, List<String> searchTerms) {
         this.id = id;
@@ -110,11 +111,11 @@ public class Recipe {
         this.description = description;
     }
 
-    public List<String> getIngredients() {
+    public List<Ingredient> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(List<String> ingredients) {
+    public void setIngredients(List<Ingredient> ingredients) {
         this.ingredients = ingredients;
     }
 
@@ -126,11 +127,11 @@ public class Recipe {
         this.ingredientsRawStr = ingredientsRawStr;
     }
 
-    public String getserving_size() {
+    public String getServing_size() {
         return serving_size;
     }
 
-    public void setserving_size(String serving_size) {
+    public void setServing_size(String serving_size) {
         this.serving_size = serving_size;
     }
 

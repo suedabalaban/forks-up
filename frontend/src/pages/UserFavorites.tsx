@@ -4,17 +4,7 @@ import RecipeDetails from "../components/RecipeDetails";
 import axios from "axios";
 import {auth} from "../config/firebaseconfig";
 import LoadingPage from "./Loading";
-
-type Recipe = {
-    id: string;
-    name: string;
-    servings: number;
-    serving_size: string;
-    ingredients?: string[];
-    ingredientsRawStr?: string[];
-    steps?: string[];
-    description: string;
-};
+import {Recipe} from "../model/Recipe";
 
 const SearchRecipes: React.FC = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
