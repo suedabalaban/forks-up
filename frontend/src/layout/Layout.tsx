@@ -53,15 +53,9 @@ const Layout: React.FC = () => {
                             <div
                                 className="relative group"
                             >
-                                {user.photoURL && user.photoURL !== "" ? (
-                                    <img
-                                        src={user.photoURL}
-                                        alt="User"
-                                        className="ml-5 h-10 w-10 rounded-full cursor-pointer hover:opacity-90 transition-opacity"
-                                    />
-                                ) : (
+
                                     <UserRound className="ml-5 h-10 w-10 p-1 border-2 border-black rounded-full cursor-pointer hover:opacity-90 transition-opacity" />
-                                )}
+
 
                                 {/* Dropdown Menu */}
                                 <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 transition-all duration-300">

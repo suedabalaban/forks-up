@@ -15,28 +15,18 @@ public class DietaryRestrictions {
     @Field("lifestyle")
     private List<String> lifestyle;
 
-    public List<String> getHealthConscious() {
-        return healthConscious;
-    }
+    public List<String> getHealthConscious() {return healthConscious;}
 
-    public void setHealthConscious(List<String> healthConscious) {
-        this.healthConscious = healthConscious;
-    }
+    public void setHealthConscious(List<String> healthConscious) {this.healthConscious = healthConscious;}
 
-    public List<String> getAllergiesIntolerances() {
-        return allergiesIntolerances;
-    }
+    public List<String> getAllergiesIntolerances() {return allergiesIntolerances;}
 
     public void setAllergiesIntolerances(List<String> allergiesIntolerances) {
         this.allergiesIntolerances = allergiesIntolerances;
     }
 
-    public List<String> getLifestyle() {
-        return lifestyle;
-    }
+    public List<String> getLifestyle() {return lifestyle;}
 
-    public void setLifestyle(List<String> lifestyle) {
-        this.lifestyle = lifestyle;
-    }
+    public void setLifestyle(List<String> lifestyle) {this.lifestyle = lifestyle;}
 
 }

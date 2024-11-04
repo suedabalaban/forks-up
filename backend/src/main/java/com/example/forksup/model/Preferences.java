@@ -30,13 +30,9 @@ public class Preferences {
         this.cuisines = cuisines;
     }
 
-    public String getPreparation_time() {
-        return preparationTime;
-    }
+    public String getPreparation_time() {return preparationTime;}
 
-    public void setPreparation_time(String preparation_time) {
-        this.preparationTime = preparation_time;
-    }
+    public void setPreparation_time(String preparation_time) {this.preparationTime = preparation_time;}
 
 }
 

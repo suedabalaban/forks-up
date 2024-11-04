@@ -20,8 +20,8 @@ public class User {
     @Field("preferences")
     private Preferences preferences;
 
-    @Field("ingredients")
-    private List<Ingredient> ingredients;
+    @Field("pantry_items")
+    private List<PantryItem> pantryItems;
 
     @DBRef
     @Field("favorites")
@@ -33,24 +33,20 @@ public class User {
             ObjectId id,
             String firebaseId,
             Preferences preferences,
-            List<Ingredient> ingredients,
+            List<PantryItem> pantryItems,
             List<Recipe> favorites
     )
     {
         this.id = id;
         this.firebaseId = firebaseId;
         this.preferences = preferences;
-        this.ingredients = ingredients;
+        this.pantryItems = pantryItems;
         this.favorites = favorites;
     }
 
-    public String getId() {
-        return id != null ? id.toHexString() : null;
-    }
+    public String getId() {return id != null ? id.toHexString() : null;}
 
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
+    public void setId(ObjectId id) {this.id = id;}
 
     public String getFirebaseId() {
         return firebaseId;
@@ -60,12 +56,10 @@ public class User {
         this.firebaseId = firebaseId;
     }
 
-    public List<Ingredient> getIngredients() {
-        return ingredients;
-    }
+    public List<PantryItem> getPantryItems() {return pantryItems;}
 
-    public void setIngredients(List<Ingredient> ingredients) {
-        this.ingredients = ingredients;
+    public void setPantryItems(List<PantryItem> pantryItems) {
+        this.pantryItems = pantryItems;
     }
 
     public Preferences getPreferences() {

@@ -1,6 +1,7 @@
 package com.example.forksup.controller;
 
 import com.example.forksup.model.Ingredient;
+import com.example.forksup.model.PantryItem;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.model.User;
 import com.example.forksup.repository.UserRepository;
@@ -77,10 +78,39 @@ public class UserController {
     }
 
     @GetMapping(path = "/pantry")
-    public ResponseEntity<List<Ingredient>> getPantry(HttpServletRequest request) {
+    public ResponseEntity<List<PantryItem>> getUserPantry(HttpServletRequest request) {
         FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        //
-        return null;
+        List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseToken.getUid());
+        return ResponseEntity.ok(pantryItems);
+    }
+
+    @PostMapping(path = "/pantry")
+    public ResponseEntity<Void> addIngredientToPantry(
+            HttpServletRequest request,
+            @RequestParam String ingredientId,
+            @RequestParam Integer quantity) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        userService.addIngredientToPantry(firebaseToken.getUid(), ingredientId, quantity);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping(path = "/pantry/{ingredientId}")
+    public ResponseEntity<PantryItem> updateIngredientQuantity(
+            HttpServletRequest request,
+            @PathVariable String ingredientId,
+            @RequestParam Integer quantity) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        PantryItem updatedItem = userService.updateIngredientQuantity(firebaseToken.getUid(), ingredientId, quantity);
+        return ResponseEntity.ok(updatedItem);
+    }
+
+    @DeleteMapping(path = "/pantry/{ingredientId}")
+    public ResponseEntity<Void> removeIngredientFromPantry(
+            HttpServletRequest request,
+            @PathVariable String ingredientId) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        userService.removeIngredientFromPantry(firebaseToken.getUid(), ingredientId);
+        return ResponseEntity.noContent().build();
     }
 
 }

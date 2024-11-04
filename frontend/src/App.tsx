@@ -14,6 +14,7 @@ import axios from "axios";
 import SearchRecipes from "./pages/SearchRecipes";
 import Loading from "./pages/Loading";
 import UserFavorites from "./pages/UserFavorites";
+import UserIngredients from "./pages/PantryPage";
 
 const App: React.FC = () => {
     const [user, setUser] = useState<any>(null);
@@ -50,6 +51,7 @@ const App: React.FC = () => {
                     <Route path="/user" element={<ProtectedRoute><UserDetails /></ProtectedRoute>} />
                     <Route path="/search" element={<ProtectedRoute><SearchRecipes/></ProtectedRoute>}/>
                     <Route path="/favorites" element={<ProtectedRoute><UserFavorites/></ProtectedRoute>}/>
+                    <Route path="/pantry" element={<ProtectedRoute><UserIngredients/></ProtectedRoute>}/>
                 </Route>
 
                 <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>} >

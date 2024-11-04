@@ -2,8 +2,10 @@ package com.example.forksup.model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+@Document(collection = "ingredients")
 public class Ingredient {
 
     @Id
@@ -20,12 +22,8 @@ public class Ingredient {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() {return name;}
 
-    public void setIngredient(String name) {
-        this.name = name;
-    }
+    public void setIngredient(String name) {this.name = name;}
 
 }

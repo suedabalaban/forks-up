@@ -75,9 +75,7 @@ public class Recipe {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public int hashCode() {return Objects.hash(id);}
 
     public ObjectId getObjectId() {return id;}
 
