@@ -6,14 +6,13 @@ import com.example.forksup.service.RecipeService;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/recipes/")
+@RequestMapping("/api/recipes")
 public class RecipeController {
 
     @Autowired
@@ -42,12 +41,12 @@ public class RecipeController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Recipe>> searchRecipesRegex(
+    public ResponseEntity<Page<Recipe>> searchRecipesRegex(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "9") int size
     ) {
-        List<Recipe> recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
+        Page<Recipe> recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
         return new ResponseEntity<>(recipes, null, HttpStatus.OK);
     }
 

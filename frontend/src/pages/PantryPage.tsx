@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Search } from 'lucide-react'; // Lucide icon
+import { Search } from 'lucide-react';
 import { Dialog, DialogTitle, DialogActions, DialogContent, Button, TextField } from '@mui/material';
 import {Ingredient} from "../model/Ingredient";
 import {auth} from "../config/firebaseconfig";
@@ -20,8 +20,15 @@ const PantryPage: React.FC = () => {
     // Handle ingredient search
     const handleSearch = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/ingredients/search?keyword=${searchQuery}`);
-            setSearchResults(response.data);
+            auth.currentUser?.getIdToken().then((token: any) => {
+                axios.get(`http://localhost:8080/api/ingredients/search?keyword=${searchQuery}`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                }).then((data) => {
+                    setSearchResults(data.data)
+                })
+            })
         } catch (error) {
             console.error('Error fetching ingredients:', error);
         }
@@ -96,7 +103,6 @@ const PantryPage: React.FC = () => {
                 )}
             </div>
 
-            {/* Dialog for quantity selection */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <DialogTitle>Add to Pantry</DialogTitle>
                 <DialogContent>
@@ -118,6 +124,7 @@ const PantryPage: React.FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
         </div>
     );
 };

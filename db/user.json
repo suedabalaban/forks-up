@@ -35,3 +35,22 @@
         }
     ]
 }
+
+
+
+{
+    "id": "String",
+    "name": "String",
+    "description": "String",
+    "ingreditents": [
+        {
+            "quantity": Number,
+            "measurment": "String", //(liter, g, kg etc. i want you to change the measurment to the metric system)
+            "name": "String" // like "chicken breast", "ground beef", "celery" or etc.
+        }
+    ],
+    "servings": Number,
+    "serving_size": "String",
+    "search_terms": ["String"],
+    "tags": ["String"],
+}
