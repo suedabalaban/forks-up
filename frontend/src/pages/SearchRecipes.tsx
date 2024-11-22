@@ -1,6 +1,6 @@
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState } from 'react';
 import RecipeCard from '../components/RecipeCard';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import {Search, ChevronLeft, ChevronRight, ChevronsRight, ChevronsLeft} from 'lucide-react';
 import RecipeDetails from "../components/RecipeDetails";
 import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
@@ -8,63 +8,80 @@ import {Recipe} from "../model/Recipe";
 const SearchRecipes: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [recipes, setRecipes] = useState<Recipe[]>([]);
-    const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(9);
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-    const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchRecipes = async () => {
+    const [page, setPage] = useState(0);
+    const [pageSize] = useState(9);
+    const [totalPages, setTotalPages] = useState(0);
+
+    const fetchRecipes = async (pageNumber = page) => {
         if (!searchTerm.trim()) return;
 
         setIsLoading(true);
         setError(null);
 
         try {
-            const response = await
-                fetch(`http://localhost:8080/api/recipes/search?keyword=${searchTerm}&page=${page}&size=${pageSize}`);
+            const response = await fetch(
+                `http://localhost:8080/api/recipes/search?keyword=${encodeURIComponent(
+                    searchTerm
+                )}&page=${pageNumber}&size=${pageSize}`
+            );
             if (!response.ok) {
-                throw new Error(response.status === 404 ? 'No recipes found' : 'Failed to fetch recipes');
+                throw new Error(
+                    response.status === 404 ? 'No recipes found' : 'Failed to fetch recipes'
+                );
             }
             const data = await response.json();
-            if (data.length === 0) {
-                setError('No recipes found matching your search criteria');
-            }
-            setRecipes(data);
-            setHasMore(data.length === pageSize);
+            setRecipes(data.content);
+            setTotalPages(data.totalPages);
+            setPage(pageNumber);
         } catch (err: any) {
             setRecipes([]);
-            setHasMore(false);
             setError(err.message || 'An error occurred while fetching recipes');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleSearch = (e: FormEvent) => {
+    const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setPage(0);
-        fetchRecipes();
+        fetchRecipes(0);
     };
 
-    const handleNextPage = () => {
-        if (hasMore) {
-            setPage(prev => prev + 1);
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 0 && newPage < totalPages) {
+            fetchRecipes(newPage);
         }
     };
 
-    const handlePreviousPage = () => {
-        if (page > 0) {
-            setPage(prev => prev - 1);
-        }
-    };
+    const handleFirstPage = () => handlePageChange(0);
+    const handleLastPage = () => handlePageChange(totalPages - 1);
+    const handlePreviousPage = () => handlePageChange(page - 1);
+    const handleNextPage = () => handlePageChange(page + 1);
 
-    useEffect(() => {
-        if (searchTerm.trim()) {
-            fetchRecipes();
+    // Generate page numbers to display
+    const getPageNumbers = () => {
+        const delta = 2; // Number of pages to show on each side of current page
+        const range: (number | string)[] = [];
+        const rangeWithDots: (number | string)[] = [];
+
+        for (let i = 0; i < totalPages; i++) {
+            if (
+                i === 0 || // First page
+                i === totalPages - 1 || // Last page
+                (i >= page - delta && i <= page + delta) // Pages around current page
+            ) {
+                range.push(i);
+            } else if (range[range.length - 1] !== '...') {
+                range.push('...');
+            }
         }
-    }, [page]);
+
+        return range;
+    };
 
     const handleClosePopup = () => {
         setSelectedRecipe(null);
@@ -93,9 +110,7 @@ const SearchRecipes: React.FC = () => {
                 </form>
             </div>
 
-            {isLoading && (
-                <LoadingPage/>
-            )}
+            {isLoading && <LoadingPage />}
 
             {error && !isLoading && (
                 <div className="text-center text-gray-600 flex items-center justify-center">
@@ -117,35 +132,77 @@ const SearchRecipes: React.FC = () => {
                         ))}
                     </div>
 
-                    <div className="mt-8 flex justify-center items-center gap-4">
+                    <div className="mt-8 flex justify-center items-center gap-2">
                         <button
-                            onClick={handlePreviousPage}
+                            onClick={handleFirstPage}
                             disabled={page === 0 || isLoading}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${
+                            className={`flex items-center gap-1 px-3 py-2 rounded-lg border ${
                                 page === 0 || isLoading
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     : 'bg-white text-gray-700 hover:bg-gray-50'
                             }`}
                         >
-                            <ChevronLeft size={20} />
-                            Previous
+                            <ChevronsLeft size={18} />
+                            First
                         </button>
 
-                        <span className="text-gray-600">
-                            Page {page + 1}
-                        </span>
+                        <button
+                            onClick={handlePreviousPage}
+                            disabled={page === 0 || isLoading}
+                            className={`flex items-center gap-1 px-3 py-2 rounded-lg border ${
+                                page === 0 || isLoading
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                            }`}
+                        >
+                            <ChevronLeft size={18} />
+                            Prev
+                        </button>
+
+                        <div className="flex items-center gap-1">
+                            {getPageNumbers().map((pageNum, index) => (
+                                pageNum === '...' ? (
+                                    <span key={index} className="px-3 py-2">...</span>
+                                ) : (
+                                    <button
+                                        key={index}
+                                        onClick={() => handlePageChange(pageNum as number)}
+                                        className={`px-3 py-2 rounded-lg border ${
+                                            page === pageNum
+                                                ? 'bg-blue-500 text-white border-blue-500'
+                                                : 'bg-white text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        {(pageNum as number) + 1}
+                                    </button>
+                                )
+                            ))}
+                        </div>
 
                         <button
                             onClick={handleNextPage}
-                            disabled={!hasMore || isLoading}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${
-                                !hasMore || isLoading
+                            disabled={page >= totalPages - 1 || isLoading}
+                            className={`flex items-center gap-1 px-3 py-2 rounded-lg border ${
+                                page >= totalPages - 1 || isLoading
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     : 'bg-white text-gray-700 hover:bg-gray-50'
                             }`}
                         >
                             Next
-                            <ChevronRight size={20} />
+                            <ChevronRight size={18} />
+                        </button>
+
+                        <button
+                            onClick={handleLastPage}
+                            disabled={page >= totalPages - 1 || isLoading}
+                            className={`flex items-center gap-1 px-3 py-2 rounded-lg border ${
+                                page >= totalPages - 1 || isLoading
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                            }`}
+                        >
+                            Last
+                            <ChevronsRight size={18} />
                         </button>
                     </div>
                 </>
@@ -160,5 +217,7 @@ const SearchRecipes: React.FC = () => {
         </div>
     );
 };
+
+
 
 export default SearchRecipes;
