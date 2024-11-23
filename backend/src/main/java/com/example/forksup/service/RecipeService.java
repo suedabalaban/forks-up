@@ -36,4 +36,30 @@ public class RecipeService {
         return new PageImpl<>(recipes, pageable, total);
     }
 
+    @Cacheable(value = "recipeSearchCache",
+            key = "#keyword + #tags + #page + #size",
+            unless = "#result.isEmpty()")
+    public Page<Recipe> searchRecipesByKeywordAndTags(String keyword, List<String> tags, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        String searchText = keyword == null || keyword.trim().isEmpty() ? "" :
+                Arrays.stream(keyword.trim().split("\\s+"))
+                        .map(word -> "\"" + word + "\"")
+                        .collect(Collectors.joining(" "));
+        List<Recipe> recipes;
+        long total;
+
+        if (tags == null || tags.isEmpty()) {
+            recipes = recipeRepository.findByNameTextSearch(searchText, pageable);
+            total = recipeRepository.countByNameTextSearch(searchText);
+        } else {
+            recipes = recipeRepository.findByNameAndTags(searchText, tags, pageable);
+            total = recipeRepository.countByNameAndTags(searchText, tags);
+        }
+        return new PageImpl<>(recipes, pageable, total);
+    }
+
+    public List<String> getAllUniqueTags() {
+        return recipeRepository.findDistinctTags();
+    }
 }

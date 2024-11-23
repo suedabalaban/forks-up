@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/recipes")
 public class RecipeController {
@@ -48,6 +50,17 @@ public class RecipeController {
     ) {
         Page<Recipe> recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
         return new ResponseEntity<>(recipes, null, HttpStatus.OK);
+    }
+
+    @GetMapping("/searchTags")
+    public ResponseEntity<Page<Recipe>> searchRecipesWithTags(
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false) List<String> tags,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "9") int size
+    ) {
+        Page<Recipe> recipes  = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
+        return new ResponseEntity<>(recipes, HttpStatus.OK);
     }
 
 }
