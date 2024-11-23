@@ -5,6 +5,7 @@ import axios from "axios";
 import {auth} from "../config/firebaseconfig";
 import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
+import {Star} from "lucide-react";
 
 const SearchRecipes: React.FC = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -63,30 +64,37 @@ const SearchRecipes: React.FC = () => {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            {recipes.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {recipes.map((recipe) => (
-                        <RecipeCard
-                            key={recipe.id}
-                            recipe={recipe}
-                            onClick={() => setSelectedRecipe(recipe)}
-                        />
-                    ))}
-                </div>
-            ) : (
-                <div className="text-center text-gray-500 p-4">
-                    No favorite recipes found.
-                </div>
-            )}
+        <div className="max-w-full mx-auto p-5">
+            <h1 className="text-4xl w-full items-center justify-center flex flex-row mt-6 font-semibold mb-2">
+                <Star className="mr-3 h-10 w-10 fill-yellow-400 text-yellow-400"/>
+                <span>Favorite Recipes</span>
+            </h1>
+            <div className="container mx-auto px-4 py-8">
+                {recipes.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {recipes.map((recipe) => (
+                            <RecipeCard
+                                key={recipe.id}
+                                recipe={recipe}
+                                onClick={() => setSelectedRecipe(recipe)}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center text-gray-500 p-4">
+                        No favorite recipes found.
+                    </div>
+                )}
 
-            {selectedRecipe && (
-                <RecipeDetails
-                    recipe={selectedRecipe}
-                    handleClosePopup={handleClosePopup}
-                />
-            )}
+                {selectedRecipe && (
+                    <RecipeDetails
+                        recipe={selectedRecipe}
+                        handleClosePopup={handleClosePopup}
+                    />
+                )}
+            </div>
         </div>
+
     );
 };
 

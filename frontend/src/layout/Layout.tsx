@@ -59,21 +59,19 @@ const Layout: React.FC = () => {
         <div className="min-h-screen flex flex-col">
             <nav className="bg-gradient-to-br from-blue-200 to-purple-200 p-4">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    {/* Logo Area */}
-                    <Link to="/" className="flex items-center opacity-75 space-x-2">
-                        <RecipesIcon className="fill-pink-700 stroke-pink-700 h-11 w-11"/>
-                        <span className="text-xl font-bold text-pink-700">Forks Up!</span>
-                    </Link>
-
-                    {/* Center Search Button */}
-                    <div className="flex-1 flex justify-center mx-4">
+                    {/* Logo and Search Button */}
+                    <div className="flex items-center space-x-6">
+                        <Link to="/" className="flex items-center opacity-75 space-x-2">
+                            <RecipesIcon className="fill-purple-700 stroke-purple-700 h-11 w-11"/>
+                            <span className="text-4xl font-bold text-purple-700">Forks Up!</span>
+                        </Link>
                         <Link to="/search">
                             <Button
-                                variant="outlined"
-                                className="h-10 px-6 flex items-center space-x-2"
+                                variant="text"
+                                className="h-11 px-6 flex items-center space-x-2 hover:shadow-sm transition-shadow"
                             >
-                                <Search className="w-5 h-5"/>
-                                <span>Search Recipes</span>
+                                <Search className="w-5 h-5 text-blue-600"/>
+                                <span className="text-blue-600">Search Recipes</span>
                             </Button>
                         </Link>
                     </div>
@@ -95,7 +93,8 @@ const Layout: React.FC = () => {
                                     />
 
                                     {/* Dropdown Menu */}
-                                    <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 transition-all duration-300">
+                                    <div
+                                        className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 transition-all duration-300">
                                         {menuItems.map((item, index) => {
                                             const IconComponent = item.icon;
                                             return (
@@ -104,7 +103,7 @@ const Layout: React.FC = () => {
                                                     to={item.path}
                                                     className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
                                                 >
-                                                    <IconComponent className="w-5 h-5 mr-3" />
+                                                    <IconComponent className="w-5 h-5 mr-3"/>
                                                     <span>{item.text}</span>
                                                 </Link>
                                             );
@@ -141,11 +140,11 @@ const Layout: React.FC = () => {
             </nav>
 
             <main className="flex-grow">
-                <Outlet />
+                <Outlet/>
             </main>
 
-            <footer className="bg-gradient-to-br from-blue-200 to-purple-200 mt-auto">
-                <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <footer className="bg-gradient-to-br from-blue-200 to-purple-200 mt-6">
+                <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Company Links */}
                         <div>
@@ -153,7 +152,8 @@ const Layout: React.FC = () => {
                             <ul className="space-y-2">
                                 {footerLinks.company.map((link, index) => (
                                     <li key={index}>
-                                        <Link to={link.path} className="text-gray-600 hover:text-gray-900 transition-colors">
+                                        <Link to={link.path}
+                                              className="text-gray-600 hover:text-gray-900 transition-colors">
                                             {link.text}
                                         </Link>
                                     </li>
@@ -167,7 +167,8 @@ const Layout: React.FC = () => {
                             <ul className="space-y-2">
                                 {footerLinks.legal.map((link, index) => (
                                     <li key={index}>
-                                        <Link to={link.path} className="text-gray-600 hover:text-gray-900 transition-colors">
+                                        <Link to={link.path}
+                                              className="text-gray-600 hover:text-gray-900 transition-colors">
                                             {link.text}
                                         </Link>
                                     </li>
