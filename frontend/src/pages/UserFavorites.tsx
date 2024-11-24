@@ -6,6 +6,7 @@ import {auth} from "../config/firebaseconfig";
 import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
 import {Star} from "lucide-react";
+import {getFavoriteRecipes} from "../api/ForksUpAPI";
 
 const SearchRecipes: React.FC = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -16,31 +17,26 @@ const SearchRecipes: React.FC = () => {
     useEffect(() => {
         const fetchFavoriteRecipes = async () => {
             setLoading(true);
-            auth.currentUser?.getIdToken().then((token: any) => {
-                axios.get(
-                    'http://localhost:8080/api/user/favorite/all',
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                    }
-                ).then((response) => {
-                    if (response.data && Array.isArray(response.data)) {
-                        setRecipes(response.data);
-                    }
-                }).catch((err) => {
-                    if (axios.isAxiosError(err)) {
-                        setError(err.response?.data?.message || "An error occurred while fetching favorites");
-                        console.error("Error fetching favorites:", err.response?.data);
-                    } else {
-                        setError("An unexpected error occurred");
-                        console.error("Error:", err);
-                    }
-                }).finally(() => {
-                    setLoading(false);
-                });
-            })
+            setError("");
+
+            try {
+                const favoriteRecipes = await getFavoriteRecipes();
+                if (Array.isArray(favoriteRecipes)) {
+                    setRecipes(favoriteRecipes);
+                } else {
+                    throw new Error('Invalid data format');
+                }
+            } catch (err: any) {
+                if (axios.isAxiosError(err)) {
+                    setError(err.response?.data?.message || 'An error occurred while fetching favorites');
+                    console.error('Error fetching favorites:', err.response?.data);
+                } else {
+                    setError('An unexpected error occurred');
+                    console.error('Error:', err);
+                }
+            } finally {
+                setLoading(false);
+            }
         };
         fetchFavoriteRecipes();
     }, []);

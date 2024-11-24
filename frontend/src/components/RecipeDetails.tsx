@@ -4,6 +4,7 @@ import { Star, UserRound, Users } from "lucide-react";
 import { auth } from "../config/firebaseconfig";
 import axios from "axios";
 import { Recipe } from "../model/Recipe";
+import {addFavorite, checkFavoriteStatus, removeFavorite} from "../api/ForksUpAPI";
 
 type RecipeDetailsProps = {
     recipe: Recipe;
@@ -25,18 +26,16 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
     const YOUTUBE_API_KEY = 'AIzaSyAOJIp4JcDsW--0SKq5pDhgrPG19DdcO30';
 
     useEffect(() => {
-        // Favorite check effect
-        auth.currentUser?.getIdToken().then((token) => {
-            axios.get(`http://localhost:8080/api/user/favorite/${recipe.id}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }).then((response) => {
-                setIsFavorite(response.data);
-            }).catch((e) => {
-                console.error("Error checking favorite status:", e);
-            });
-        });
+        const fetchFavoriteStatus = async () => {
+            try {
+                const favoriteStatus = await checkFavoriteStatus(recipe.id);
+                setIsFavorite(favoriteStatus);
+            } catch (error) {
+                console.error('Error fetching favorite status:', error);
+            }
+        };
+
+        fetchFavoriteStatus();
 
         // YouTube search effect
         const fetchYouTubeVideos = async () => {
@@ -74,29 +73,17 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
         fetchYouTubeVideos();
     }, [recipe.id, recipe.name]);
 
-    const toggleFavorite = () => {
-        if (isFavorite) {
-            auth.currentUser?.getIdToken().then((token) => {
-                axios.delete(`http://localhost:8080/api/user/favorite/${recipe.id}`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }).catch((e) => {
-                    console.error(e);
-                });
-            });
-        } else {
-            auth.currentUser?.getIdToken().then((token) => {
-                axios.put(`http://localhost:8080/api/user/favorite/${recipe.id}`, null, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }).catch((e) => {
-                    console.error(e);
-                });
-            });
+    const toggleFavorite = async () => {
+        try {
+            if (isFavorite) {
+                await removeFavorite(recipe.id);
+            } else {
+                await addFavorite(recipe.id);
+            }
+            setIsFavorite(!isFavorite);
+        } catch (error) {
+            console.error('Error toggling favorite status:', error);
         }
-        setIsFavorite(!isFavorite);
     };
 
     return (

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Plus, Minus, Trash2 } from 'lucide-react';
 import axios from 'axios';
-import { getAuth } from 'firebase/auth';
 import {PantryItem} from "../model/PantryItem";
 import {Ingredient} from "../model/Ingredient";
+import {addIngredient, getIngredients, getPantryItems, removeIngredient} from "../api/ForksUpAPI";
 
 const Pantry = () => {
     const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
@@ -13,28 +13,13 @@ const Pantry = () => {
     const [searchLoading, setSearchLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const auth = getAuth();
-
-    // API isteği için yardımcı fonksiyon
-    const makeAuthenticatedRequest = async (requestFn: (token: string) => Promise<any>) => {
-        try {
-            const token = await auth.currentUser?.getIdToken();
-            if (!token) {
-                throw new Error('No authentication token available');
-            }
-            return await requestFn(token);
-        } catch (err) {
-            throw err;
-        }
-    };
-
     useEffect(() => {
         fetchPantryItems();
     }, []);
 
     // Ingredient arama
     useEffect(() => {
-        const searchIngredients = async () => {
+        const HandleSearchIngredients = async () => {
             if (searchQuery.trim() === '') {
                 setSearchResults([]);
                 return;
@@ -42,91 +27,55 @@ const Pantry = () => {
 
             try {
                 setSearchLoading(true);
-                await makeAuthenticatedRequest(async (token) => {
-                    const response = await axios.get(`http://localhost:8080/api/ingredients/search`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        },
-                        params: { keyword: searchQuery }
-                    });
-                    setSearchResults(response.data);
-                });
+                const response = await getIngredients(searchQuery)
+                setSearchResults(response.data);
             } catch (err) {
-                setError('Arama sırasında bir hata oluştu');
+                setError('An error occurred during the search\n');
             } finally {
                 setSearchLoading(false);
             }
         };
 
-        const timeoutId = setTimeout(searchIngredients, 300);
+        const timeoutId = setTimeout(HandleSearchIngredients, 300);
         return () => clearTimeout(timeoutId);
     }, [searchQuery]);
 
     const fetchPantryItems = async () => {
         try {
             setLoading(true);
-            await makeAuthenticatedRequest(async (token) => {
-                const response = await axios.get('http://localhost:8080/api/user/pantry', {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                setPantryItems(response.data);
-            });
+            const  response = await getPantryItems()
+            setPantryItems(response.data);
         } catch (err) {
-            setError('Pantry yüklenirken bir hata oluştu');
+            setError('An error occurred while loading Pantry\n');
         } finally {
             setLoading(false);
         }
     };
 
-    const addIngredient = async (ingredientId: string) => {
+    const HandleAddIngredient = async (ingredientId: string) => {
         try {
-            await makeAuthenticatedRequest(async (token) => {
-                await axios.post('http://localhost:8080/api/user/pantry', null, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    },
-                    params: {
-                        ingredientId,
-                        quantity: 1
-                    }
-                });
-            });
-            fetchPantryItems();
+            await addIngredient(ingredientId);
+            await fetchPantryItems();
         } catch (err) {
-            setError('Ingredient eklenirken bir hata oluştu');
+            setError('An error occurred while adding the ingredient');
         }
     };
 
-    const updateQuantity = async (ingredientId: string, quantity: number) => {
+    const HandleUpdateQuantity = async (ingredientId: string, quantity: number) => {
         try {
-            await makeAuthenticatedRequest(async (token) => {
-                await axios.put(`http://localhost:8080/api/user/pantry/${ingredientId}`, null, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    },
-                    params: { quantity }
-                });
-            });
-            fetchPantryItems();
+            await addIngredient(ingredientId)
+            await fetchPantryItems();
         } catch (err) {
-            setError('Miktar güncellenirken bir hata oluştu');
+            setError('An error occurred while updating the quantity\n');
         }
     };
 
-    const removeIngredient = async (ingredientId: string) => {
+    const handleRemoveIngredient = async (ingredientId: string) => {
         try {
-            await makeAuthenticatedRequest(async (token) => {
-                await axios.delete(`http://localhost:8080/api/user/pantry/${ingredientId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-            });
-            fetchPantryItems();
+            await removeIngredient(ingredientId);
+            await fetchPantryItems();
         } catch (err) {
-            setError('Ingredient silinirken bir hata oluştu');
+            setError('An error occurred while deleting the ingredient\n');
         }
     };
 
@@ -167,7 +116,7 @@ const Pantry = () => {
                                         >
                                             <span>{ingredient.name}</span>
                                             <button
-                                                onClick={() => addIngredient(ingredient.id)}
+                                                onClick={() => HandleAddIngredient(ingredient.id)}
                                                 className="p-1 hover:bg-gray-100 rounded"
                                             >
                                                 <Plus size={20} className="text-green-600" />
@@ -201,7 +150,7 @@ const Pantry = () => {
                                         <span className="font-medium">{item.ingredient.name}</span>
                                         <div className="flex items-center gap-3">
                                             <button
-                                                onClick={() => updateQuantity(item.ingredient.id, Math.max(0, item.quantity - 1))}
+                                                onClick={() => HandleUpdateQuantity(item.ingredient.id, Math.max(0, item.quantity - 1))}
                                                 className="p-1 hover:bg-gray-100 rounded"
                                             >
                                                 <Minus size={18} className="text-gray-600" />
@@ -210,14 +159,14 @@ const Pantry = () => {
                                             <span className="w-8 text-center">{item.quantity}</span>
 
                                             <button
-                                                onClick={() => updateQuantity(item.ingredient.id, item.quantity + 1)}
+                                                onClick={() => HandleUpdateQuantity(item.ingredient.id, item.quantity + 1)}
                                                 className="p-1 hover:bg-gray-100 rounded"
                                             >
                                                 <Plus size={18} className="text-gray-600" />
                                             </button>
 
                                             <button
-                                                onClick={() => removeIngredient(item.ingredient.id)}
+                                                onClick={() => handleRemoveIngredient(item.ingredient.id)}
                                                 className="p-1 hover:bg-gray-100 rounded ml-2"
                                             >
                                                 <Trash2 size={18} className="text-red-600" />

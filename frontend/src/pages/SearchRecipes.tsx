@@ -6,6 +6,8 @@ import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
 import TagFilters from "../components/TagFilter";
 import tags from "../assets/tags.json"
+import {getRecipes} from "../api/ForksUpAPI";
+import {wait} from "@testing-library/user-event/dist/utils";
 
 const SearchRecipes: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -27,30 +29,13 @@ const SearchRecipes: React.FC = () => {
         setError(null);
 
         try {
-            // Tags arrayini query string formatında dönüştür
-            const tagsQuery = selectedTags
-                .map(tag => `tags=${encodeURIComponent(tag)}`)
-                .join('&');
-
-            const response = await fetch(
-                `http://localhost:8080/api/recipes/searchTags?keyword=${encodeURIComponent(
-                    searchTerm
-                )}&page=${pageNumber}&size=${pageSize}${tagsQuery ? `&${tagsQuery}` : ''}`
-            );
-
-            if (!response.ok) {
-                throw new Error(
-                    response.status === 404 ? 'No recipes found' : 'Failed to fetch recipes'
-                );
-            }
-
-            const data = await response.json();
+            console.log(selectedTags)
+            const data = await getRecipes(searchTerm, selectedTags, pageNumber, pageSize);
 
             if (data.content.length > 0) {
                 setRecipes(data.content);
-
             } else {
-                setError('No recipes found')
+                setError('No recipes found');
             }
 
             setTotalPages(data.totalPages);
@@ -62,6 +47,11 @@ const SearchRecipes: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchRecipes(page);
+    }, [selectedTags, page]);
+
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -113,7 +103,6 @@ const SearchRecipes: React.FC = () => {
                     onTagsChange={(newTags: string[]) => {
                         setSelectedTags(newTags);
                         setPage(0);
-                        fetchRecipes(0);
                     }}
                 />
             </div>

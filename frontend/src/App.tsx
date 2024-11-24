@@ -14,29 +14,22 @@ import axios from "axios";
 import SearchRecipes from "./pages/SearchRecipes";
 import Loading from "./pages/Loading";
 import UserFavorites from "./pages/UserFavorites";
-import UserIngredients from "./pages/PantryPage";
+import UserIngredients from "./pages/Pantry";
+import DietaryPreferences from "./pages/DietaryPreferences";
+import {registerOrUpdateUser} from "./api/ForksUpAPI";
 
 const App: React.FC = () => {
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
-            if (user) {
-                const isFirstLogin = !localStorage.getItem(`userRegistered_${user.uid}`);
-                 if ((user.metadata.creationTime === user.metadata.lastSignInTime) || isFirstLogin ) {
-                     user.getIdToken().then((token: any) => {
-                         axios.put("http://localhost:8080/api/user", null , {
-                             headers: {
-                                 "Authorization": `Bearer ${token}`
-                             }
-                         }).then(() => {
-                             localStorage.setItem(`userRegistered_${user.uid}`, 'true');
-                         }).catch((e) => {
-                             console.error(e);
-                         })
-                     });
-                 }
+            if (currentUser) {
+                try {
+                    await registerOrUpdateUser(currentUser);
+                } catch (e) {
+                    console.error('Error registering or updating user:', e);
+                }
             }
         });
         return () => unsubscribe();
@@ -52,6 +45,7 @@ const App: React.FC = () => {
                     <Route path="/search" element={<ProtectedRoute><SearchRecipes/></ProtectedRoute>}/>
                     <Route path="/favorites" element={<ProtectedRoute><UserFavorites/></ProtectedRoute>}/>
                     <Route path="/pantry" element={<ProtectedRoute><UserIngredients/></ProtectedRoute>}/>
+                    <Route path="/dietary-preferences" element={<ProtectedRoute><DietaryPreferences/></ProtectedRoute>}/>
                 </Route>
 
                 <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>} >
