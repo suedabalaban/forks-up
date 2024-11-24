@@ -143,7 +143,7 @@ const Layout: React.FC = () => {
                 <Outlet/>
             </main>
 
-            <footer className="bg-gradient-to-br from-blue-200 to-purple-200 mt-6">
+            <footer className="bg-gradient-to-br from-blue-200 to-purple-200">
                 <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Company Links */}

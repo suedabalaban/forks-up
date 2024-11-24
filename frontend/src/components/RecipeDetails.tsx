@@ -31,13 +31,11 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }
-            })
-                .then((response) => {
-                    setIsFavorite(response.data);
-                })
-                .catch((e) => {
-                    console.error("Error checking favorite status:", e);
-                });
+            }).then((response) => {
+                setIsFavorite(response.data);
+            }).catch((e) => {
+                console.error("Error checking favorite status:", e);
+            });
         });
 
         // YouTube search effect
@@ -151,7 +149,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                             ))}
                         </ul>
                     </div>
-                    <div className="mt-4">
+                    <div className="mb-5 mt-4">
                         <h4 className="font-medium text-gray-700">Steps</h4>
                         <ol>
                             {recipe.steps?.map((step, index) => (

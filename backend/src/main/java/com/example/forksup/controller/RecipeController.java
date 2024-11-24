@@ -55,7 +55,7 @@ public class RecipeController {
     @GetMapping("/searchTags")
     public ResponseEntity<Page<Recipe>> searchRecipesWithTags(
         @RequestParam(required = false) String keyword,
-        @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) List<String> tags,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "9") int size
     ) {

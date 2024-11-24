@@ -20,7 +20,6 @@ public class IngredientController {
 
     @GetMapping("/search")
     public ResponseEntity<List<Ingredient>> searchIngredients(@RequestParam String keyword) {
-        System.out.println(keyword);
         List<Ingredient> ingredients = ingredientRepository.findByKeywordSortedByRelevance(keyword);
         return ResponseEntity.ok(ingredients);
     }
