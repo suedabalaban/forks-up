@@ -1,9 +1,7 @@
 package com.example.forksup.controller;
 
-import com.example.forksup.model.Ingredient;
-import com.example.forksup.model.PantryItem;
-import com.example.forksup.model.Recipe;
-import com.example.forksup.model.User;
+import com.example.forksup.exception.ResourceNotFoundException;
+import com.example.forksup.model.*;
 import com.example.forksup.repository.UserRepository;
 import com.example.forksup.service.UserService;
 import com.google.firebase.auth.FirebaseToken;
@@ -113,4 +111,16 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping(path = "/preferences")
+    public ResponseEntity<User> getUserPreferencesFromJson(
+            HttpServletRequest request,
+            @RequestBody Preferences preferences) {
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        User user = userRepository.findUserByFirebaseId(firebaseToken.getUid()).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        user.setPreferences(preferences);
+        userRepository.save(user);
+        return ResponseEntity.ok(user);
+    }
 }
