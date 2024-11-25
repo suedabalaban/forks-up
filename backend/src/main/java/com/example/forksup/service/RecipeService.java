@@ -62,4 +62,25 @@ public class RecipeService {
     public List<String> getAllUniqueTags() {
         return recipeRepository.findDistinctTags();
     }
+
+    @Cacheable(value = "recipeSearchCache",
+            key = "#keyword + #tags + #pantryItemNames + #page + #size",
+            unless = "#result.isEmpty()")
+    public Page<Recipe> searchRecipesByKeywordTagsAndPantryItems(
+            String keyword, List<String> tags, List<String> pantryItemNames, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        String searchText = keyword == null || keyword.trim().isEmpty() ? "" :
+                Arrays.stream(keyword.trim().split("\\s+"))
+                        .map(word -> "\"" + word + "\"")
+                        .collect(Collectors.joining(" "));
+
+        List<Recipe> recipes;
+        long total;
+
+        recipes = recipeRepository.findByNameTagsAndIngredients(searchText, tags, pantryItemNames, pageable);
+        total = recipeRepository.countByNameTagsAndIngredients(searchText, tags, pantryItemNames);
+        return new PageImpl<>(recipes, pageable, total);
+    }
 }
