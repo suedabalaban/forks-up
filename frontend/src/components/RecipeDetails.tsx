@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Close } from "@mui/icons-material";
-import { Star, UserRound, Users } from "lucide-react";
+import { Star, UserRound, Users, Printer } from "lucide-react";
 import { auth } from "../config/firebaseconfig";
 import axios from "axios";
 import { Recipe } from "../model/Recipe";
@@ -87,100 +87,200 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
         }
     };
 
+    const handlePrint = () => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        const content = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${recipe.name} - Recipe</title>
+                <style>
+                    body {
+                        font-family: -apple-system, system-ui, sans-serif;
+                        line-height: 1.5;
+                        padding: 2rem;
+                        max-width: 800px;
+                        margin: 0 auto;
+                    }
+                    h1 { font-size: 2rem; margin-bottom: 1rem; }
+                    h2 { font-size: 1.5rem; margin: 2rem 0 1rem; }
+                    .description { color: #666; margin-bottom: 2rem; }
+                    .info { margin-bottom: 2rem; }
+                    .ingredients { margin-bottom: 2rem; }
+                    .ingredients li { margin-bottom: 0.5rem; }
+                    .steps li { margin-bottom: 1rem; }
+                    @media print {
+                        body { padding: 0; }
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>${recipe.name}</h1>
+                <p class="description">${recipe.description}</p>
+                
+                <div class="info">
+                    <p><strong>Servings:</strong> ${recipe.servings}</p>
+                    <p><strong>Serving Size:</strong> ${recipe.serving_size.slice(2)}</p>
+                </div>
+
+                <h2>🥘 Ingredients</h2>
+                <ul class="ingredients">
+                    ${recipe.ingredientsRawStr?.map(ingredient => {
+                        const emoji = getIngredientEmoji(ingredient);
+                        return `<li>${emoji || '•'} ${ingredient}</li>`;
+                    }).join('')}
+                </ul>
+
+                <h2>📝 Instructions</h2>
+                <ol class="steps">
+                    ${recipe.steps?.map(step => `<li>${step}</li>`).join('')}
+                </ol>
+            </body>
+            </html>
+        `;
+
+        printWindow.document.write(content);
+        printWindow.document.close();
+        printWindow.print();
+    };
+
     return (
         <div
             onClick={handleClosePopup}
-            className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
         >
             <div
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-lg p-6 max-w-full min-w-[50rem] mx-4 max-h-[80vh] flex flex-row overflow-y-auto relative"
+                className="bg-white rounded-2xl shadow-xl max-w-6xl w-full mx-4 max-h-[85vh] flex flex-row overflow-hidden relative"
             >
-                <div className="min-w-[50rem] w-min">
-                    <button onClick={handleClosePopup}
-                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
-                        <Close/>
-                    </button>
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
-                        {recipe.name}
-                        <button
-                            onClick={toggleFavorite}
-                            className="flex items-center justify-center transition-all duration-200 focus:outline-none ml-2"
-                            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                {/* Main Content */}
+                <div className="flex-1 p-8 overflow-y-auto">
+                    <div className="max-w-3xl">
+                        <button 
+                            onClick={handleClosePopup}
+                            className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
                         >
-                            <Star
-                                className={`
-                                transition-colors duration-200 h-full
-                                ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400 hover:text-gray-600'}
-                            `}
-                            />
+                            <Close className="w-6 h-6" />
                         </button>
-                    </h3>
-                    <p className="text-m text-gray-500 mb-3">
-                        {recipe.description}
-                    </p>
-                    <div className="flex flex-row mb-3">
-                        <p className="mr-1 font-semibold">Servings: {recipe.servings}</p>
-                        {Array.from(Array(recipe.servings % 2 === 1 ? (recipe.servings - 1) / 2 : recipe.servings / 2), (e, i) => {
-                            return <Users key={i}/>;
-                        })}
-                        {
-                            recipe.servings % 2 === 1 && <UserRound/>
-                        }
-                    </div>
-                    <p className="font-semibold">Serving Size: {recipe.serving_size.slice(2)}</p>
-                    <div className="mt-2">
-                        <h4 className="font-semibold text-gray-700">🥘 Ingredients</h4>
-                        <ul className="space-y-1">
-                            {recipe.ingredientsRawStr?.map((ingredient, index) => {
-                                const emoji = getIngredientEmoji(ingredient);
-                                return (
-                                    <li key={index} className="text-gray-600 flex items-center gap-2">
-                                        <span className="w-6 text-center">{emoji || '•'}</span>
-                                        {ingredient}
+
+                        {/* Header Section */}
+                        <div className="mb-8">
+                            <div className="flex items-start justify-between mb-2">
+                                <h2 className="text-3xl font-bold text-gray-800">
+                                    {recipe.name}
+                                </h2>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={toggleFavorite}
+                                        className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
+                                        aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                                    >
+                                        <Star
+                                            className={`w-8 h-8 transition-colors duration-200
+                                            ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400 hover:text-gray-600'}`}
+                                        />
+                                    </button>
+                                    <button 
+                                        onClick={handlePrint}
+                                        className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
+                                        title="Print Recipe"
+                                    >
+                                        <Printer className="w-7 h-7 text-gray-400 hover:text-gray-600" />
+                                    </button>
+                                </div>
+                            </div>
+                            <p className="text-lg text-gray-600 mb-4">
+                                {recipe.description}
+                            </p>
+                            
+                            {/* Recipe Info */}
+                            <div className="flex items-center gap-6 text-gray-600">
+                                <div className="flex items-center gap-2">
+                                    <Users className="w-5 h-5" />
+                                    <span>Serves {recipe.servings}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="font-medium">Serving Size:</span>
+                                    <span>{recipe.serving_size.slice(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Ingredients Section */}
+                        <div className="mb-8">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <span>🥘</span>
+                                <span>Ingredients</span>
+                            </h3>
+                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {recipe.ingredientsRawStr?.map((ingredient, index) => {
+                                    const emoji = getIngredientEmoji(ingredient);
+                                    return (
+                                        <li key={index} className="flex items-center gap-3 text-gray-600">
+                                            <span className="w-8 h-8 flex items-center justify-center bg-gray-50 rounded-lg text-lg">
+                                                {emoji || '•'}
+                                            </span>
+                                            <span>{ingredient}</span>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+
+                        {/* Steps Section */}
+                        <div className="mb-8">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <span>📝</span>
+                                <span>Instructions</span>
+                            </h3>
+                            <ol className="space-y-4">
+                                {recipe.steps?.map((step, index) => (
+                                    <li key={index} className="flex gap-4">
+                                        <span className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-medium">
+                                            {index + 1}
+                                        </span>
+                                        <p className="text-gray-600 pt-1">{step}</p>
                                     </li>
-                                );
-                            })}
-                        </ul>
-                    </div>
-                    <div className="mb-5 mt-4">
-                        <h4 className="font-medium text-gray-700">Steps</h4>
-                        <ol>
-                            {recipe.steps?.map((step, index) => (
-                                <li key={index}
-                                    className="text-gray-600 flex flex-row">{(index + 1) + " - " + step + "\n"}</li>
-                            ))}
-                        </ol>
+                                ))}
+                            </ol>
+                        </div>
                     </div>
                 </div>
 
-                {/* Youtube Thumbnails*/}
-                <div className="mt-4 ml-2 w-96 pl-6 border-l">
-                    <h4 className="font-semibold text-gray-700 mb-4">Related Videos</h4>
-                    {loading && <p className="text-gray-600">Loading videos...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
-                    <div className="space-y-4">
+                {/* Video Sidebar */}
+                <div className="w-96 bg-gray-50 p-8 overflow-y-auto border-l border-gray-100">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-6">Related Videos</h3>
+                    {loading && (
+                        <div className="text-gray-500 animate-pulse">Loading videos...</div>
+                    )}
+                    {error && (
+                        <div className="text-red-500 bg-red-50 p-3 rounded-lg">
+                            {error}
+                        </div>
+                    )}
+                    <div className="space-y-6">
                         {videos.map((video) => (
-                            <div key={video.id} className="group">
-                                <a
-                                    href={`https://www.youtube.com/watch?v=${video.id}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block"
-                                >
-                                    <div className="relative">
-                                        <img
-                                            src={video.thumbnail}
-                                            alt={video.title}
-                                            className="w-full rounded-lg shadow-md transition-transform group-hover:scale-105"
-                                        />
-                                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 rounded-lg transition-opacity" />
-                                    </div>
-                                    <h5 className="mt-2 text-sm text-gray-800 font-medium line-clamp-2">
-                                        {video.title}
-                                    </h5>
-                                </a>
-                            </div>
+                            <a
+                                key={video.id}
+                                href={`https://www.youtube.com/watch?v=${video.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block group"
+                            >
+                                <div className="relative rounded-xl overflow-hidden">
+                                    <img
+                                        src={video.thumbnail}
+                                        alt={video.title}
+                                        className="w-full transition duration-300 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity" />
+                                </div>
+                                <h4 className="mt-2 text-sm text-gray-700 group-hover:text-purple-600 transition-colors line-clamp-2">
+                                    {video.title}
+                                </h4>
+                            </a>
                         ))}
                     </div>
                 </div>

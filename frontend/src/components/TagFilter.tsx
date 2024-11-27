@@ -74,10 +74,10 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
             <div
                 key={tag}
                 onClick={() => handleTagClick(tag)}
-                className={`ml-6 py-1 px-2 my-1 rounded-md cursor-pointer text-m ${
+                className={`ml-6 py-1.5 px-3 my-1.5 rounded-lg cursor-pointer text-sm transition-all duration-200 ${
                     selectedTags.has(tag)
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'hover:bg-purple-100 text-gray-700'
+                        ? 'bg-blue-100 text-blue-700 shadow-sm'
+                        : 'hover:bg-purple-50 text-gray-700 hover:shadow-sm'
                 }`}
             >
                 {tag.replace(/-/g, ' ')}
@@ -92,11 +92,13 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
     ): React.ReactNode => {
         const displayName = name.replace(/_/g, ' ');
         return (
-            <div key={name} className={`${!parentExpanded ? 'hidden' : ''}`}>
-                <div className="font-medium text-gray-700 py-1 px-2 ml-4">
+            <div key={name} className={`${!parentExpanded ? 'hidden' : ''} mb-4`}>
+                <div className="font-medium text-gray-700 py-2 px-2 ml-4 border-b border-gray-300">
                     {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
                 </div>
-                {renderTags(tags)}
+                <div className="mt-2">
+                    {renderTags(tags)}
+                </div>
             </div>
         );
     };
@@ -109,53 +111,55 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
         const displayName = category.replace(/_/g, ' ');
 
         return (
-            <div key={category} className="mb-4">
+            <div key={category} className="mb-6">
                 <div
                     onClick={() => toggleCategory(category)}
-                    className="flex items-center gap-2 py-2 px-3 bg-purple-200 rounded-lg cursor-pointer hover:bg-purple-100"
+                    className="flex items-center gap-2 py-2.5 px-4 bg-purple-100 rounded-xl cursor-pointer hover:bg-purple-200 transition-all duration-200 shadow-sm hover:shadow-md"
                 >
                     {isExpanded ? (
-                        <ChevronDown size={20} className="text-purple-600" />
+                        <ChevronDown size={20} className="text-purple-700" />
                     ) : (
-                        <ChevronRight size={20} className="text-purple-600" />
+                        <ChevronRight size={20} className="text-purple-700" />
                     )}
-                    <span className="font-semibold text-purple-600">
-            {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
-          </span>
+                    <span className="font-semibold text-purple-700">
+                        {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
+                    </span>
                 </div>
 
-                {!Array.isArray(data) ? (
-                    Object.entries(data as object).map(([subCategory, subTags]) =>
-                        renderSubcategory(
-                            subCategory,
-                            subTags as string[],
-                            isExpanded
+                <div className={`mt-3 transition-all duration-300 ${!isExpanded ? 'hidden opacity-0' : 'opacity-100'}`}>
+                    {!Array.isArray(data) ? (
+                        Object.entries(data as object).map(([subCategory, subTags]) =>
+                            renderSubcategory(
+                                subCategory,
+                                subTags as string[],
+                                isExpanded
+                            )
                         )
-                    )
-                ) : (
-                    <div className={!isExpanded ? 'hidden' : ''}>
-                        {renderTags(data)}
-                    </div>
-                )}
+                    ) : (
+                        <div className="mt-2">
+                            {renderTags(data)}
+                        </div>
+                    )}
+                </div>
             </div>
         );
     };
 
     return (
         <div className="p-4 overflow-y-auto max-h-screen">
-            <div className="mb-4">
-                <h2 className="text-xl font-bold text-purple-600 mb-2">Filters</h2>
+            <div className="mb-6">
+                <h2 className="text-xl font-bold text-purple-700 mb-4">Filters</h2>
                 {selectedTags.size > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
                         {Array.from(selectedTags).map(tag => (
                             <span
                                 key={tag}
                                 onClick={() => handleTagClick(tag)}
-                                className="inline-flex items-center bg-blue-200 text-blue-700 px-2 py-1 rounded-md text-sm cursor-pointer hover:bg-blue-200"
+                                className="inline-flex items-center bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-sm cursor-pointer hover:bg-blue-200 transition-all duration-200 shadow-sm"
                             >
-                {tag.replace(/-/g, ' ')}
-                                <span className="ml-1">×</span>
-              </span>
+                                {tag.replace(/-/g, ' ')}
+                                <span className="ml-2 text-blue-500 hover:text-blue-700">×</span>
+                            </span>
                         ))}
                     </div>
                 )}

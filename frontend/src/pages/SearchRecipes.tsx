@@ -89,8 +89,8 @@ const SearchRecipes: React.FC = () => {
     };
 
     return (
-        <div className="h-full w-full flex flex-row">
-            <div className="h-full w-96 bg-gray-50 border-r-gray-300 border-r-2">
+        <div className="max-w-[90rem] mx-auto flex flex-row">
+            <div className="w-80 min-w-[20rem] bg-gray-50 border-r border-gray-200 min-h-screen">
                 <TagFilters
                     tags={tags}
                     onTagsChange={(newTags: string[]) => {
@@ -99,7 +99,7 @@ const SearchRecipes: React.FC = () => {
                     }}
                 />
             </div>
-            <div className="container overflow-y-auto max-h-screen mx-auto px-4 py-8">
+            <div className="flex-1 px-8 py-6 min-h-[52rem]">
                 {isLoading && <LoadingPage />}
 
                 {error && !isLoading && (
@@ -122,7 +122,7 @@ const SearchRecipes: React.FC = () => {
                             ))}
                         </div>
 
-                        <div className="mt-8 flex justify-center items-center gap-2">
+                        <div className="mt-8 mb-6 flex justify-center items-center gap-2">
                             <button
                                 onClick={handleFirstPage}
                                 disabled={page === 0 || isLoading}
