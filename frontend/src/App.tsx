@@ -4,19 +4,19 @@ import Layout from "./layout/Layout";
 import {UserDetails} from "./pages/UserDetails";
 import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {onAuthStateChanged} from "firebase/auth";
 import {auth} from "./config/firebaseconfig";
 import LoginLayout from "./layout/LoginLayout";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import axios from "axios";
 import SearchRecipes from "./pages/SearchRecipes";
 import Loading from "./pages/Loading";
 import UserFavorites from "./pages/UserFavorites";
 import UserIngredients from "./pages/Pantry";
 import DietaryPreferences from "./pages/DietaryPreferences";
 import {registerOrUpdateUser} from "./api/ForksUpAPI";
+import Settings from "./pages/Settings";
 
 const App: React.FC = () => {
     const [user, setUser] = useState<any>(null);
@@ -46,6 +46,8 @@ const App: React.FC = () => {
                     <Route path="/favorites" element={<ProtectedRoute><UserFavorites/></ProtectedRoute>}/>
                     <Route path="/pantry" element={<ProtectedRoute><UserIngredients/></ProtectedRoute>}/>
                     <Route path="/dietary-preferences" element={<ProtectedRoute><DietaryPreferences/></ProtectedRoute>}/>
+                    <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
+
                 </Route>
 
                 <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>} >

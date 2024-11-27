@@ -1,16 +1,16 @@
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
-import {Search, ChevronLeft, ChevronRight, ChevronsRight, ChevronsLeft} from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsRight, ChevronsLeft } from 'lucide-react';
 import RecipeDetails from "../components/RecipeDetails";
 import LoadingPage from "./Loading";
-import {Recipe} from "../model/Recipe";
+import { Recipe } from "../model/Recipe";
 import TagFilters from "../components/TagFilter";
 import tags from "../assets/tags.json"
-import {getRecipes} from "../api/ForksUpAPI";
-import {wait} from "@testing-library/user-event/dist/utils";
+import { getRecipes } from "../api/ForksUpAPI";
 
 const SearchRecipes: React.FC = () => {
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -23,13 +23,13 @@ const SearchRecipes: React.FC = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const fetchRecipes = async (pageNumber = page) => {
-        if (!searchTerm.trim()) return;
+        const searchTerm = searchParams.get('q');
+        if (!searchTerm?.trim()) return;
 
         setIsLoading(true);
         setError(null);
 
         try {
-            console.log(selectedTags)
             const data = await getRecipes(searchTerm, selectedTags, pageNumber, pageSize);
 
             if (data.content.length > 0) {
@@ -49,15 +49,8 @@ const SearchRecipes: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchRecipes(page);
-    }, [selectedTags, page]);
-
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        setPage(0);
         fetchRecipes(0);
-    };
+    }, [searchParams, selectedTags]);
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 0 && newPage < totalPages) {
@@ -97,9 +90,9 @@ const SearchRecipes: React.FC = () => {
 
     return (
         <div className="h-full w-full flex flex-row">
-            <div className="h-full w-96 bg-gradient-to-br from-purple-200 bg-blue-200">
+            <div className="h-full w-96 bg-gray-50 border-r-gray-300 border-r-2">
                 <TagFilters
-                    tags={tags} // Your tags object
+                    tags={tags}
                     onTagsChange={(newTags: string[]) => {
                         setSelectedTags(newTags);
                         setPage(0);
@@ -107,27 +100,6 @@ const SearchRecipes: React.FC = () => {
                 />
             </div>
             <div className="container overflow-y-auto max-h-screen mx-auto px-4 py-8">
-                <div className="mb-8">
-                    <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Search recipes..."
-                                className="w-full px-4 py-2 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                            <button
-                                type="submit"
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-blue-500"
-                                disabled={isLoading}
-                            >
-                                <Search size={20}/>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
                 {isLoading && <LoadingPage />}
 
                 {error && !isLoading && (
@@ -137,7 +109,7 @@ const SearchRecipes: React.FC = () => {
                         </div>
                     </div>
                 )}
-                {recipes.length > 0}
+
                 {!isLoading && !error && recipes.length > 0 && (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -236,7 +208,5 @@ const SearchRecipes: React.FC = () => {
         </div>
     );
 };
-
-
 
 export default SearchRecipes;

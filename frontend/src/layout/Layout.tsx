@@ -8,6 +8,7 @@ import RecipesIcon from "../assets/RecipesIcon";
 
 const Layout: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,10 +31,17 @@ const Layout: React.FC = () => {
         }
     };
 
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchTerm.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+        }
+    };
+
     const menuItems = [
         { icon: Star, text: "Favorites", path: "/favorites" },
         { icon: Utensils, text: "Diet and Health", path: "/dietary-preferences" },
-        { icon: ShoppingBag, text: "My Items", path: "/pantry" },
+        { icon: ShoppingBag, text: "My Pantry", path: "/pantry" },
         { icon: Settings, text: "Settings", path: "/settings" },
     ];
 
@@ -56,90 +64,104 @@ const Layout: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="flex flex-col">
             <nav className="bg-gradient-to-br from-blue-200 to-purple-200 p-4">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    {/* Logo and Search Button */}
-                    <div className="flex items-center space-x-6">
-                        <Link to="/" className="flex items-center opacity-75 space-x-2">
+                    {/* Logo and Search Form */}
+                    <div className="flex items-center justify-between w-full gap-6">
+                        <Link to="/" className="flex items-center opacity-75 space-x-2 min-w-fit">
                             <RecipesIcon className="fill-purple-700 stroke-purple-700 h-11 w-11"/>
                             <span className="text-4xl font-bold text-purple-700">Forks Up!</span>
                         </Link>
-                        <Link to="/search">
-                            <Button
-                                variant="text"
-                                className="h-11 px-6 flex items-center space-x-2 hover:shadow-sm transition-shadow"
-                            >
-                                <Search className="w-5 h-5 text-blue-600"/>
-                                <span className="text-blue-600">Search Recipes</span>
-                            </Button>
-                        </Link>
-                    </div>
-
-                    {/* User Menu */}
-                    <ul className="flex items-center space-x-4">
-                        {user ? (
-                            <li className="flex flex-row relative">
-                                <Button
-                                    variant="outlined"
-                                    className="h-10"
-                                    onClick={handleLogout}
+                        <form onSubmit={handleSearch} className="w-full max-w-2xl">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Search recipes..."
+                                    className="w-full px-4 py-2 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                <button
+                                    type="submit"
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-blue-500"
                                 >
-                                    Log Out
-                                </Button>
-                                <div className="relative group">
-                                    <UserRound
-                                        className="ml-5 h-10 w-10 p-1 border-2 stroke-blue-500 border-blue-500 rounded-full cursor-pointer hover:opacity-90 transition-opacity"
-                                    />
+                                    <Search size={20}/>
+                                </button>
+                            </div>
+                        </form>
+                        
+                        {/* User Menu */}
+                        <ul className="flex items-center space-x-4 min-w-fit">
+                            {user ? (
+                                <li className="flex flex-row relative">
+                                    <Button
+                                        variant="outlined"
+                                        className="h-10"
+                                        onClick={handleLogout}
+                                    >
+                                        Log Out
+                                    </Button>
+                                    <div className="relative group">
+                                        <UserRound
+                                            className="ml-5 h-10 w-10 p-1 border-2 stroke-blue-500 border-blue-500 rounded-full cursor-pointer hover:opacity-90 transition-opacity"
+                                        />
 
-                                    {/* Dropdown Menu */}
-                                    <div
-                                        className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 transition-all duration-300">
-                                        {menuItems.map((item, index) => {
-                                            const IconComponent = item.icon;
-                                            return (
-                                                <Link
-                                                    key={index}
-                                                    to={item.path}
-                                                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                                                >
-                                                    <IconComponent className="w-5 h-5 mr-3"/>
-                                                    <span>{item.text}</span>
-                                                </Link>
-                                            );
-                                        })}
+                                        {/* Dropdown Menu */}
+                                        <div
+                                            className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 transition-all duration-300">
+                                            <p className="text-center h-8 border-b border-gray-400 mb-2">
+                                                {user.displayName}
+                                            </p>
+                                            {menuItems.map((item, index) => {
+                                                const IconComponent = item.icon;
+                                                return (
+                                                    <>
+                                                        <Link
+                                                            key={index}
+                                                            to={item.path}
+                                                            className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                                                        >
+                                                            <IconComponent className="w-5 h-5 mr-3"/>
+                                                            <span>{item.text}</span>
+                                                        </Link>
+                                                    </>
+
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        ) : (
-                            <>
-                                <li>
-                                    <Link to="/login">
-                                        <Button
-                                            variant="outlined"
-                                            className="h-10"
-                                        >
-                                            Log In
-                                        </Button>
-                                    </Link>
                                 </li>
-                                <li>
-                                    <Link to="/sign-up">
-                                        <Button
-                                            variant="text"
-                                            className="h-10"
-                                        >
-                                            Sign Up
-                                        </Button>
-                                    </Link>
-                                </li>
-                            </>
-                        )}
-                    </ul>
+                            ) : (
+                                <>
+                                    <li>
+                                        <Link to="/login">
+                                            <Button
+                                                variant="outlined"
+                                                className="h-10"
+                                            >
+                                                Log In
+                                            </Button>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/sign-up">
+                                            <Button
+                                                variant="text"
+                                                className="h-10"
+                                            >
+                                                Sign Up
+                                            </Button>
+                                        </Link>
+                                    </li>
+                                </>
+                            )}
+                        </ul>
+                    </div>
                 </div>
             </nav>
 
-            <main className="flex-grow">
+            <main className="bg-gray-50 flex-grow min-h-screen">
                 <Outlet/>
             </main>
 
@@ -198,7 +220,7 @@ const Layout: React.FC = () => {
 
                     <div className="mt-8 pt-8 border-t border-gray-200">
                         <p className="text-center text-gray-500">
-                            © {new Date().getFullYear()} Your Company Name. All rights reserved.
+                            &copy; {new Date().getFullYear()} Your Company Name. All rights reserved.
                         </p>
                     </div>
                 </div>
