@@ -5,6 +5,7 @@ import { auth } from "../config/firebaseconfig";
 import axios from "axios";
 import { Recipe } from "../model/Recipe";
 import {addFavorite, checkFavoriteStatus, removeFavorite} from "../api/ForksUpAPI";
+import { getIngredientEmoji } from "../assets/ingredientEmojis";
 
 type RecipeDetailsProps = {
     recipe: Recipe;
@@ -129,11 +130,17 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                     </div>
                     <p className="font-semibold">Serving Size: {recipe.serving_size.slice(2)}</p>
                     <div className="mt-2">
-                        <h4 className="font-semibold text-gray-700">Ingredients</h4>
-                        <ul>
-                            {recipe.ingredientsRawStr?.map((ingredient, index) => (
-                                <li key={index} className="text-gray-600">{ingredient}</li>
-                            ))}
+                        <h4 className="font-semibold text-gray-700">🥘 Ingredients</h4>
+                        <ul className="space-y-1">
+                            {recipe.ingredientsRawStr?.map((ingredient, index) => {
+                                const emoji = getIngredientEmoji(ingredient);
+                                return (
+                                    <li key={index} className="text-gray-600 flex items-center gap-2">
+                                        <span className="w-6 text-center">{emoji || '•'}</span>
+                                        {ingredient}
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                     <div className="mb-5 mt-4">

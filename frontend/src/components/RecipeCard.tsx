@@ -1,62 +1,7 @@
 import {UserRound, Users} from "lucide-react";
 import {Recipe} from "../model/Recipe";
 import React from "react";
-
-const getIngredientEmoji = (ingredient: string): string => {
-    const ingredientMap: { [key: string]: string } = {
-        // Meats
-        'chicken': '🍗',
-        'beef': '🥩',
-        'pork': '🥓',
-        'fish': '🐟',
-        'turkey': '🦃',
-        // Vegetables
-        'tomato': '🍅',
-        'potato': '🥔',
-        'carrot': '🥕',
-        'corn': '🌽',
-        'broccoli': '🥦',
-        'cucumber': '🥒',
-        'lettuce': '🥬',
-        'onion': '🧅',
-        'garlic': '🧄',
-        'mushroom': '🍄',
-        'pepper': '🫑',
-        // Fruits
-        'apple': '🍎',
-        'banana': '🍌',
-        'orange': '🍊',
-        'lemon': '🍋',
-        'strawberry': '🍓',
-        'grape': '🍇',
-        'watermelon': '🍉',
-        'pear': '🍐',
-        'peach': '🍑',
-        'cherry': '🍒',
-        // Dairy & Eggs
-        'milk': '🥛',
-        'cheese': '🧀',
-        'egg': '🥚',
-        'butter': '🧈',
-        // Bread & Grains
-        'bread': '🍞',
-        'rice': '🍚',
-        // Others
-        'salt': '🧂',
-        'sugar': '🧂',
-        'honey': '🍯',
-        'chocolate': '🍫',
-        'oil': '🛢️',
-    };
-
-    const lowercaseIngredient = ingredient.toLowerCase();
-    for (const [key, emoji] of Object.entries(ingredientMap)) {
-        if (lowercaseIngredient.includes(key)) {
-            return emoji;
-        }
-    }
-    return '';
-};
+import { getIngredientEmoji } from "../assets/ingredientEmojis";
 
 type RecipeCardProps = {
     recipe: Recipe;
