@@ -9,4 +9,5 @@ export type Recipe = {
     ingredientsRawStr?: string[];
     steps: string[];
     description: string;
+    imageUrl?: string;
 };
