@@ -18,12 +18,14 @@ public class SecurityConfig {
     @Autowired
     private FirebaseAuthenticationFilter firebaseTokenFilter;
 
+    @Autowired
+    CustomCorsConfiguration customCorsConfiguration;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
-                .cors(cors -> cors.disable())
+                .cors(c -> c.configurationSource(customCorsConfiguration))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**", "/api/recipes/**").permitAll()
