@@ -1,5 +1,6 @@
 package com.example.forksup.controller;
 
+import com.example.forksup.model.Ingredient;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.repository.RecipeRepository;
 import com.example.forksup.service.RecipeService;
@@ -54,13 +55,23 @@ public class RecipeController {
 
     @GetMapping("/searchTags")
     public ResponseEntity<Page<Recipe>> searchRecipesWithTags(
-        @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "9") int size
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size
     ) {
         Page<Recipe> recipes  = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
         return new ResponseEntity<>(recipes, HttpStatus.OK);
     }
-
+    @GetMapping("searchTagsAndPantry")
+    public ResponseEntity<Page<Recipe>> searchRecipesWithTagsAndPantry(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) List<String> pantryItems,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size
+    ){
+        Page<Recipe> recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(keyword, tags, pantryItems, page, size);
+        return new ResponseEntity<>(recipes, HttpStatus.OK);
+    }
 }
