@@ -22,6 +22,24 @@ const SearchRecipes: React.FC = () => {
 
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+    const popularCategories = [
+        { name: 'Quick & Easy', icon: '⚡', description: 'Ready in 30 minutes or less' },
+        { name: 'Healthy', icon: '🥗', description: 'Nutritious and balanced meals' },
+        { name: 'Comfort Food', icon: '🍲', description: 'Hearty and satisfying dishes' },
+        { name: 'Desserts', icon: '🍰', description: 'Sweet treats and baked goods' },
+        { name: 'Vegetarian', icon: '🥬', description: 'Meat-free delicious options' },
+        { name: 'International', icon: '🌎', description: 'Cuisines from around the world' }
+    ];
+
+    const mealTypes = [
+        'Breakfast & Brunch 🍳',
+        'Lunch Ideas 🥪',
+        'Quick Dinners 🍝',
+        'Healthy Snacks 🥕',
+        'Weekend Baking 🥖',
+        'Party Food 🎉'
+    ];
+
     const fetchRecipes = async (pageNumber = page) => {
         const searchTerm = searchParams.get('q');
         if (!searchTerm?.trim()) return;
@@ -110,7 +128,70 @@ const SearchRecipes: React.FC = () => {
                     </div>
                 )}
 
-                {!isLoading && !error && recipes.length > 0 && (
+                {!isLoading && !error && !searchParams.get('q')?.trim() && (
+                    <div className="max-w-4xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                                Discover Amazing Recipes
+                            </h1>
+                            <p className="text-gray-600 text-lg">
+                                Search for recipes or explore our popular categories below
+                            </p>
+                        </div>
+
+                        <div className="mb-12">
+                            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                                Popular Categories
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {popularCategories.map((category) => (
+                                    <div 
+                                        key={category.name}
+                                        className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-all duration-200 cursor-pointer group"
+                                        onClick={() => {
+                                            setSearchParams({ q: category.name });
+                                        }}
+                                    >
+                                        <div className="flex items-start space-x-4">
+                                            <span className="text-3xl group-hover:scale-110 transition-transform">
+                                                {category.icon}
+                                            </span>
+                                            <div>
+                                                <h3 className="font-medium text-gray-900 group-hover:text-purple-700 transition-colors">
+                                                    {category.name}
+                                                </h3>
+                                                <p className="text-sm text-gray-500 mt-1">
+                                                    {category.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                                Browse by Meal Type
+                            </h2>
+                            <div className="flex flex-wrap gap-3">
+                                {mealTypes.map((type) => (
+                                    <button
+                                        key={type}
+                                        onClick={() => {
+                                            setSearchParams({ q: type.split(' ')[0] });
+                                        }}
+                                        className="px-4 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200"
+                                    >
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {!isLoading && !error && searchParams.get('q')?.trim() && recipes.length > 0 && (
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {recipes.map((recipe) => (
