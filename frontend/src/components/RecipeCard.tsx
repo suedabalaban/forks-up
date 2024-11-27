@@ -2,6 +2,62 @@ import {UserRound, Users} from "lucide-react";
 import {Recipe} from "../model/Recipe";
 import React from "react";
 
+const getIngredientEmoji = (ingredient: string): string => {
+    const ingredientMap: { [key: string]: string } = {
+        // Meats
+        'chicken': '🍗',
+        'beef': '🥩',
+        'pork': '🥓',
+        'fish': '🐟',
+        'turkey': '🦃',
+        // Vegetables
+        'tomato': '🍅',
+        'potato': '🥔',
+        'carrot': '🥕',
+        'corn': '🌽',
+        'broccoli': '🥦',
+        'cucumber': '🥒',
+        'lettuce': '🥬',
+        'onion': '🧅',
+        'garlic': '🧄',
+        'mushroom': '🍄',
+        'pepper': '🫑',
+        // Fruits
+        'apple': '🍎',
+        'banana': '🍌',
+        'orange': '🍊',
+        'lemon': '🍋',
+        'strawberry': '🍓',
+        'grape': '🍇',
+        'watermelon': '🍉',
+        'pear': '🍐',
+        'peach': '🍑',
+        'cherry': '🍒',
+        // Dairy & Eggs
+        'milk': '🥛',
+        'cheese': '🧀',
+        'egg': '🥚',
+        'butter': '🧈',
+        // Bread & Grains
+        'bread': '🍞',
+        'rice': '🍚',
+        // Others
+        'salt': '🧂',
+        'sugar': '🧂',
+        'honey': '🍯',
+        'chocolate': '🍫',
+        'oil': '🛢️',
+    };
+
+    const lowercaseIngredient = ingredient.toLowerCase();
+    for (const [key, emoji] of Object.entries(ingredientMap)) {
+        if (lowercaseIngredient.includes(key)) {
+            return emoji;
+        }
+    }
+    return '';
+};
+
 type RecipeCardProps = {
     recipe: Recipe;
     onClick: () => void;
@@ -33,7 +89,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
                     <div className="flex flex-wrap gap-1">
                         {recipe.ingredients.slice(0, 3).map((ingredient, idx) => (
                             <span key={idx} className="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs text-gray-600">
-                                {ingredient.name}
+                                {ingredient.name} {getIngredientEmoji(ingredient.name)}
                             </span>
                         ))}
                         {recipe.ingredients.length > 3 && (
