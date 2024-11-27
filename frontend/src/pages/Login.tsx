@@ -67,7 +67,7 @@ const Login = () => {
                       className="block text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out">
                     Forgot password?
                 </Link>
-                <Link to="/sign-up"
+                <Link to="/signup"
                       className="block text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out">
                     Don't have an account? Sign up
                 </Link>

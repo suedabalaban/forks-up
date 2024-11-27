@@ -147,8 +147,8 @@ export const removeIngredient = async (ingredientId: string) => {
 export const getRecipes = async (
     keyword: string,
     selectedTags: string[] = [],
-    pageNumber: number = 0,
-    pageSize: number = 10
+    page: number = 0,
+    size: number = 10
 ) => {
     try {
         const token = await getToken();
@@ -161,8 +161,8 @@ export const getRecipes = async (
             },
             params: {
                 keyword,
-                pageNumber,
-                pageSize,
+                page,
+                size,
             },
             paramsSerializer: params => {
                 const baseParams = new URLSearchParams(params as any).toString();

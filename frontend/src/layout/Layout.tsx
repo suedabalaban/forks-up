@@ -145,7 +145,7 @@ const Layout: React.FC = () => {
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link to="/sign-up">
+                                        <Link to="/signup">
                                             <Button
                                                 variant="text"
                                                 className="h-10"
@@ -161,7 +161,7 @@ const Layout: React.FC = () => {
                 </div>
             </nav>
 
-            <main className="bg-gray-50 flex-grow min-h-screen">
+            <main className="bg-gray-50 flex-grow min-h-[52rem]">
                 <Outlet/>
             </main>
 
