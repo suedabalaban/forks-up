@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import tagsData from "../assets/tags.json";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {addUserPreferences, Preferences} from "../api/ForksUpAPI";
 
-interface DietaryPreferencesState {
+export interface DietaryPreferencesState {
   health_conscious: string[];
   allergies_intolerances: string[];
   lifestyle: string[];
@@ -18,6 +19,7 @@ const DietaryPreferences: React.FC = () => {
   });
 
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const steps = [
     {
@@ -68,9 +70,24 @@ const DietaryPreferences: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    console.log('Kaydedilen tercihler:', preferences);
-    // TODO Add save preferences request
+  const handleSubmit = async () => {
+    try {
+      const userPreferences = {
+        dietary_restrictions: {
+          health_conscious: preferences.health_conscious,
+          allergies_intolerances: preferences.allergies_intolerances,
+          lifestyle: preferences.lifestyle
+        },
+        cuisines: preferences.selectedCuisines,
+        preparation_time: ""
+      };
+      
+      await addUserPreferences(userPreferences);
+      setSuccessMessage("Tercihleriniz başarılı bir şekilde kaydedilmiştir");
+      setTimeout(() => setSuccessMessage(""), 3000); // 3 saniye sonra mesajı kaldır
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+    }
   };
 
   const renderTags = (tags: string[], category: keyof DietaryPreferencesState) => {
@@ -172,6 +189,12 @@ const DietaryPreferences: React.FC = () => {
             {currentStep < steps.length - 1 && <ChevronRight size={20} className="ml-2" />}
           </button>
         </div>
+
+        {successMessage && (
+          <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-lg text-center">
+            {successMessage}
+          </div>
+        )}
       </div>
     </div>
   );

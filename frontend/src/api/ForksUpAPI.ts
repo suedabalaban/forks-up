@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {auth} from "../config/firebaseconfig";
+import DietaryPreferences from "../pages/DietaryPreferences";
 
 const api = axios.create({
     baseURL: 'http://localhost:8080/api',
@@ -67,7 +68,7 @@ export const removeFavorite = async (recipeId: string) => {
 export const getIngredients = async (searchQuery: string) => {
     try {
         const token = await getToken();
-        return await axios.get(`http://localhost:8080/api/ingredients/search`, {
+        return await api.get(`/api/ingredients/search`, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -83,7 +84,7 @@ export const getIngredients = async (searchQuery: string) => {
 export const getPantryItems = async () => {
     try {
         const token = await getToken();
-        return await axios.get(`http://localhost:8080/api/user/pantry`, {
+        return await api.get(`/api/user/pantry`, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -98,7 +99,7 @@ export const getPantryItems = async () => {
 export const addIngredient = async (ingredientId: string) => {
     try {
         const token = await getToken();
-        return await axios.post('http://localhost:8080/api/user/pantry', null, {
+        return await api.post('/api/user/pantry', null, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -117,7 +118,7 @@ export const addIngredient = async (ingredientId: string) => {
 export const updateQuantity = async (ingredientId: string, quantity: number) => {
     try {
         const token = await getToken();
-        return await axios.put(`http://localhost:8080/api/user/pantry/${ingredientId}`, null, {
+        return await api.put(`/api/user/pantry/${ingredientId}`, null, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -133,7 +134,7 @@ export const updateQuantity = async (ingredientId: string, quantity: number) => 
 export const removeIngredient = async (ingredientId: string) => {
     try {
         const token = await getToken();
-        return await axios.delete(`http://localhost:8080/api/user/pantry/${ingredientId}`, {
+        return await api.delete(`/api/user/pantry/${ingredientId}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -215,3 +216,31 @@ export const registerOrUpdateUser = async (user: any) => {
         throw error;
     }
 };
+
+export interface DietaryRestrictions {
+    health_conscious: string[]
+    allergies_intolerances: string[]
+    lifestyle: string[] 
+}
+
+export interface Preferences {
+    dietary_restrictions: DietaryRestrictions
+    cuisines: string[] 
+    preparation_time: string
+}
+
+//
+export const addUserPreferences = async (preferences: Preferences) => {
+    try {
+        const token = await getToken();
+        const response = await api.post('/user/preferences', preferences, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error saving user preferences:', error);
+        throw error;
+    }
+}

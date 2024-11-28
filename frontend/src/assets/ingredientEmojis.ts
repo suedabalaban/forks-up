@@ -207,6 +207,9 @@ export const ingredientMap: { [key: string]: string } = {
 };
 
 export const getIngredientEmoji = (ingredient: string): string => {
+    if (ingredient == null) {
+        return '';
+    }
     const lowercaseIngredient = ingredient.toLowerCase();
     for (const [key, emoji] of Object.entries(ingredientMap)) {
         if (lowercaseIngredient.includes(key)) {

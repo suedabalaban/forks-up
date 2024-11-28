@@ -4,7 +4,6 @@ import { User, onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from "../config/firebaseconfig";
 import {UserRound, Settings, ShoppingBag, Star, Utensils, Search} from "lucide-react";
 import Button from "@mui/material/Button";
-import ForkLogo from "../assets/ForkLogo";
 import RecipesIcon from "../assets/RecipesIcon";
 
 const Layout: React.FC = () => {

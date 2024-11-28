@@ -112,7 +112,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/preferences")
-    public ResponseEntity<User> getUserPreferencesFromJson(
+    public ResponseEntity<User> addUserPreferences(
             HttpServletRequest request,
             @RequestBody Preferences preferences) {
         FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
