@@ -1,6 +1,7 @@
-import {UserRound, Users} from "lucide-react";
-import {Recipe} from "../model/Recipe";
+import { UserRound, Users } from "lucide-react";
+import { Recipe } from "../model/Recipe";
 import React from "react";
+import { motion } from "framer-motion";
 import { getIngredientEmoji } from "../assets/ingredientEmojis";
 
 type RecipeCardProps = {
@@ -10,11 +11,21 @@ type RecipeCardProps = {
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
     return (
-        <div
+        <motion.div
             onClick={onClick}
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            className="bg-white rounded-lg shadow-md overflow-hidden"
+            whileHover={{ 
+                scale: 1.03,
+                transition: { duration: 0.2 }
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+        >
             <div className="relative h-48">
-                <img
+                <motion.img
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.3 }}
                     src={recipe.imageUrl || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg'}
                     alt={recipe.name}
                     className="w-full h-full object-cover"
@@ -26,35 +37,55 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
                     </div>
                 </div>
             </div>
-            <div className="p-4">
+            <motion.div 
+                className="p-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+            >
                 <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                     {recipe.description}
                 </p>
                 <div className="space-y-2">
                     <div className="flex flex-wrap gap-1">
                         {recipe.ingredients.slice(0, 3).map((ingredient, idx) => (
-                            <span key={idx} className="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs text-gray-600">
+                            <motion.span 
+                                key={idx} 
+                                className="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs text-gray-600"
+                                whileHover={{ scale: 1.1, backgroundColor: "#f3f4f6" }}
+                                transition={{ duration: 0.2 }}
+                            >
                                 {ingredient.name} {getIngredientEmoji(ingredient.name)}
-                            </span>
+                            </motion.span>
                         ))}
                         {recipe.ingredients.length > 3 && (
-                            <span className="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs text-gray-600">
+                            <motion.span 
+                                className="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs text-gray-600"
+                                whileHover={{ scale: 1.1, backgroundColor: "#f3f4f6" }}
+                                transition={{ duration: 0.2 }}
+                            >
                                 +{recipe.ingredients.length - 3} more
-                            </span>
+                            </motion.span>
                         )}
                     </div>
                     <div className="flex items-center text-gray-600 text-sm">
                         <span className="mr-2">Servings: {recipe.servings}</span>
                         <div className="flex">
-                            {Array.from(Array(recipe.servings % 2 === 1 ? (recipe.servings - 1) / 2 : recipe.servings / 2), (e, i) => (
-                                <Users key={i} size={16} className="text-gray-500"/>
+                            {Array.from(Array(recipe.servings)).map((_, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                >
+                                    <UserRound size={16} className="text-gray-400" />
+                                </motion.div>
                             ))}
-                            {recipe.servings % 2 === 1 && <UserRound size={16} className="text-gray-500"/>}
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 };
 

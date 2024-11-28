@@ -6,6 +6,7 @@ import axios from "axios";
 import { Recipe } from "../model/Recipe";
 import {addFavorite, checkFavoriteStatus, removeFavorite} from "../api/ForksUpAPI";
 import { getIngredientEmoji } from "../assets/ingredientEmojis";
+import { motion, AnimatePresence } from "framer-motion";
 
 type RecipeDetailsProps = {
     recipe: Recipe;
@@ -147,145 +148,185 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
     };
 
     return (
-        <div
-            onClick={handleClosePopup}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
-        >
-            <div
-                onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-2xl shadow-xl max-w-6xl w-full mx-4 max-h-[85vh] flex flex-row overflow-hidden relative"
+        <AnimatePresence>
+            <motion.div
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={handleClosePopup}
             >
-                {/* Main Content */}
-                <div className="flex-1 p-8 overflow-y-auto">
-                    <div className="max-w-3xl">
-                        <button 
-                            onClick={handleClosePopup}
-                            className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-                        >
-                            <Close className="w-6 h-6" />
-                        </button>
+                <motion.div
+                    className="bg-white rounded-2xl shadow-xl max-w-6xl w-full mx-4 max-h-[85vh] flex flex-row overflow-hidden relative"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    transition={{ type: "spring", damping: 25 }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {/* Main Content */}
+                    <motion.div
+                        className="flex-1 p-8 overflow-y-auto"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                    >
+                        <div className="max-w-3xl">
+                            <motion.button
+                                className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                                onClick={handleClosePopup}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                            >
+                                <Close className="w-6 h-6" />
+                            </motion.button>
 
-                        {/* Header Section */}
-                        <div className="mb-8">
-                            <div className="flex items-start justify-between mb-2">
-                                <h2 className="text-3xl font-bold text-gray-800">
-                                    {recipe.name}
-                                </h2>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={toggleFavorite}
-                                        className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
-                                        aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-                                    >
-                                        <Star
-                                            className={`w-8 h-8 transition-colors duration-200
-                                            ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400 hover:text-gray-600'}`}
-                                        />
-                                    </button>
-                                    <button 
-                                        onClick={handlePrint}
-                                        className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
-                                        title="Print Recipe"
-                                    >
-                                        <Printer className="w-7 h-7 text-gray-400 hover:text-gray-600" />
-                                    </button>
+                            {/* Header Section */}
+                            <div className="mb-8">
+                                <div className="flex items-start justify-between mb-2">
+                                    <h2 className="text-3xl font-bold text-gray-800">
+                                        {recipe.name}
+                                    </h2>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={toggleFavorite}
+                                            className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
+                                            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                                        >
+                                            <Star
+                                                className={`w-8 h-8 transition-colors duration-200
+                                                ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400 hover:text-gray-600'}`}
+                                            />
+                                        </button>
+                                        <button 
+                                            onClick={handlePrint}
+                                            className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
+                                            title="Print Recipe"
+                                        >
+                                            <Printer className="w-7 h-7 text-gray-400 hover:text-gray-600" />
+                                        </button>
+                                    </div>
+                                </div>
+                                <p className="text-lg text-gray-600 mb-4">
+                                    {recipe.description}
+                                </p>
+                                
+                                {/* Recipe Info */}
+                                <div className="flex items-center gap-6 text-gray-600">
+                                    <div className="flex items-center gap-2">
+                                        <Users className="w-5 h-5" />
+                                        <span>Serves {recipe.servings}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium">Serving Size:</span>
+                                        <span>{recipe.serving_size.slice(2)}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <p className="text-lg text-gray-600 mb-4">
-                                {recipe.description}
-                            </p>
-                            
-                            {/* Recipe Info */}
-                            <div className="flex items-center gap-6 text-gray-600">
-                                <div className="flex items-center gap-2">
-                                    <Users className="w-5 h-5" />
-                                    <span>Serves {recipe.servings}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="font-medium">Serving Size:</span>
-                                    <span>{recipe.serving_size.slice(2)}</span>
-                                </div>
-                            </div>
-                        </div>
 
-                        {/* Ingredients Section */}
-                        <div className="mb-8">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <span>🥘</span>
-                                <span>Ingredients</span>
-                            </h3>
-                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {recipe.ingredientsRawStr?.map((ingredient, index) => {
-                                    const emoji = getIngredientEmoji(ingredient);
-                                    return (
-                                        <li key={index} className="flex items-center gap-3 text-gray-600">
+                            {/* Ingredients Section */}
+                            <motion.div 
+                                className="mb-8"
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                            >
+                                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span>🥘</span>
+                                    <span>Ingredients</span>
+                                </h3>
+                                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {recipe.ingredientsRawStr?.map((ingredient, index) => (
+                                        <motion.li
+                                            key={index}
+                                            className="flex items-center gap-3 text-gray-600"
+                                            initial={{ x: -20, opacity: 0 }}
+                                            animate={{ x: 0, opacity: 1 }}
+                                            transition={{ delay: index * 0.1 }}
+                                        >
                                             <span className="w-8 h-8 flex items-center justify-center bg-gray-50 rounded-lg text-lg">
-                                                {emoji || '•'}
+                                                {getIngredientEmoji(ingredient) || '•'}
                                             </span>
                                             <span>{ingredient}</span>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
+                                        </motion.li>
+                                    ))}
+                                </ul>
+                            </motion.div>
 
-                        {/* Steps Section */}
-                        <div className="mb-8">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <span>📝</span>
-                                <span>Instructions</span>
-                            </h3>
-                            <ol className="space-y-4">
-                                {recipe.steps?.map((step, index) => (
-                                    <li key={index} className="flex gap-4">
-                                        <span className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-medium">
-                                            {index + 1}
-                                        </span>
-                                        <p className="text-gray-600 pt-1">{step}</p>
-                                    </li>
-                                ))}
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Video Sidebar */}
-                <div className="w-96 bg-gray-50 p-8 overflow-y-auto border-l border-gray-100">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-6">Related Videos</h3>
-                    {loading && (
-                        <div className="text-gray-500 animate-pulse">Loading videos...</div>
-                    )}
-                    {error && (
-                        <div className="text-red-500 bg-red-50 p-3 rounded-lg">
-                            {error}
-                        </div>
-                    )}
-                    <div className="space-y-6">
-                        {videos.map((video) => (
-                            <a
-                                key={video.id}
-                                href={`https://www.youtube.com/watch?v=${video.id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="block group"
+                            {/* Steps Section */}
+                            <motion.div
+                                className="mb-8"
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.4 }}
                             >
-                                <div className="relative rounded-xl overflow-hidden">
-                                    <img
-                                        src={video.thumbnail}
-                                        alt={video.title}
-                                        className="w-full transition duration-300 group-hover:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity" />
-                                </div>
-                                <h4 className="mt-2 text-sm text-gray-700 group-hover:text-purple-600 transition-colors line-clamp-2">
-                                    {video.title}
-                                </h4>
-                            </a>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
+                                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                    <span>📝</span>
+                                    <span>Instructions</span>
+                                </h3>
+                                <ol className="space-y-4">
+                                    {recipe.steps?.map((step, index) => (
+                                        <motion.li
+                                            key={index}
+                                            className="flex gap-4"
+                                            initial={{ x: -20, opacity: 0 }}
+                                            animate={{ x: 0, opacity: 1 }}
+                                            transition={{ delay: 0.5 + index * 0.1 }}
+                                        >
+                                            <span className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-medium">
+                                                {index + 1}
+                                            </span>
+                                            <p className="text-gray-600 pt-1">{step}</p>
+                                        </motion.li>
+                                    ))}
+                                </ol>
+                            </motion.div>
+                        </div>
+                    </motion.div>
+
+                    {/* Video Sidebar */}
+                    <motion.div
+                        className="w-96 bg-gray-50 p-8 overflow-y-auto border-l border-gray-100"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                    >
+                        <h3 className="text-xl font-semibold text-gray-800 mb-6">Related Videos</h3>
+                        {loading && (
+                            <div className="text-gray-500 animate-pulse">Loading videos...</div>
+                        )}
+                        {error && (
+                            <div className="text-red-500 bg-red-50 p-3 rounded-lg">
+                                {error}
+                            </div>
+                        )}
+                        <div className="space-y-6">
+                            {videos.map((video) => (
+                                <a
+                                    key={video.id}
+                                    href={`https://www.youtube.com/watch?v=${video.id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block group"
+                                >
+                                    <div className="relative rounded-xl overflow-hidden">
+                                        <img
+                                            src={video.thumbnail}
+                                            alt={video.title}
+                                            className="w-full transition duration-300 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity" />
+                                    </div>
+                                    <h4 className="mt-2 text-sm text-gray-700 group-hover:text-purple-600 transition-colors line-clamp-2">
+                                        {video.title}
+                                    </h4>
+                                </a>
+                            ))}
+                        </div>
+                    </motion.div>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>
     );
 };
 
