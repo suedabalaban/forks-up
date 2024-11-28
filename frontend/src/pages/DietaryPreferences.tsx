@@ -83,8 +83,8 @@ const DietaryPreferences: React.FC = () => {
       };
       
       await addUserPreferences(userPreferences);
-      setSuccessMessage("Tercihleriniz başarılı bir şekilde kaydedilmiştir");
-      setTimeout(() => setSuccessMessage(""), 3000); // 3 saniye sonra mesajı kaldır
+      setSuccessMessage("Preferences saved successfully");
+      setTimeout(() => setSuccessMessage(""), 3000); 
     } catch (error) {
       console.error('Error saving preferences:', error);
     }
@@ -110,7 +110,7 @@ const DietaryPreferences: React.FC = () => {
     return Object.entries(tagsData.cuisines).map(([cuisine, dishes]) => (
       <div key={cuisine} className="mb-6">
         <h3 className="text-lg font-semibold mb-3 text-purple-800">
-          {cuisine.charAt(0).toUpperCase() + cuisine.slice(1).replace(/_/g, ' ')} Mutfağı
+          {cuisine.charAt(0).toUpperCase() + cuisine.slice(1).replace(/_/g, ' ')} Cuisine
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {dishes.map((dish) => (
@@ -148,7 +148,7 @@ const DietaryPreferences: React.FC = () => {
           ))}
         </div>
         <div className="text-center text-sm text-purple-600">
-          Adım {currentStep + 1} / {steps.length}
+          Step {currentStep + 1} / {steps.length}
         </div>
       </div>
 
@@ -179,13 +179,13 @@ const DietaryPreferences: React.FC = () => {
             }`}
           >
             <ChevronLeft size={20} className="mr-2" />
-            Geri
+            Back
           </button>
           <button
             onClick={handleNext}
             className="flex items-center px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
           >
-            {currentStep === steps.length - 1 ? 'Tamamla' : 'İleri'}
+            {currentStep === steps.length - 1 ? 'Complete' : 'Next'}
             {currentStep < steps.length - 1 && <ChevronRight size={20} className="ml-2" />}
           </button>
         </div>

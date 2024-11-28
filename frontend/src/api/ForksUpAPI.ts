@@ -68,7 +68,7 @@ export const removeFavorite = async (recipeId: string) => {
 export const getIngredients = async (searchQuery: string) => {
     try {
         const token = await getToken();
-        return await api.get(`/api/ingredients/search`, {
+        return await api.get(`/ingredients/search`, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -84,12 +84,13 @@ export const getIngredients = async (searchQuery: string) => {
 export const getPantryItems = async () => {
     try {
         const token = await getToken();
-        return await api.get(`/api/user/pantry`, {
+        return await api.get(`/user/pantry`, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
         });
     } catch (error) {
+        console.error('Error getting ingredients:', error);
         console.error('Error fetching pantry items:', error);
         throw error;
     }
@@ -99,7 +100,7 @@ export const getPantryItems = async () => {
 export const addIngredient = async (ingredientId: string) => {
     try {
         const token = await getToken();
-        return await api.post('/api/user/pantry', null, {
+        return await api.post('/user/pantry', null, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -118,7 +119,7 @@ export const addIngredient = async (ingredientId: string) => {
 export const updateQuantity = async (ingredientId: string, quantity: number) => {
     try {
         const token = await getToken();
-        return await api.put(`/api/user/pantry/${ingredientId}`, null, {
+        return await api.put(`/user/pantry/${ingredientId}`, null, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -134,7 +135,7 @@ export const updateQuantity = async (ingredientId: string, quantity: number) => 
 export const removeIngredient = async (ingredientId: string) => {
     try {
         const token = await getToken();
-        return await api.delete(`/api/user/pantry/${ingredientId}`, {
+        return await api.delete(`/user/pantry/${ingredientId}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
