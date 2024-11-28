@@ -70,8 +70,8 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
                     </div>
                     <div className="flex items-center text-gray-600 text-sm">
                         <span className="mr-2">Servings: {recipe.servings}</span>
-                        <div className="flex">
-                            {Array.from(Array(recipe.servings)).map((_, idx) => (
+                        <div className="flex items-center">
+                            {Array.from(Array(Math.min(10, recipe.servings))).map((_, idx) => (
                                 <motion.div
                                     key={idx}
                                     initial={{ scale: 0 }}
@@ -81,6 +81,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
                                     <UserRound size={16} className="text-gray-400" />
                                 </motion.div>
                             ))}
+                            {recipe.servings > 10 && (
+                                <span className="ml-1 text-gray-400">+</span>
+                            )}
                         </div>
                     </div>
                 </div>
