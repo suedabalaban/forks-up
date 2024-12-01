@@ -81,10 +81,8 @@ public class GeminiService {
     }
 
     public GeminiResponse analyzeRecipe(String recipeId, String question){
-        // Create cache key
         String cacheKey = recipeId + "-" + question.toLowerCase().trim();
         
-        // Check cache first
         String cachedResponse = responseCache.get(cacheKey);
         if (cachedResponse != null) {
             return new GeminiResponse(cachedResponse);
@@ -147,7 +145,6 @@ public class GeminiService {
             geminiResponse = "Please ask a yes/no question";
         }
 
-        // Store in cache before returning
         responseCache.put(cacheKey, geminiResponse);
         return new GeminiResponse(geminiResponse);
     }

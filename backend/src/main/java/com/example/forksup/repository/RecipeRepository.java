@@ -18,6 +18,9 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
     @Query("{ $text: { $search: ?0 } }")
     List<Recipe> findByNameTextSearch(String keyword, Pageable pageable);
 
+    @Query(" {ingredients: {$in: ?0}}")
+    List<Recipe> findByIngredientsIn(List<ObjectId> ingredientIds, Pageable pageable);
+
     @Query("{ $and: [ { $text: { $search: ?0 } }, { tags: { $all: ?1 } } ] }")
     List<Recipe> findByNameAndTags(String keyword, List<String> tags, Pageable pageable);
 
@@ -42,6 +45,9 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
             "  { ingredients: { $in: ?2 } } " +
             "] }", count = true)
     long countByNameTagsAndIngredients(String keyword, List<String> tags, List<ObjectId> ingredientIds);
+
+    @Query(value = " {ingredients: {$in: ?0}}", count = true)
+    long countByIngredients(List<ObjectId> ingredientIds);
 
     @Cacheable(value = "uniqueTagsCache")
     @Aggregation(pipeline = {

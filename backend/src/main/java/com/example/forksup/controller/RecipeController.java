@@ -53,7 +53,7 @@ public class RecipeController {
         return new ResponseEntity<>(recipes, null, HttpStatus.OK);
     }
 
-    @GetMapping("/searchTags")
+    @GetMapping("/searchByTags")
     public ResponseEntity<Page<Recipe>> searchRecipesWithTags(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
@@ -63,7 +63,7 @@ public class RecipeController {
         Page<Recipe> recipes  = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
         return new ResponseEntity<>(recipes, HttpStatus.OK);
     }
-    @GetMapping("searchTagsAndPantry")
+    @GetMapping("searchByTagsAndPantry")
     public ResponseEntity<Page<Recipe>> searchRecipesWithTagsAndPantry(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
@@ -71,15 +71,16 @@ public class RecipeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size
     ){
-        System.out.println("Received search parameters:");
-        System.out.println("Keyword: " + keyword);
-        System.out.println("Tags: " + tags);
-        System.out.println("Pantry Items: " + pantryItems);
-        System.out.println("Page: " + page);
-        System.out.println("Size: " + size);
-        
         Page<Recipe> recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(keyword, tags, pantryItems, page, size);
-        System.out.println("Found recipes count: " + (recipes != null ? recipes.getTotalElements() : 0));
+        return new ResponseEntity<>(recipes, HttpStatus.OK);
+    }
+    @GetMapping("searchByIngredients")
+    public ResponseEntity<Page<Recipe>> searchRecipesWithIngredients(
+            @RequestParam(required = false) List<String> pantryItems,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size
+    ){
+        Page<Recipe> recipes = recipeService.searchRecipesByPantryItems(pantryItems, page, size);
         return new ResponseEntity<>(recipes, HttpStatus.OK);
     }
 }

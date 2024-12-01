@@ -76,11 +76,6 @@ public class RecipeService {
     public Page<Recipe> searchRecipesByKeywordTagsAndPantryItems(
             String keyword, List<String> tags, List<String> pantryItemNames, int page, int size) {
 
-        System.out.println("Service layer - Processing search with:");
-        System.out.println("Keyword: " + keyword);
-        System.out.println("Tags: " + tags);
-        System.out.println("Pantry Items: " + pantryItemNames);
-
         Pageable pageable = PageRequest.of(page, size);
 
         String searchText = keyword == null || keyword.trim().isEmpty() ? "" :
@@ -88,7 +83,6 @@ public class RecipeService {
                         .map(word -> "\"" + word + "\"")
                         .collect(Collectors.joining(" "));
 
-        System.out.println("Processed search text: " + searchText);
 
         List<ObjectId> ingredientIds = new ArrayList<>();
         if (pantryItemNames != null && !pantryItemNames.isEmpty()) {
@@ -96,7 +90,6 @@ public class RecipeService {
                     .stream()
                     .map(Ingredient::getObjectId)
                     .collect(Collectors.toList());
-            System.out.println("Found ingredient IDs: " + ingredientIds);
         }
 
         List<Recipe> recipes;
@@ -105,8 +98,23 @@ public class RecipeService {
         recipes = recipeRepository.findByNameTagsAndIngredients(searchText, tags, ingredientIds, pageable);
         total = recipeRepository.countByNameTagsAndIngredients(searchText, tags, ingredientIds);
 
-        System.out.println("Found " + total + " recipes in total");
-        System.out.println("Returning " + (recipes != null ? recipes.size() : 0) + " recipes for current page");
+        return new PageImpl<>(recipes, pageable, total);
+    }
+    @Cacheable(value = "recipeSearchCache",
+            key = "{#pantryItemNames, #page, #size}",
+            unless = "#result.isEmpty()")
+    public Page<Recipe> searchRecipesByPantryItems(List<String> pantryItemNames, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<ObjectId> ingredientIds = new ArrayList<>();
+        if (pantryItemNames != null && !pantryItemNames.isEmpty()) {
+            ingredientIds = ingredientRepository.findByNameIn(pantryItemNames)
+                    .stream()
+                    .map(Ingredient::getObjectId)
+                    .collect(Collectors.toList());
+        }
+        List<Recipe> recipes = recipeRepository.findByIngredientsIn(ingredientIds, pageable);
+        long total = recipeRepository.countByIngredients(ingredientIds);
 
         return new PageImpl<>(recipes, pageable, total);
     }
