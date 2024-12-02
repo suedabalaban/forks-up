@@ -76,8 +76,8 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
                 onClick={() => handleTagClick(tag)}
                 className={`ml-6 py-1.5 px-3 my-1.5 rounded-lg cursor-pointer text-sm transition-all duration-200 ${
                     selectedTags.has(tag)
-                        ? 'bg-blue-100 text-blue-700 shadow-sm'
-                        : 'hover:bg-purple-50 text-gray-700 hover:shadow-sm'
+                        ? 'bg-blue-600 dark:bg-blue-500 text-white'
+                        : 'hover:bg-purple-50 dark:hover:bg-purple-600 text-gray-700 dark:text-gray-300 hover:shadow-sm'
                 }`}
             >
                 {tag.replace(/-/g, ' ')}
@@ -93,7 +93,7 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
         const displayName = name.replace(/_/g, ' ');
         return (
             <div key={name} className={`${!parentExpanded ? 'hidden' : ''} mb-4`}>
-                <div className="font-medium text-gray-700 py-2 px-2 ml-4 border-b border-gray-300">
+                <div className="font-medium text-gray-700 dark:text-gray-300 py-2 px-2 ml-4 border-b border-gray-300 dark:border-gray-600">
                     {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
                 </div>
                 <div className="mt-2">
@@ -114,14 +114,14 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
             <div key={category} className="mb-6">
                 <div
                     onClick={() => toggleCategory(category)}
-                    className="flex items-center gap-2 py-2.5 px-4 bg-purple-100 rounded-xl cursor-pointer hover:bg-purple-200 transition-all duration-200 shadow-sm hover:shadow-md"
+                    className="flex items-center gap-2 py-2.5 px-4 bg-purple-100 dark:bg-purple-600 rounded-xl cursor-pointer hover:bg-purple-200 dark:hover:bg-purple-500 transition-all duration-200 shadow-sm hover:shadow-md"
                 >
                     {isExpanded ? (
-                        <ChevronDown size={20} className="text-purple-700" />
+                        <ChevronDown size={20} className="text-purple-700 dark:text-purple-400" />
                     ) : (
-                        <ChevronRight size={20} className="text-purple-700" />
+                        <ChevronRight size={20} className="text-purple-700 dark:text-purple-400" />
                     )}
-                    <span className="font-semibold text-purple-700">
+                    <span className="font-semibold text-purple-700 dark:text-purple-400">
                         {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
                     </span>
                 </div>
@@ -146,19 +146,19 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
     };
 
     return (
-        <div className="p-4 overflow-y-auto max-h-screen">
+        <div className="p-4 overflow-y-auto h-auto max-h-[110vh]">
             <div className="mb-6">
-                <h2 className="text-xl font-bold text-purple-700 mb-4">Filters</h2>
+                <h2 className="text-xl font-bold text-purple-700 dark:text-purple-400 mb-4">Filters</h2>
                 {selectedTags.size > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
+                    <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         {Array.from(selectedTags).map(tag => (
                             <span
                                 key={tag}
                                 onClick={() => handleTagClick(tag)}
-                                className="inline-flex items-center bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-sm cursor-pointer hover:bg-blue-200 transition-all duration-200 shadow-sm"
+                                className="inline-flex items-center bg-blue-600 dark:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-sm cursor-pointer hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 shadow-sm"
                             >
                                 {tag.replace(/-/g, ' ')}
-                                <span className="ml-2 text-blue-500 hover:text-blue-700">×</span>
+                                <span className="ml-2 text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-500">×</span>
                             </span>
                         ))}
                     </div>

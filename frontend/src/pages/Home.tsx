@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChefHat, Clock, Users, Utensils } from 'lucide-react';
+import { ChefHat, Clock, Users } from 'lucide-react';
 
 const Home: React.FC = () => {
     const featuredRecipes = [
@@ -42,15 +42,15 @@ const Home: React.FC = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
             {/* Hero Section */}
-            <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl p-8 mb-12">
+            <div className="bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-700 dark:to-blue-700 rounded-2xl p-8 mb-12">
                 <div className="max-w-3xl">
-                    <h1 className="text-4xl font-bold text-purple-800 mb-4">
+                    <h1 className="text-4xl font-bold text-purple-800 dark:text-white mb-4">
                         Discover Cooking
                     </h1>
-                    <p className="text-lg text-gray-700 mb-6">
+                    <p className="text-lg text-gray-700 dark:text-gray-400 mb-6">
                         Create wonders in the kitchen with thousands of delicious recipes, step-by-step instructions, and cooking tips.
                     </p>
-                    <Link to="/search" className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300">
+                    <Link to="/search" className="bg-purple-600 dark:bg-purple-700 text-white px-6 py-3 rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 transition duration-300">
                         Explore Recipes
                     </Link>
                 </div>
@@ -58,13 +58,13 @@ const Home: React.FC = () => {
 
             {/* Categories */}
             <section className="mb-12">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Categories</h2>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Categories</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {tags.map((tag) => (
                         <Link to={`/search?tag=${tag.name}`} key={tag.name} 
-                              className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition duration-300 text-center">
+                              className="bg-white dark:bg-gray-700 p-4 rounded-xl shadow-sm hover:shadow-md transition duration-300 text-center">
                             <span className="text-3xl mb-2 block">{tag.icon}</span>
-                            <span className="text-gray-700">{tag.displayName}</span>
+                            <span className="text-gray-700 dark:text-gray-400">{tag.displayName}</span>
                         </Link>
                     ))}
                 </div>
@@ -72,14 +72,14 @@ const Home: React.FC = () => {
 
             {/* Featured Recipes */}
             <section>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Featured Recipes</h2>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Featured Recipes</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {featuredRecipes.map((recipe) => (
-                        <div key={recipe.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300">
+                        <div key={recipe.id} className="bg-white dark:bg-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300">
                             <img src={recipe.image} alt={recipe.title} className="w-full h-48 object-cover" />
                             <div className="p-4">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">{recipe.title}</h3>
-                                <div className="flex items-center justify-between text-sm text-gray-600">
+                                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">{recipe.title}</h3>
+                                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                                     <div className="flex items-center">
                                         <Clock size={16} className="mr-1" />
                                         <span>{recipe.time}</span>

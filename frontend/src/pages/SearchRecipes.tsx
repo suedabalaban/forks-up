@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, {useState, useEffect} from 'react';
+import {useSearchParams} from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
-import { ChevronLeft, ChevronRight, ChevronsRight, ChevronsLeft } from 'lucide-react';
+import {ChevronLeft, ChevronRight, ChevronsRight, ChevronsLeft} from 'lucide-react';
 import RecipeDetails from "../components/RecipeDetails";
 import LoadingPage from "./Loading";
-import { Recipe } from "../model/Recipe";
+import {Recipe} from "../model/Recipe";
 import TagFilters from "../components/TagFilter";
 import tags from "../assets/tags.json"
-import { getRecipes } from "../api/ForksUpAPI";
+import {getRecipes} from "../api/ForksUpAPI";
 
 const SearchRecipes: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -23,12 +23,12 @@ const SearchRecipes: React.FC = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const popularCategories = [
-        { name: 'Quick & Easy', icon: '⚡', description: 'Ready in 30 minutes or less' },
-        { name: 'Healthy', icon: '🥗', description: 'Nutritious and balanced meals' },
-        { name: 'Comfort Food', icon: '🍲', description: 'Hearty and satisfying dishes' },
-        { name: 'Desserts', icon: '🍰', description: 'Sweet treats and baked goods' },
-        { name: 'Vegetarian', icon: '🥬', description: 'Meat-free delicious options' },
-        { name: 'International', icon: '🌎', description: 'Cuisines from around the world' }
+        {name: 'Quick & Easy', icon: '⚡', description: 'Ready in 30 minutes or less'},
+        {name: 'Healthy', icon: '🥗', description: 'Nutritious and balanced meals'},
+        {name: 'Comfort Food', icon: '🍲', description: 'Hearty and satisfying dishes'},
+        {name: 'Desserts', icon: '🍰', description: 'Sweet treats and baked goods'},
+        {name: 'Vegetarian', icon: '🥬', description: 'Meat-free delicious options'},
+        {name: 'International', icon: '🌎', description: 'Cuisines from around the world'}
     ];
 
     const mealTypes = [
@@ -107,8 +107,8 @@ const SearchRecipes: React.FC = () => {
     };
 
     return (
-        <div className="max-w-[90rem] mx-auto flex flex-row">
-            <div className="w-80 min-w-[20rem] bg-gray-50 border-r border-gray-200 min-h-screen">
+        <div className="max-w-[90rem] mx-auto flex flex-row dark:bg-gray-900">
+            <div className="w-80 min-w-[20rem] border-r border-gray-200 dark:border-gray-700 min-h-screen">
                 <TagFilters
                     tags={tags}
                     onTagsChange={(newTags: string[]) => {
@@ -117,13 +117,13 @@ const SearchRecipes: React.FC = () => {
                     }}
                 />
             </div>
-            <div className="flex-1 px-8 py-6 min-h-[52rem]">
-                {isLoading && <LoadingPage />}
+            <div className="flex-1 px-8 py-6 min-h-[52rem] dark:text-gray-100">
+                {isLoading && <LoadingPage/>}
 
                 {error && !isLoading && (
-                    <div className="text-center text-gray-600 flex items-center justify-center">
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                            <p className="text-red-600">{error}</p>
+                    <div className="text-center text-gray-600 dark:text-gray-400 flex items-center justify-center">
+                        <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4">
+                            <p className="text-red-600 dark:text-red-400">{error}</p>
                         </div>
                     </div>
                 )}
@@ -131,25 +131,25 @@ const SearchRecipes: React.FC = () => {
                 {!isLoading && !error && !searchParams.get('q')?.trim() && (
                     <div className="max-w-4xl mx-auto">
                         <div className="text-center mb-12">
-                            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
                                 Discover Amazing Recipes
                             </h1>
-                            <p className="text-gray-600 text-lg">
+                            <p className="text-gray-600 dark:text-gray-400 text-lg">
                                 Search for recipes or explore our popular categories below
                             </p>
                         </div>
 
                         <div className="mb-12">
-                            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">
                                 Popular Categories
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {popularCategories.map((category) => (
-                                    <div 
+                                    <div
                                         key={category.name}
-                                        className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-all duration-200 cursor-pointer group"
+                                        className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-400 transition-all duration-200 cursor-pointer group"
                                         onClick={() => {
-                                            setSearchParams({ q: category.name });
+                                            setSearchParams({q: category.name});
                                         }}
                                     >
                                         <div className="flex items-start space-x-4">
@@ -157,10 +157,10 @@ const SearchRecipes: React.FC = () => {
                                                 {category.icon}
                                             </span>
                                             <div>
-                                                <h3 className="font-medium text-gray-900 group-hover:text-purple-700 transition-colors">
+                                                <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">
                                                     {category.name}
                                                 </h3>
-                                                <p className="text-sm text-gray-500 mt-1">
+                                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                                     {category.description}
                                                 </p>
                                             </div>
@@ -171,7 +171,7 @@ const SearchRecipes: React.FC = () => {
                         </div>
 
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">
                                 Browse by Meal Type
                             </h2>
                             <div className="flex flex-wrap gap-3">
@@ -179,9 +179,9 @@ const SearchRecipes: React.FC = () => {
                                     <button
                                         key={type}
                                         onClick={() => {
-                                            setSearchParams({ q: type.split(' ')[0] });
+                                            setSearchParams({q: type.split(' ')[0]});
                                         }}
-                                        className="px-4 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-purple-100 hover:text-purple-700 transition-colors duration-200"
+                                        className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-400 transition-colors duration-200"
                                     >
                                         {type}
                                     </button>
@@ -209,11 +209,11 @@ const SearchRecipes: React.FC = () => {
                                 disabled={page === 0 || isLoading}
                                 className={`flex items-center gap-1 px-3 py-2 rounded-lg border ${
                                     page === 0 || isLoading
-                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                 }`}
                             >
-                                <ChevronsLeft size={18} />
+                                <ChevronsLeft size={18}/>
                                 First
                             </button>
 
@@ -222,11 +222,11 @@ const SearchRecipes: React.FC = () => {
                                 disabled={page === 0 || isLoading}
                                 className={`flex items-center gap-1 px-3 py-2 rounded-lg border ${
                                     page === 0 || isLoading
-                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                 }`}
                             >
-                                <ChevronLeft size={18} />
+                                <ChevronLeft size={18}/>
                                 Prev
                             </button>
 
@@ -240,8 +240,8 @@ const SearchRecipes: React.FC = () => {
                                             onClick={() => handlePageChange(pageNum as number)}
                                             className={`px-3 py-2 rounded-lg border ${
                                                 page === pageNum
-                                                    ? 'bg-blue-500 text-white border-blue-500'
-                                                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                                                    ? 'bg-blue-500 dark:bg-blue-400 text-white border-blue-500 dark:border-blue-400'
+                                                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                             }`}
                                         >
                                             {(pageNum as number) + 1}
@@ -255,12 +255,12 @@ const SearchRecipes: React.FC = () => {
                                 disabled={page >= totalPages - 1 || isLoading}
                                 className={`flex items-center gap-1 px-3 py-2 rounded-lg border ${
                                     page >= totalPages - 1 || isLoading
-                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                 }`}
                             >
                                 Next
-                                <ChevronRight size={18} />
+                                <ChevronRight size={18}/>
                             </button>
 
                             <button
@@ -268,12 +268,12 @@ const SearchRecipes: React.FC = () => {
                                 disabled={page >= totalPages - 1 || isLoading}
                                 className={`flex items-center gap-1 px-3 py-2 rounded-lg border ${
                                     page >= totalPages - 1 || isLoading
-                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                                 }`}
                             >
                                 Last
-                                <ChevronsRight size={18} />
+                                <ChevronsRight size={18}/>
                             </button>
                         </div>
                     </>

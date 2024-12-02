@@ -1,12 +1,11 @@
 import React, {useState, useEffect} from "react";
 import RecipeCard from "../components/RecipeCard";
 import RecipeDetails from "../components/RecipeDetails";
-import axios from "axios";
-import {auth} from "../config/firebaseconfig";
 import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
 import {Star} from "lucide-react";
 import {getFavoriteRecipes} from "../api/ForksUpAPI";
+import {Link} from "react-router-dom";
 
 const SearchRecipes: React.FC = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -21,19 +20,10 @@ const SearchRecipes: React.FC = () => {
 
             try {
                 const favoriteRecipes = await getFavoriteRecipes();
-                if (Array.isArray(favoriteRecipes)) {
-                    setRecipes(favoriteRecipes);
-                } else {
-                    throw new Error('Invalid data format');
-                }
-            } catch (err: any) {
-                if (axios.isAxiosError(err)) {
-                    setError(err.response?.data?.message || 'An error occurred while fetching favorites');
-                    console.error('Error fetching favorites:', err.response?.data);
-                } else {
-                    setError('An unexpected error occurred');
-                    console.error('Error:', err);
-                }
+                setRecipes(favoriteRecipes);
+            } catch (err) {
+                console.error('Error:', err);
+                setError('An error occurred while fetching favorites');
             } finally {
                 setLoading(false);
             }
@@ -47,14 +37,17 @@ const SearchRecipes: React.FC = () => {
 
     if (loading) {
         return (
-            <LoadingPage/>
+            <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-purple-500 dark:border-purple-400 border-t-transparent"></div>
+                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading your favorites...</p>
+            </div>
         );
     }
 
     if (error) {
         return (
-            <div className="text-center text-red-500 p-4">
-                {error}
+            <div className="text-center py-12">
+                <p className="text-red-600 dark:text-red-400">{error}</p>
             </div>
         );
     }
@@ -63,7 +56,7 @@ const SearchRecipes: React.FC = () => {
         <div className="max-w-full mx-auto p-5">
             <h1 className="text-4xl w-full items-center justify-center flex flex-row mt-6 font-semibold mb-2">
                 <Star className="mr-3 h-10 w-10 fill-yellow-400 text-yellow-400"/>
-                <span>Favorite Recipes</span>
+                <span className="text-gray-900 dark:text-gray-100">Favorite Recipes</span>
             </h1>
             <div className="container mx-auto px-4 py-8">
                 {recipes.length > 0 ? (
@@ -77,8 +70,23 @@ const SearchRecipes: React.FC = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center text-gray-500 p-4">
-                        No favorite recipes found.
+                    <div className="text-center py-16">
+                        <div className="mb-6 text-6xl">
+                            🍳
+                        </div>
+                        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                            No Favorite Recipes Yet
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-8">
+                            Start exploring delicious recipes and save your favorites to build your personal collection.
+                            You can easily find them here for quick access later!
+                        </p>
+                        <Link 
+                            to="/search" 
+                            className="inline-flex items-center px-6 py-3 rounded-lg bg-purple-600 dark:bg-purple-500 text-white hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors duration-300"
+                        >
+                            Discover Recipes
+                        </Link>
                     </div>
                 )}
 

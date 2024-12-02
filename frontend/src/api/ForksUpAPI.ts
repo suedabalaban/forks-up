@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {auth} from "../config/firebaseconfig";
-import DietaryPreferences from "../pages/DietaryPreferences";
 
 const api = axios.create({
     baseURL: 'http://localhost:8080/api',
@@ -188,10 +187,12 @@ export const getFavoriteRecipes = async () => {
                 'Content-Type': 'application/json',
             },
         });
-        return response.data;
+        // API'den gelen veri null veya undefined ise boş array dön
+        return response.data || [];
     } catch (error) {
         console.error('Error retrieving favorite recipes:', error);
-        throw error;
+        // Hata durumunda boş array dön
+        return [];
     }
 };
 

@@ -150,14 +150,14 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
     return (
         <AnimatePresence>
             <motion.div
-                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+                className="fixed inset-0 bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-50 flex items-center justify-center p-4 z-50"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={handleClosePopup}
             >
                 <motion.div
-                    className="bg-white rounded-2xl shadow-xl max-w-6xl w-full mx-4 max-h-[85vh] flex flex-row overflow-hidden relative"
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-6xl w-full mx-4 max-h-[85vh] flex flex-row overflow-hidden relative"
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}
@@ -173,7 +173,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                     >
                         <div className="max-w-3xl">
                             <motion.button
-                                className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                                className="absolute top-6 right-6 p-2 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                 onClick={handleClosePopup}
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
@@ -184,35 +184,35 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                             {/* Header Section */}
                             <div className="mb-8">
                                 <div className="flex items-start justify-between mb-2">
-                                    <h2 className="text-3xl font-bold text-gray-800">
+                                    <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200">
                                         {recipe.name}
                                     </h2>
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={toggleFavorite}
-                                            className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
+                                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                                             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                                         >
                                             <Star
                                                 className={`w-8 h-8 transition-colors duration-200
-                                                ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400 hover:text-gray-600'}`}
+                                                ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300'}`}
                                             />
                                         </button>
                                         <button 
                                             onClick={handlePrint}
-                                            className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
+                                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                                             title="Print Recipe"
                                         >
-                                            <Printer className="w-7 h-7 text-gray-400 hover:text-gray-600" />
+                                            <Printer className="w-7 h-7 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300" />
                                         </button>
                                     </div>
                                 </div>
-                                <p className="text-lg text-gray-600 mb-4">
+                                <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
                                     {recipe.description}
                                 </p>
                                 
                                 {/* Recipe Info */}
-                                <div className="flex items-center gap-6 text-gray-600">
+                                <div className="flex items-center gap-6 text-gray-600 dark:text-gray-300">
                                     <div className="flex items-center gap-2">
                                         <Users className="w-5 h-5" />
                                         <span>Serves {recipe.servings}</span>
@@ -231,7 +231,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.3 }}
                             >
-                                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                     <span>🥘</span>
                                     <span>Ingredients</span>
                                 </h3>
@@ -239,12 +239,12 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                                     {recipe.ingredientsRawStr?.map((ingredient, index) => (
                                         <motion.li
                                             key={index}
-                                            className="flex items-center gap-3 text-gray-600"
+                                            className="flex items-center gap-3 text-gray-600 dark:text-gray-300"
                                             initial={{ x: -20, opacity: 0 }}
                                             animate={{ x: 0, opacity: 1 }}
                                             transition={{ delay: index * 0.1 }}
                                         >
-                                            <span className="w-8 h-8 flex items-center justify-center bg-gray-50 rounded-lg text-lg">
+                                            <span className="w-8 h-8 flex items-center justify-center bg-gray-50 dark:bg-gray-700/50 rounded-lg text-lg">
                                                 {getIngredientEmoji(ingredient) || '•'}
                                             </span>
                                             <span>{ingredient}</span>
@@ -260,7 +260,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.4 }}
                             >
-                                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                     <span>📝</span>
                                     <span>Instructions</span>
                                 </h3>
@@ -268,15 +268,15 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                                     {recipe.steps?.map((step, index) => (
                                         <motion.li
                                             key={index}
-                                            className="flex gap-4"
+                                            className="flex gap-4 text-gray-600 dark:text-gray-300"
                                             initial={{ x: -20, opacity: 0 }}
                                             animate={{ x: 0, opacity: 1 }}
                                             transition={{ delay: 0.5 + index * 0.1 }}
                                         >
-                                            <span className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-medium">
+                                            <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 font-medium">
                                                 {index + 1}
                                             </span>
-                                            <p className="text-gray-600 pt-1">{step}</p>
+                                            <p className="mt-1">{step}</p>
                                         </motion.li>
                                     ))}
                                 </ol>
@@ -286,17 +286,17 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
 
                     {/* Video Sidebar */}
                     <motion.div
-                        className="w-96 bg-gray-50 p-8 overflow-y-auto border-l border-gray-100"
+                        className="w-96 bg-gray-50 dark:bg-gray-700/50 p-8 overflow-y-auto border-l border-gray-100 dark:border-gray-700"
                         initial={{ x: 20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.5 }}
                     >
-                        <h3 className="text-xl font-semibold text-gray-800 mb-6">Related Videos</h3>
+                        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Related Videos</h3>
                         {loading && (
-                            <div className="text-gray-500 animate-pulse">Loading videos...</div>
+                            <div className="text-gray-500 dark:text-gray-300 animate-pulse">Loading videos...</div>
                         )}
                         {error && (
-                            <div className="text-red-500 bg-red-50 p-3 rounded-lg">
+                            <div className="text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/10 p-3 rounded-lg">
                                 {error}
                             </div>
                         )}
@@ -317,7 +317,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                                         />
                                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity" />
                                     </div>
-                                    <h4 className="mt-2 text-sm text-gray-700 group-hover:text-purple-600 transition-colors line-clamp-2">
+                                    <h4 className="mt-2 text-sm text-gray-700 dark:text-gray-300 group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors line-clamp-2">
                                         {video.title}
                                     </h4>
                                 </a>

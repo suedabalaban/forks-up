@@ -2,16 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-    @apply h-full;
+@layer base {
+    html, body, #root {
+        @apply h-full;
+    }
+
+    body {
+        @apply bg-gray-50 dark:bg-gray-900;
+    }
 }
-body {
-    @apply h-full;
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+    @apply w-2;
 }
-div#root {
-    @apply flex flex-col;
-    @apply h-full;
+
+::-webkit-scrollbar-track {
+    @apply bg-transparent;
 }
-main {
-    @apply h-full;
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-600;
 }

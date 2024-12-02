@@ -97,8 +97,8 @@ const DietaryPreferences: React.FC = () => {
         onClick={() => handleTagClick(tag, category)}
         className={`py-2 px-4 my-2 rounded-lg cursor-pointer transition-all ${
           (preferences[category] as string[]).includes(tag)
-            ? 'bg-purple-600 text-white'
-            : 'bg-purple-100 hover:bg-purple-200 text-purple-800'
+            ? 'bg-purple-600 text-white dark:bg-purple-500 dark:text-white'
+            : 'bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 dark:text-purple-200'
         }`}
       >
         {tag.replace(/-/g, ' ')}
@@ -109,7 +109,7 @@ const DietaryPreferences: React.FC = () => {
   const renderCuisines = () => {
     return Object.entries(tagsData.cuisines).map(([cuisine, dishes]) => (
       <div key={cuisine} className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-purple-800">
+        <h3 className="text-lg font-semibold mb-3 text-purple-800 dark:text-purple-200">
           {cuisine.charAt(0).toUpperCase() + cuisine.slice(1).replace(/_/g, ' ')} Cuisine
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -119,8 +119,8 @@ const DietaryPreferences: React.FC = () => {
               onClick={() => handleTagClick(dish, 'selectedCuisines')}
               className={`py-2 px-4 rounded-lg cursor-pointer transition-all ${
                 preferences.selectedCuisines.includes(dish)
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-purple-100 hover:bg-purple-200 text-purple-800'
+                  ? 'bg-purple-600 text-white dark:bg-purple-500 dark:text-white'
+                  : 'bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 dark:text-purple-200'
               }`}
             >
               {dish.replace(/-/g, ' ')}
@@ -142,22 +142,22 @@ const DietaryPreferences: React.FC = () => {
             <div
               key={index}
               className={`flex-1 h-2 mx-1 rounded ${
-                index <= currentStep ? 'bg-purple-600' : 'bg-purple-200'
+                index <= currentStep ? 'bg-purple-600 dark:bg-purple-500' : 'bg-purple-200 dark:bg-purple-900/20'
               }`}
             />
           ))}
         </div>
-        <div className="text-center text-sm text-purple-600">
+        <div className="text-center text-sm text-purple-600 dark:text-purple-200">
           Step {currentStep + 1} / {steps.length}
         </div>
       </div>
 
       {/* Content */}
-      <div className="bg-white rounded-xl shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-purple-800 mb-2">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-purple-800 dark:text-purple-200 mb-2">
           {currentStepData.title}
         </h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
           {currentStepData.description}
         </p>
 
@@ -174,8 +174,8 @@ const DietaryPreferences: React.FC = () => {
             disabled={currentStep === 0}
             className={`flex items-center px-6 py-2 rounded-lg ${
               currentStep === 0
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-purple-100 text-purple-600 hover:bg-purple-200'
+                ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                : 'bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-900/30'
             }`}
           >
             <ChevronLeft size={20} className="mr-2" />
@@ -183,7 +183,7 @@ const DietaryPreferences: React.FC = () => {
           </button>
           <button
             onClick={handleNext}
-            className="flex items-center px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            className="flex items-center px-6 py-2 bg-purple-600 dark:bg-purple-500 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600"
           >
             {currentStep === steps.length - 1 ? 'Complete' : 'Next'}
             {currentStep < steps.length - 1 && <ChevronRight size={20} className="ml-2" />}
@@ -191,7 +191,7 @@ const DietaryPreferences: React.FC = () => {
         </div>
 
         {successMessage && (
-          <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-lg text-center">
+          <div className="mt-4 p-4 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-lg text-center">
             {successMessage}
           </div>
         )}
