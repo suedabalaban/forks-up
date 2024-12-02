@@ -69,7 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout }) => {
                         {user ? (
                             <div className="relative group">
                                 <div className="flex items-center space-x-3 cursor-pointer">
-                                    <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
                                         <span className="text-purple-600 dark:text-purple-300 font-medium">
                                             {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
                                         </span>

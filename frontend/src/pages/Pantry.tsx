@@ -101,16 +101,23 @@ const Pantry = () => {
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search ingredients... 🔍"
-                                className="w-full p-3 pl-12 border rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-purple-500 dark:focus:border-purple-400 transition-all duration-300"
+                                placeholder="Search ingredients... "
+                                className="w-full px-4 py-2 pr-12 rounded-full border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                             />
-                            <Search className="absolute left-4 top-3.5 text-purple-400 dark:text-purple-300" size={20} />
+                            <button
+                                type="submit"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                            >
+                                <Search size={20}/>
+                            </button>
                         </div>
 
-                        <div className="max-h-[calc(100vh-300px)] overflow-y-auto mt-4 scrollbar-thin scrollbar-thumb-purple-500 dark:scrollbar-thumb-purple-400 scrollbar-track-purple-100 dark:scrollbar-track-gray-700">
+                        <div
+                            className="max-h-[calc(100vh-300px)] overflow-y-auto mt-4 scrollbar-thin scrollbar-thumb-purple-500 dark:scrollbar-thumb-purple-400 scrollbar-track-purple-100 dark:scrollbar-track-gray-700">
                             {searchLoading ? (
                                 <div className="text-center py-8">
-                                    <div className="animate-spin text-purple-600 dark:text-purple-300 text-2xl mb-2">🔄</div>
+                                    <div className="animate-spin text-purple-600 dark:text-purple-300 text-2xl mb-2">🔄
+                                    </div>
                                     <p className="text-purple-600 dark:text-purple-300">Searching for ingredients...</p>
                                 </div>
                             ) : (

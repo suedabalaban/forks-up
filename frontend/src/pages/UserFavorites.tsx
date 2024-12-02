@@ -93,7 +93,7 @@ const SearchRecipes: React.FC = () => {
                 {selectedRecipe && (
                     <RecipeDetails
                         recipe={selectedRecipe}
-                        handleClosePopup={handleClosePopup}
+                        onClose={handleClosePopup}
                     />
                 )}
             </div>

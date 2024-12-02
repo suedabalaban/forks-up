@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 // Type definitions for the tag structure
 interface TagStructure {
@@ -43,15 +44,30 @@ type CategoryKey = keyof TagStructure;
 type SubcategoryKey<T> = T extends object ? keyof T : never;
 
 const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
+    const [searchParams, setSearchParams] = useSearchParams();
     const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
         new Set(['dietary_restrictions'])
     );
 
+    useEffect(() => {
+        const urlTag = searchParams.get('tag');
+        if (urlTag && !selectedTags.has(urlTag)) {
+            const newSelectedTags = new Set(selectedTags);
+            newSelectedTags.add(urlTag);
+            setSelectedTags(newSelectedTags);
+            onTagsChange(Array.from(newSelectedTags));
+        }
+    }, [searchParams, selectedTags]);
+
     const handleTagClick = (tag: string): void => {
         const newSelectedTags = new Set(selectedTags);
         if (newSelectedTags.has(tag)) {
             newSelectedTags.delete(tag);
+            if (searchParams.get('tag') === tag) {
+                searchParams.delete('tag');
+                setSearchParams(searchParams);
+            }
         } else {
             newSelectedTags.add(tag);
         }
@@ -150,7 +166,7 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
             <div className="mb-6">
                 <h2 className="text-xl font-bold text-purple-700 dark:text-purple-400 mb-4">Filters</h2>
                 {selectedTags.size > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div className="flex flex-wrap gap-2 mb-4 p-3 rounded-lg">
                         {Array.from(selectedTags).map(tag => (
                             <span
                                 key={tag}
