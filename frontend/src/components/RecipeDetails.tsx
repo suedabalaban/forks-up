@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 type RecipeDetailsProps = {
     recipe: Recipe;
-    handleClosePopup: () => void;
+    onClose: () => void;
 };
 
 type YouTubeVideo = {
@@ -19,7 +19,7 @@ type YouTubeVideo = {
     thumbnail: string;
 };
 
-const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup}) => {
+const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose}) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [videos, setVideos] = useState<YouTubeVideo[]>([]);
     const [loading, setLoading] = useState(false);
@@ -154,7 +154,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={handleClosePopup}
+                onClick={onClose}
             >
                 <motion.div
                     className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-6xl w-full mx-4 max-h-[85vh] flex flex-row overflow-hidden relative"
@@ -174,7 +174,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, handleClosePopup})
                         <div className="max-w-3xl">
                             <motion.button
                                 className="absolute top-6 right-6 p-2 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                                onClick={handleClosePopup}
+                                onClick={onClose}
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                             >

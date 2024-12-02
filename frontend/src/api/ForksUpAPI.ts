@@ -146,28 +146,33 @@ export const removeIngredient = async (ingredientId: string) => {
 };
 
 export const getRecipes = async (
-    keyword: string,
-    selectedTags: string[] = [],
+    keyword?: string,
+    tags?: string[],
+    pantryItems?: string[],
     page: number = 0,
-    size: number = 10
-) => {
+    size: number = 9
+): Promise<any> => {
     try {
+        const params = new URLSearchParams();
+        
+        // Add parameters only if they are defined
+        if (keyword) {
+            params.append('keyword', keyword);
+        }
+        if (tags && tags.length > 0) {
+            tags.forEach(tag => params.append('tags', tag));
+        }
+        if (pantryItems && pantryItems.length > 0) {
+            pantryItems.forEach(item => params.append('pantryItems', item));
+        }
+        
+        params.append('page', page.toString());
+        params.append('size', size.toString());
+
         const token = await getToken();
-        const tagsQuery = selectedTags
-            .map(tag => `tags=${encodeURIComponent(tag)}`)
-            .join('&');
-        const response = await api.get('/recipes/searchTags', {
+        const response = await api.get(`/recipes/search?${params.toString()}`, {
             headers: {
                 Authorization: `Bearer ${token}`
-            },
-            params: {
-                keyword,
-                page,
-                size,
-            },
-            paramsSerializer: params => {
-                const baseParams = new URLSearchParams(params as any).toString();
-                return tagsQuery ? `${baseParams}&${tagsQuery}` : baseParams;
             },
         });
         return response.data;
