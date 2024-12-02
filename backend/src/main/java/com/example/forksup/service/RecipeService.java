@@ -69,6 +69,17 @@ public class RecipeService {
     public List<String> getAllUniqueTags() {
         return recipeRepository.findDistinctTags();
     }
+    @Cacheable(value = "recipeSearchCache",
+            key = "#tags",
+            unless = "#result.isEmpty()")
+    public Page<Recipe> searchRecipesByTags(List<String> tags, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<Recipe> recipes = recipeRepository.findByTagsIn(tags, pageable);
+        long total = recipeRepository.countByTags(tags);
+        return new PageImpl<>(recipes, pageable, total);
+    }
+
 
     @Cacheable(value = "recipeSearchCache",
             key = "#keyword + #tags + #pantryItemNames + #page + #size",
