@@ -11,4 +11,6 @@ import java.util.List;
 public interface IngredientRepository extends MongoRepository<Ingredient, ObjectId> {
     @Query(value = "{ $text: { $search: ?0 } }", sort = "{ score: { $meta: 'textScore' } }")
     List<Ingredient> findByKeywordSortedByRelevance(String keyword);
+
+    List<Ingredient> findByNameIn(List<String> names);
 }

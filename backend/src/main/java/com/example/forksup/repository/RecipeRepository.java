@@ -18,12 +18,21 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
     @Query("{ $text: { $search: ?0 } }")
     List<Recipe> findByNameTextSearch(String keyword, Pageable pageable);
 
+    @Query(" {ingredients: {$in: ?0}}")
+    List<Recipe> findByIngredientsIn(List<ObjectId> ingredientIds, Pageable pageable);
+
+    @Query(" {tags: { $all: ?0} }")
+    List<Recipe> findByTagsIn(List<String> tags, Pageable pageable);
+
     @Query("{ $and: [ { $text: { $search: ?0 } }, { tags: { $all: ?1 } } ] }")
     List<Recipe> findByNameAndTags(String keyword, List<String> tags, Pageable pageable);
 
-    //düzelteceğim bozuk mlesf
-    @Query("{ $and: [ { $text: { $search: ?0 } }, { tags: { $all: ?1 } }, { 'ingredients.ingredient.name': { $in: ?2 } } ] }")
-    List<Recipe> findByNameTagsAndIngredients(String keyword, List<String> tags, List<String> ingredientNames, Pageable pageable);
+    @Query("{ $and: [ " +
+            "  { $text: { $search: ?0 } }, " +
+            "  { tags: { $all: ?1 } }, " +
+            "  { ingredients: { $in: ?2 } } " +
+            "] }")
+    List<Recipe> findByNameTagsAndIngredients(String keyword, List<String> tags, List<ObjectId> ingredientIds, Pageable pageable);
 
     @Cacheable(value = "recipeCountCache", key = "#keyword")
     @Query(value = "{ $text: { $search: '?0' }}", count = true)
@@ -33,8 +42,18 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
     @Query(value = "{ $and: [ { $text: { $search: ?0 } }, { tags: { $all: ?1 } } ] }", count = true)
     long countByNameAndTags(String keyword, List<String> tags);
 
-    @Query(value = "{ $and: [ { $text: { $search: ?0 } }, { tags: { $all: ?1 } }, { 'ingredients.ingredient.name': { $in: ?2 } } ] }", count = true)
-    long countByNameTagsAndIngredients(String keyword, List<String> tags, List<String> ingredientNames);
+    @Query(value = "{ $and: [ " +
+            "  { $text: { $search: ?0 } }, " +
+            "  { tags: { $all: ?1 } }, " +
+            "  { ingredients: { $in: ?2 } } " +
+            "] }", count = true)
+    long countByNameTagsAndIngredients(String keyword, List<String> tags, List<ObjectId> ingredientIds);
+
+    @Query(value = " {ingredients: {$in: ?0}}", count = true)
+    long countByIngredients(List<ObjectId> ingredientIds);
+
+    @Query(value = "{tags: {$all: ?0}}", count = true)
+    long countByTags(List<String> tags);
 
     @Cacheable(value = "uniqueTagsCache")
     @Aggregation(pipeline = {

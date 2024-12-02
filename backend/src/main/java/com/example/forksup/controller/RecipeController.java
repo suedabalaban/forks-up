@@ -45,15 +45,43 @@ public class RecipeController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<Recipe>> searchRecipesRegex(
-            @RequestParam String keyword,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) List<String> pantryItems,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size
     ) {
-        Page<Recipe> recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
-        return new ResponseEntity<>(recipes, null, HttpStatus.OK);
+        try {
+            Page<Recipe> recipes;
+            
+            if (keyword != null && tags != null && pantryItems != null) {
+                recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(keyword, tags, pantryItems, page, size);
+            }
+            else if (keyword != null && tags != null) {
+                recipes = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
+            }
+            else if (keyword != null && tags == null && pantryItems == null) {
+                recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
+            }
+            else if (keyword == null && tags == null && pantryItems != null) {
+                recipes = recipeService.searchRecipesByPantryItems(pantryItems, page, size);
+            }
+            else if (keyword == null && tags != null && pantryItems == null) {
+                recipes = recipeService.searchRecipesByTags(tags, page, size);
+            }
+            else {
+                return ResponseEntity.badRequest()
+                    .body(Page.empty());
+            }
+            
+            return ResponseEntity.ok(recipes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body(Page.empty());
+        }
     }
 
-    @GetMapping("/searchTags")
+    @GetMapping("/searchByTags")
     public ResponseEntity<Page<Recipe>> searchRecipesWithTags(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
@@ -63,7 +91,7 @@ public class RecipeController {
         Page<Recipe> recipes  = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
         return new ResponseEntity<>(recipes, HttpStatus.OK);
     }
-    @GetMapping("searchTagsAndPantry")
+    @GetMapping("searchByTagsAndPantry")
     public ResponseEntity<Page<Recipe>> searchRecipesWithTagsAndPantry(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
@@ -72,6 +100,15 @@ public class RecipeController {
             @RequestParam(defaultValue = "9") int size
     ){
         Page<Recipe> recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(keyword, tags, pantryItems, page, size);
+        return new ResponseEntity<>(recipes, HttpStatus.OK);
+    }
+    @GetMapping("searchByIngredients")
+    public ResponseEntity<Page<Recipe>> searchRecipesWithIngredients(
+            @RequestParam(required = false) List<String> pantryItems,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size
+    ){
+        Page<Recipe> recipes = recipeService.searchRecipesByPantryItems(pantryItems, page, size);
         return new ResponseEntity<>(recipes, HttpStatus.OK);
     }
 }

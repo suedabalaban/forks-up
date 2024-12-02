@@ -1,5 +1,8 @@
 package com.example.forksup.service;
 
+import com.example.forksup.model.Ingredient;
+import com.example.forksup.repository.IngredientRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.repository.RecipeRepository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +23,10 @@ import java.util.stream.Collectors;
 public class RecipeService {
 
     @Autowired
-    RecipeRepository recipeRepository;
+    private RecipeRepository recipeRepository;
+
+    @Autowired
+    private IngredientRepository ingredientRepository;
 
     @Cacheable(value = "recipeSearchCache",
             key = "#keyword + #page + #size",
@@ -62,6 +69,17 @@ public class RecipeService {
     public List<String> getAllUniqueTags() {
         return recipeRepository.findDistinctTags();
     }
+    @Cacheable(value = "recipeSearchCache",
+            key = "#tags",
+            unless = "#result.isEmpty()")
+    public Page<Recipe> searchRecipesByTags(List<String> tags, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<Recipe> recipes = recipeRepository.findByTagsIn(tags, pageable);
+        long total = recipeRepository.countByTags(tags);
+        return new PageImpl<>(recipes, pageable, total);
+    }
+
 
     @Cacheable(value = "recipeSearchCache",
             key = "#keyword + #tags + #pantryItemNames + #page + #size",
@@ -76,11 +94,39 @@ public class RecipeService {
                         .map(word -> "\"" + word + "\"")
                         .collect(Collectors.joining(" "));
 
+
+        List<ObjectId> ingredientIds = new ArrayList<>();
+        if (pantryItemNames != null && !pantryItemNames.isEmpty()) {
+            ingredientIds = ingredientRepository.findByNameIn(pantryItemNames)
+                    .stream()
+                    .map(Ingredient::getObjectId)
+                    .collect(Collectors.toList());
+        }
+
         List<Recipe> recipes;
         long total;
 
-        recipes = recipeRepository.findByNameTagsAndIngredients(searchText, tags, pantryItemNames, pageable);
-        total = recipeRepository.countByNameTagsAndIngredients(searchText, tags, pantryItemNames);
+        recipes = recipeRepository.findByNameTagsAndIngredients(searchText, tags, ingredientIds, pageable);
+        total = recipeRepository.countByNameTagsAndIngredients(searchText, tags, ingredientIds);
+
+        return new PageImpl<>(recipes, pageable, total);
+    }
+    @Cacheable(value = "recipeSearchCache",
+            key = "{#pantryItemNames, #page, #size}",
+            unless = "#result.isEmpty()")
+    public Page<Recipe> searchRecipesByPantryItems(List<String> pantryItemNames, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<ObjectId> ingredientIds = new ArrayList<>();
+        if (pantryItemNames != null && !pantryItemNames.isEmpty()) {
+            ingredientIds = ingredientRepository.findByNameIn(pantryItemNames)
+                    .stream()
+                    .map(Ingredient::getObjectId)
+                    .collect(Collectors.toList());
+        }
+        List<Recipe> recipes = recipeRepository.findByIngredientsIn(ingredientIds, pageable);
+        long total = recipeRepository.countByIngredients(ingredientIds);
+
         return new PageImpl<>(recipes, pageable, total);
     }
 }
