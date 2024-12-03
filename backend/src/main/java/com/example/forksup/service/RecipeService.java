@@ -1,7 +1,9 @@
 package com.example.forksup.service;
 
 import com.example.forksup.model.Ingredient;
+import com.example.forksup.model.PantryItem;
 import com.example.forksup.repository.IngredientRepository;
+import com.example.forksup.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,6 +29,10 @@ public class RecipeService {
 
     @Autowired
     private IngredientRepository ingredientRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
     @Cacheable(value = "recipeSearchCache",
             key = "#keyword + #page + #size",
@@ -85,23 +91,19 @@ public class RecipeService {
             key = "#keyword + #tags + #pantryItemNames + #page + #size",
             unless = "#result.isEmpty()")
     public Page<Recipe> searchRecipesByKeywordTagsAndPantryItems(
-            String keyword, List<String> tags, List<String> pantryItemNames, int page, int size) {
-
+            String firebaseId, String keyword, List<String> tags, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseId);
+
+        List<ObjectId> ingredientIds = pantryItems.stream()
+                .map(item -> item.getIngredient().getObjectId())
+                .collect(Collectors.toList());
 
         String searchText = keyword == null || keyword.trim().isEmpty() ? "" :
                 Arrays.stream(keyword.trim().split("\\s+"))
                         .map(word -> "\"" + word + "\"")
                         .collect(Collectors.joining(" "));
 
-
-        List<ObjectId> ingredientIds = new ArrayList<>();
-        if (pantryItemNames != null && !pantryItemNames.isEmpty()) {
-            ingredientIds = ingredientRepository.findByNameIn(pantryItemNames)
-                    .stream()
-                    .map(Ingredient::getObjectId)
-                    .collect(Collectors.toList());
-        }
 
         List<Recipe> recipes;
         long total;
@@ -112,18 +114,16 @@ public class RecipeService {
         return new PageImpl<>(recipes, pageable, total);
     }
     @Cacheable(value = "recipeSearchCache",
-            key = "{#pantryItemNames, #page, #size}",
+            key = "{#firebaseId, #page, #size}",
             unless = "#result.isEmpty()")
-    public Page<Recipe> searchRecipesByPantryItems(List<String> pantryItemNames, int page, int size) {
+    public Page<Recipe> searchRecipesByPantryItems(String firebaseId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-
-        List<ObjectId> ingredientIds = new ArrayList<>();
-        if (pantryItemNames != null && !pantryItemNames.isEmpty()) {
-            ingredientIds = ingredientRepository.findByNameIn(pantryItemNames)
-                    .stream()
-                    .map(Ingredient::getObjectId)
-                    .collect(Collectors.toList());
-        }
+        List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseId);
+        
+        List<ObjectId> ingredientIds = pantryItems.stream()
+                .map(item -> item.getIngredient().getObjectId())
+                .collect(Collectors.toList());
+        
         List<Recipe> recipes = recipeRepository.findByIngredientsIn(ingredientIds, pageable);
         long total = recipeRepository.countByIngredients(ingredientIds);
 

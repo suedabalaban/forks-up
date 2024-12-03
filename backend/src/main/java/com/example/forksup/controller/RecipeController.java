@@ -4,7 +4,10 @@ import com.example.forksup.model.Ingredient;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.repository.RecipeRepository;
 import com.example.forksup.service.RecipeService;
+import com.google.firebase.auth.FirebaseToken;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,28 +48,27 @@ public class RecipeController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<Recipe>> searchRecipesRegex(
+            HttpServletRequest request,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
-            @RequestParam(required = false) List<String> pantryItems,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size
     ) {
+        String firebaseId = request.getHeader("X-Firebase-Id");
+        
         try {
             Page<Recipe> recipes;
             
-            if (keyword != null && tags != null && pantryItems != null) {
-                recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(keyword, tags, pantryItems, page, size);
+            if (keyword != null && tags != null && firebaseId != null) {
+                recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(firebaseId, keyword, tags, page, size);
             }
             else if (keyword != null && tags != null) {
                 recipes = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
             }
-            else if (keyword != null && tags == null && pantryItems == null) {
+            else if (keyword != null && tags == null) {
                 recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
             }
-            else if (keyword == null && tags == null && pantryItems != null) {
-                recipes = recipeService.searchRecipesByPantryItems(pantryItems, page, size);
-            }
-            else if (keyword == null && tags != null && pantryItems == null) {
+            else if (keyword == null && tags != null) {
                 recipes = recipeService.searchRecipesByTags(tags, page, size);
             }
             else {
@@ -93,22 +95,40 @@ public class RecipeController {
     }
     @GetMapping("searchByTagsAndPantry")
     public ResponseEntity<Page<Recipe>> searchRecipesWithTagsAndPantry(
+            HttpServletRequest request,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
-            @RequestParam(required = false) List<String> pantryItems,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size
     ){
-        Page<Recipe> recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(keyword, tags, pantryItems, page, size);
-        return new ResponseEntity<>(recipes, HttpStatus.OK);
+        String firebaseId = request.getHeader("X-Firebase-Id");
+        if (firebaseId == null || firebaseId.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        try {
+            Page<Recipe> recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(firebaseId, keyword, tags, page, size);
+            return ResponseEntity.ok(recipes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
     @GetMapping("searchByIngredients")
     public ResponseEntity<Page<Recipe>> searchRecipesWithIngredients(
-            @RequestParam(required = false) List<String> pantryItems,
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size
     ){
-        Page<Recipe> recipes = recipeService.searchRecipesByPantryItems(pantryItems, page, size);
-        return new ResponseEntity<>(recipes, HttpStatus.OK);
+        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+        if (firebaseToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        try {
+            Page<Recipe> recipes = recipeService.searchRecipesByPantryItems(firebaseToken.getUid(), page, size);
+            return ResponseEntity.ok(recipes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
