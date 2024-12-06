@@ -32,11 +32,11 @@ public class UserController {
     }
 
     @PutMapping(path = "")
-    public ResponseEntity<String> createUser(HttpServletRequest request) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
+    public ResponseEntity<String> saveUser(HttpServletRequest request) {
+        String uid = (String) request.getSession().getAttribute("uid");
         User u = userService.insertUser(new User(
                 null,
-                firebaseToken.getUid(),
+                uid,
                 null,
                 null,
                 null)
@@ -49,36 +49,36 @@ public class UserController {
 
     @GetMapping("/favorite/{recipeId}")
     public ResponseEntity<Boolean> isRecipeInFavorites(HttpServletRequest request, @PathVariable String recipeId) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        boolean isFavorite = userService.isRecipeInFavorites(firebaseToken.getUid(), recipeId);
+        String uid = (String) request.getSession().getAttribute("uid");
+        boolean isFavorite = userService.isRecipeInFavorites(uid, recipeId);
         return ResponseEntity.ok(isFavorite);
     }
 
     @PutMapping(path = "/favorite/{recipeId}")
     public ResponseEntity<String> addFavorite(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        userService.addRecipeToFavorites(firebaseToken.getUid(), recipeId);
+        String uid = (String) request.getSession().getAttribute("uid");
+        userService.addRecipeToFavorites(uid, recipeId);
         return new ResponseEntity<>(null, null, HttpStatus.OK);
     }
 
     @DeleteMapping( path = "/favorite/{recipeId}")
     public ResponseEntity<String> removeFavorite(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        userService.removeRecipeFromFavorites(firebaseToken.getUid(), recipeId);
+        String uid = (String) request.getSession().getAttribute("uid");
+        userService.removeRecipeFromFavorites(uid, recipeId);
         return new ResponseEntity<>(null, null, HttpStatus.OK);
     }
 
     @GetMapping(path = "/favorite/all")
     public ResponseEntity<List<Recipe>> getFavorites(HttpServletRequest request) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        List<Recipe> recipes = userService.getFavoriteRecipes(firebaseToken.getUid());
+        String uid = (String) request.getSession().getAttribute("uid");
+        List<Recipe> recipes = userService.getFavoriteRecipes(uid);
         return new ResponseEntity<>(recipes, null, HttpStatus.OK);
     }
 
     @GetMapping(path = "/pantry")
     public ResponseEntity<List<PantryItem>> getUserPantry(HttpServletRequest request) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseToken.getUid());
+        String uid = (String) request.getSession().getAttribute("uid");
+        List<PantryItem> pantryItems = userService.getUserPantryItems(uid);
         return ResponseEntity.ok(pantryItems);
     }
 
@@ -87,8 +87,8 @@ public class UserController {
             HttpServletRequest request,
             @RequestParam String ingredientId,
             @RequestParam Integer quantity) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        userService.addIngredientToPantry(firebaseToken.getUid(), ingredientId, quantity);
+        String uid = (String) request.getSession().getAttribute("uid");
+        userService.addIngredientToPantry(uid, ingredientId, quantity);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -97,8 +97,8 @@ public class UserController {
             HttpServletRequest request,
             @PathVariable String ingredientId,
             @RequestParam Integer quantity) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        PantryItem updatedItem = userService.updateIngredientQuantity(firebaseToken.getUid(), ingredientId, quantity);
+        String uid = (String) request.getSession().getAttribute("uid");
+        PantryItem updatedItem = userService.updateIngredientQuantity(uid, ingredientId, quantity);
         return ResponseEntity.ok(updatedItem);
     }
 
@@ -106,8 +106,8 @@ public class UserController {
     public ResponseEntity<Void> removeIngredientFromPantry(
             HttpServletRequest request,
             @PathVariable String ingredientId) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        userService.removeIngredientFromPantry(firebaseToken.getUid(), ingredientId);
+        String uid = (String) request.getSession().getAttribute("uid");
+        userService.removeIngredientFromPantry(uid, ingredientId);
         return ResponseEntity.noContent().build();
     }
 
@@ -115,12 +115,13 @@ public class UserController {
     public ResponseEntity<User> addUserPreferences(
             HttpServletRequest request,
             @RequestBody Preferences preferences) {
-        FirebaseToken firebaseToken = (FirebaseToken) request.getSession().getAttribute("FirebaseToken");
-        User user = userRepository.findUserByFirebaseId(firebaseToken.getUid()).orElseThrow(() ->
+        String uid = (String) request.getSession().getAttribute("uid");
+        User user = userRepository.findUserByFirebaseId(uid).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
         user.setPreferences(preferences);
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }
+
 }
