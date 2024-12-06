@@ -24,21 +24,39 @@ public class GeminiController {
         return geminiService.analyzeText(request.getInputText());
     }
 
-    @PostMapping("/analyzeRecipe")
-    public ResponseEntity<GeminiResponse> analyzeRecipe(
-            @RequestParam String recipeId,
+    @PostMapping("/recipe/{recipeId}/dietary")
+    public ResponseEntity<GeminiResponse> checkDietaryRestriction(
+            @PathVariable String recipeId,
             @RequestBody GeminiRequest request) {
-        if (request == null || request.getInputText() == null || request.getInputText().trim().isEmpty()) {
-            throw new IllegalArgumentException("Question cannot be null or empty");
+        if (request.getInputText() == null || request.getInputText().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (request.getInputText().length() > 100) {
+            return ResponseEntity.badRequest().body(new GeminiResponse("Question length should not exceed 100 characters"));
         }
         try {
-            GeminiResponse response = geminiService.analyzeRecipe(recipeId, request.getInputText());
+            GeminiResponse response = geminiService.checkDietaryRestriction(recipeId, request.getInputText());
             return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (ResourceNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 
+    @PostMapping("/recipe/{recipeId}/steps")
+    public ResponseEntity<GeminiResponse> analyzeRecipeSteps(
+            @PathVariable String recipeId,
+            @RequestBody GeminiRequest request) {
+        if (request.getInputText() == null || request.getInputText().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (request.getInputText().length() > 100) {
+            return ResponseEntity.badRequest().body(new GeminiResponse("Question length should not exceed 100 characters"));
+        }
+        try {
+            GeminiResponse response = geminiService.analyzeRecipeSteps(recipeId, request.getInputText());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

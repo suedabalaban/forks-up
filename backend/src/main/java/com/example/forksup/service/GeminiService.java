@@ -4,7 +4,7 @@ import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.GeminiResponse;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.repository.RecipeRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.forksup.service.prompt.RecipePromptBuilder;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import java.util.*;
-import java.io.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -80,35 +79,15 @@ public class GeminiService {
         }
     }
 
-    public GeminiResponse analyzeRecipe(String recipeId, String question){
-        String cacheKey = recipeId + "-" + question.toLowerCase().trim();
-        
-        String cachedResponse = responseCache.get(cacheKey);
-        if (cachedResponse != null) {
-            return new GeminiResponse(cachedResponse);
-        }
-
+    private Recipe getRecipe(String recipeId) {
         ObjectId idObj = new ObjectId(recipeId);
-        Recipe recipe = recipeRepository.findById(idObj)
+        return recipeRepository.findById(idObj)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + recipeId));
+    }
 
-        List<String> ingredients = recipe.getIngredientsRawStr();
-        if (ingredients == null || ingredients.isEmpty()) {
-            throw new IllegalArgumentException("Recipe has no ingredients");
-        }
-
+    private GeminiResponse sendGeminiRequest(String prompt) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
-        String prompt = String.format(
-                "Recipe Name: %s\nDescription: %s\nIngredients:\n%s\nSteps:\n%s\n\n" +
-                "Based on this recipe, answer the following question with ONLY 'Yes' or 'No', without including any recipe details: %s",
-                recipe.getName(),
-                recipe.getDescription(),
-                String.join("\n- ", recipe.getIngredientsRawStr()),
-                String.join("\n", recipe.getSteps()),
-                question
-        );
 
         Map<String, Object> part = new HashMap<>();
         part.put("text", prompt);
@@ -121,31 +100,59 @@ public class GeminiService {
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(
-                apiUrl + "?key=" + apiKey,
-                HttpMethod.POST,
-                request,
-                Map.class
-        );
+        try {
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    apiUrl + "?key=" + apiKey,
+                    HttpMethod.POST,
+                    request,
+                    Map.class
+            );
 
-        Map<String, Object> responseBody = response.getBody();
-        List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
-        Map<String, Object> firstCandidate = candidates.get(0);
-        Map<String, Object> responseContent = (Map<String, Object>) firstCandidate.get("content");
-        List<Map<String, Object>> parts = (List<Map<String, Object>>) responseContent.get("parts");
-        String generatedText = (String) parts.get(0).get("text");
+            Map<String, Object> responseBody = response.getBody();
+            List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
+            Map<String, Object> firstCandidate = candidates.get(0);
+            Map<String, Object> responseContent = (Map<String, Object>) firstCandidate.get("content");
+            List<Map<String, Object>> parts = (List<Map<String, Object>>) responseContent.get("parts");
+            return new GeminiResponse(((String) parts.get(0).get("text")).trim());
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to process Gemini API response: " + e.getMessage());
+        }
+    }
 
-        String cleanResponse = generatedText.trim().toLowerCase();
-        String geminiResponse;
-        if (cleanResponse.contains("yes") && !cleanResponse.contains("no")) {
-            geminiResponse = "Yes";
-        } else if (cleanResponse.contains("no") && !cleanResponse.contains("yes")) {
-            geminiResponse = "No";
-        } else {
-            geminiResponse = "Please ask a yes/no question";
+    public GeminiResponse checkDietaryRestriction(String recipeId, String restriction) {
+        String cacheKey = recipeId + "-is-" + restriction.toLowerCase().trim();
+        
+        String cachedResponse = responseCache.get(cacheKey);
+        if (cachedResponse != null) {
+            return new GeminiResponse(cachedResponse);
         }
 
-        responseCache.put(cacheKey, geminiResponse);
-        return new GeminiResponse(geminiResponse);
+        Recipe recipe = getRecipe(recipeId);
+        String prompt = new RecipePromptBuilder(recipe, 
+                "explain in one short sentence if this recipe is " + restriction + " or not.")
+                .withIngredients()
+                .build();
+        
+        GeminiResponse response = sendGeminiRequest(prompt);
+        responseCache.put(cacheKey, response.getResponse());
+        return response;
+    }
+
+    public GeminiResponse analyzeRecipeSteps(String recipeId, String question) {
+        String cacheKey = recipeId + "-steps-" + question.toLowerCase().trim();
+        
+        String cachedResponse = responseCache.get(cacheKey);
+        if (cachedResponse != null) {
+            return new GeminiResponse(cachedResponse);
+        }
+
+        Recipe recipe = getRecipe(recipeId);
+        String prompt = new RecipePromptBuilder(recipe, question)
+                .withSteps()
+                .build();
+        
+        GeminiResponse response = sendGeminiRequest(prompt);
+        responseCache.put(cacheKey, response.getResponse());
+        return response;
     }
 }
