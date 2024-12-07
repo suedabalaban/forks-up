@@ -82,4 +82,20 @@ public class RecipeController {
                 .body(Page.empty());
         }
     }
+    @GetMapping("/preferences")
+    public ResponseEntity<Page<Recipe>> searchRecipesByPreferences(
+            HttpServletRequest request,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        String uid = (String) request.getSession().getAttribute("uid");
+        if (uid == null) {
+            return new ResponseEntity<>(null, null, HttpStatus.UNAUTHORIZED);
+        }
+
+        Page<Recipe> recipes = recipeService.searchRecipesByUserPreferences(
+                keyword != null ? keyword : "", uid, page, size);
+        return ResponseEntity.ok(recipes);
+    }
 }

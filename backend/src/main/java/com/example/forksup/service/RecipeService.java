@@ -1,7 +1,6 @@
 package com.example.forksup.service;
 
-import com.example.forksup.model.Ingredient;
-import com.example.forksup.model.PantryItem;
+import com.example.forksup.model.*;
 import com.example.forksup.repository.IngredientRepository;
 import com.example.forksup.repository.UserRepository;
 import org.bson.types.ObjectId;
@@ -13,12 +12,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.example.forksup.model.Recipe;
 import com.example.forksup.repository.RecipeRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,9 +71,6 @@ public class RecipeService {
         return new PageImpl<>(recipes, pageable, total);
     }
 
-    public List<String> getAllUniqueTags() {
-        return recipeRepository.findDistinctTags();
-    }
     @Cacheable(value = "recipeSearchCache",
             key = "#tags",
             unless = "#result.isEmpty()")
@@ -88,7 +84,7 @@ public class RecipeService {
 
 
     @Cacheable(value = "recipeSearchCache",
-            key = "#keyword + #tags + #pantryItemNames + #page + #size",
+            key = "#keyword + #tags + #page + #size",
             unless = "#result.isEmpty()")
     public Page<Recipe> searchRecipesByKeywordTagsAndPantryItems(
             String firebaseId, String keyword, List<String> tags, int page, int size) {
@@ -128,5 +124,63 @@ public class RecipeService {
         long total = recipeRepository.countByIngredients(ingredientIds);
 
         return new PageImpl<>(recipes, pageable, total);
+    }
+
+    public Page<Recipe> searchRecipesByUserPreferences(String keyword, String firebaseId, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseId);
+        Preferences preferences = userService.getUserPreferences(firebaseId);
+        
+        List<ObjectId> ingredientIds = new ArrayList<>();
+        if (pantryItems != null && !pantryItems.isEmpty()) {
+            ingredientIds = pantryItems.stream()
+                    .filter(item -> item.getIngredient() != null)
+                    .map(item -> item.getIngredient().getObjectId())
+                    .filter(Objects::nonNull)
+                    .toList();
+        }
+
+        if (preferences != null) {
+            List<String> tags = new ArrayList<>();
+            if (preferences.getCuisines() != null) {
+                tags.addAll(preferences.getCuisines());
+            }
+            DietaryRestrictions dietaryRestrictions = preferences.getDietaryRestrictions();
+            if(dietaryRestrictions != null) {
+                if(dietaryRestrictions.getHealthConscious() != null){
+                    tags.addAll(dietaryRestrictions.getHealthConscious());
+                }
+                if(dietaryRestrictions.getLifestyle() != null){
+                    tags.addAll(dietaryRestrictions.getLifestyle());
+                }
+            }
+            if(preferences.getPreparation_time() != null) {
+                tags.add(preferences.getPreparation_time());
+            }
+
+            List<Recipe> recipes;
+            long total;
+            
+            if (keyword.trim().isEmpty() && ingredientIds.isEmpty()) {
+                recipes = recipeRepository.findByTagsIn(tags, pageable);
+                total = recipeRepository.count(); 
+            }
+            else if (keyword.trim().isEmpty()) {
+                recipes = recipeRepository.findByIngredientsIn(ingredientIds, pageable);
+                total = recipeRepository.count();
+            }
+            else if (ingredientIds.isEmpty()) {
+                recipes = recipeRepository.findByNameAndTags(keyword, tags, pageable);
+                total = recipeRepository.countByNameAndTags(keyword, tags);
+            }
+            else {
+                recipes = recipeRepository.findByNameTagsAndIngredients(keyword, tags, ingredientIds, pageable);
+                total = recipeRepository.countByNameTagsAndIngredients(keyword, tags, ingredientIds);
+            }
+            
+            return new PageImpl<>(recipes, pageable, total);
+        }
+        
+        return Page.empty(pageable);
     }
 }
