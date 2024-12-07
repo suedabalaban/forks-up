@@ -27,6 +27,9 @@ public class User {
     @Field("favorites")
     private List<Recipe> favorites;
 
+    @Field("recipe_history")
+    private List<RecipeHistory> recipeHistory;
+
     public User() {}
 
     public User (
@@ -74,4 +77,7 @@ public class User {
 
     public void setFavorites(List<Recipe> favorites) {this.favorites = favorites;}
 
+    public List<RecipeHistory> getRecipeHistory() {return recipeHistory;}
+
+    public void setRecipeHistory(List<RecipeHistory> recipeHistory) {this.recipeHistory = recipeHistory;}
 }

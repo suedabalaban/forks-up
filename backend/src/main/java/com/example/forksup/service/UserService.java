@@ -1,11 +1,7 @@
 package com.example.forksup.service;
 
-
 import com.example.forksup.exception.ResourceNotFoundException;
-import com.example.forksup.model.Ingredient;
-import com.example.forksup.model.PantryItem;
-import com.example.forksup.model.Recipe;
-import com.example.forksup.model.User;
+import com.example.forksup.model.*;
 import com.example.forksup.repository.IngredientRepository;
 import com.example.forksup.repository.RecipeRepository;
 import com.example.forksup.repository.UserRepository;
@@ -160,6 +156,57 @@ public class UserService {
             throw new ResourceNotFoundException("Ingredient not found in pantry");
         }
         userRepository.save(u);
+    }
+
+    public List<RecipeHistory> getRecipeHistory(String firebaseId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        return user.getRecipeHistory();
+    }
+
+    public void addItemToRecipeHistory(String firebaseId, String recipeId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        Recipe recipe = recipeRepository.findById(new ObjectId(recipeId)).orElseThrow(() ->
+                new ResourceNotFoundException("Recipe not found")
+        );
+        if (user.getRecipeHistory() == null) {
+            user.setRecipeHistory(new ArrayList<RecipeHistory>());
+        }
+        if(!user.getRecipeHistory().contains(recipe)) {
+            RecipeHistory recipeHistoryItem = new RecipeHistory(recipe);
+            user.getRecipeHistory().add(recipeHistoryItem);
+            userRepository.save(user);
+        }
+    }
+
+    public void removeItemFromRecipeHistory(String firebaseId, String recipeId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        Recipe recipe = recipeRepository.findById(new ObjectId(recipeId)).orElseThrow(() ->
+                new ResourceNotFoundException("Recipe not found")
+        );
+        if (user.getRecipeHistory() != null) {
+            user.getRecipeHistory().removeIf(historyItem -> 
+                historyItem.getRecipe().getId().equals(recipe.getId())
+            );
+            userRepository.save(user);
+        }
+    }
+
+    public boolean isItemInRecipeHistory(String firebaseId, String recipeId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        if(user.getRecipeHistory() == null) {return false;}
+        Recipe recipe = recipeRepository.findById(new ObjectId(recipeId)).orElseThrow(() ->
+                new ResourceNotFoundException("Recipe not found")
+        );
+        return user.getRecipeHistory().stream()
+                .anyMatch(historyItem -> historyItem.getRecipe().getId().equals(recipe.getId()));
     }
 
 }
