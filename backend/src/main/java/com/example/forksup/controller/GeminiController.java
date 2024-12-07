@@ -16,14 +16,6 @@ public class GeminiController {
     @Autowired
     private GeminiService geminiService;
 
-    @PostMapping("/analyze")
-    public GeminiResponse analyzeText(@RequestBody GeminiRequest request) {
-        if (request == null || request.getInputText() == null || request.getInputText().trim().isEmpty()) {
-            throw new IllegalArgumentException("Input text cannot be null or empty");
-        }
-        return geminiService.analyzeText(request.getInputText());
-    }
-
     @PostMapping("/recipe/{recipeId}/dietary")
     public ResponseEntity<GeminiResponse> checkDietaryRestriction(
             @PathVariable String recipeId,

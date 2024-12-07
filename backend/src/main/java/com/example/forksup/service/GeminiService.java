@@ -32,53 +32,6 @@ public class GeminiService {
         this.restTemplate = new RestTemplate();
     }
 
-    public GeminiResponse analyzeText(String text){
-        String apiKey = this.apiKey;
-        String apiUrl = this.apiUrl;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, Object> part = new HashMap<>();
-        part.put("text", text);
-
-        Map<String, Object> content = new HashMap<>();
-        content.put("parts", Collections.singletonList(part));
-
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("contents", Collections.singletonList(content));
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(
-                apiUrl + "?key=" + apiKey,
-                HttpMethod.POST,
-                request,
-                Map.class
-        );
-
-        try {
-            Map<String, Object> responseBody = response.getBody();
-            if (responseBody == null || !responseBody.containsKey("candidates")) {
-                throw new IllegalStateException("Invalid response from Gemini API");
-            }
-
-            List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
-            if (candidates == null || candidates.isEmpty()) {
-                throw new IllegalStateException("No response candidates from Gemini API");
-            }
-
-            Map<String, Object> firstCandidate = candidates.get(0);
-            Map<String, Object> responseContent = (Map<String, Object>) firstCandidate.get("content");
-            List<Map<String, Object>> parts = (List<Map<String, Object>>) responseContent.get("parts");
-            String generatedText = (String) parts.get(0).get("text");
-
-            return new GeminiResponse(generatedText);
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to process Gemini API response: " + e.getMessage());
-        }
-    }
-
     private Recipe getRecipe(String recipeId) {
         ObjectId idObj = new ObjectId(recipeId);
         return recipeRepository.findById(idObj)
