@@ -125,6 +125,13 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping(path = "/preferences/all")
+    public ResponseEntity<Preferences> getUserPreferences(HttpServletRequest request) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        Preferences userPreferences = userService.getUserPreferences(uid);
+        return ResponseEntity.ok(userPreferences);
+    }
+
     @GetMapping(path = "/recipeHistory/all")
     public ResponseEntity<List<RecipeHistory>> getUserRecipeHistory(HttpServletRequest request) {
         String uid = (String) request.getSession().getAttribute("uid");

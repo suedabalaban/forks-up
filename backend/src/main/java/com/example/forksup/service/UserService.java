@@ -209,4 +209,11 @@ public class UserService {
                 .anyMatch(historyItem -> historyItem.getRecipe().getId().equals(recipe.getId()));
     }
 
+    public Preferences getUserPreferences(String firebaseId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        return user.getPreferences();
+    }
+
 }
