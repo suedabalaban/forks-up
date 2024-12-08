@@ -100,7 +100,6 @@ public class RecipeService {
                         .map(word -> "\"" + word + "\"")
                         .collect(Collectors.joining(" "));
 
-
         List<Recipe> recipes;
         long total;
 
@@ -141,42 +140,36 @@ public class RecipeService {
         }
 
         if (preferences != null) {
-            List<String> tags = new ArrayList<>();
-            if (preferences.getCuisines() != null) {
-                tags.addAll(preferences.getCuisines());
-            }
+            List<String> cuisines = preferences.getCuisines();
+            List<String> otherPreferences = new ArrayList<>();
+            
             DietaryRestrictions dietaryRestrictions = preferences.getDietaryRestrictions();
             if(dietaryRestrictions != null) {
                 if(dietaryRestrictions.getHealthConscious() != null){
-                    tags.addAll(dietaryRestrictions.getHealthConscious());
+                    otherPreferences.addAll(dietaryRestrictions.getHealthConscious());
                 }
                 if(dietaryRestrictions.getLifestyle() != null){
-                    tags.addAll(dietaryRestrictions.getLifestyle());
+                    otherPreferences.addAll(dietaryRestrictions.getLifestyle());
                 }
             }
             if(preferences.getPreparation_time() != null) {
-                tags.add(preferences.getPreparation_time());
+                otherPreferences.add(preferences.getPreparation_time());
             }
+
+            String searchText = keyword == null || keyword.trim().isEmpty() ? "" :
+                    Arrays.stream(keyword.trim().split("\\s+"))
+                            .map(word -> "\"" + word + "\"")
+                            .collect(Collectors.joining(" "));
 
             List<Recipe> recipes;
             long total;
             
-            if (keyword.trim().isEmpty() && ingredientIds.isEmpty()) {
-                recipes = recipeRepository.findByTagsIn(tags, pageable);
-                total = recipeRepository.count(); 
+            if (cuisines == null) {
+                cuisines = new ArrayList<>();
             }
-            else if (keyword.trim().isEmpty()) {
-                recipes = recipeRepository.findByIngredientsIn(ingredientIds, pageable);
-                total = recipeRepository.count();
-            }
-            else if (ingredientIds.isEmpty()) {
-                recipes = recipeRepository.findByNameAndTags(keyword, tags, pageable);
-                total = recipeRepository.countByNameAndTags(keyword, tags);
-            }
-            else {
-                recipes = recipeRepository.findByNameTagsAndIngredients(keyword, tags, ingredientIds, pageable);
-                total = recipeRepository.countByNameTagsAndIngredients(keyword, tags, ingredientIds);
-            }
+            
+            recipes = recipeRepository.findByNameCuisinesAndPreferences(searchText, cuisines, otherPreferences, pageable);
+            total = recipeRepository.countByNameCuisinesAndPreferences(searchText, cuisines, otherPreferences);
             
             return new PageImpl<>(recipes, pageable, total);
         }
