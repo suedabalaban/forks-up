@@ -41,6 +41,16 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
             "] }")
     List<Recipe> findByNameCuisinesAndPreferences(String keyword, List<String> cuisines, List<String> preferences, Pageable pageable);
 
+    @Query("{ $and: [ " +
+            "{ $text: { $search: ?0 } }, " +
+            "{ tags: { $in: ?1 } }, " + // cuisines with OR operator
+            "{ tags: { $all: ?2 } }, " + // other preferences with AND operator
+            "{ tags: { $nin: ?3 } } " + // exclude allergies and intolerances
+            "] }")
+    List<Recipe> findByNameCuisinesPreferencesExcludeAllergies(
+            String keyword, List<String> cuisines, List<String> preferences, 
+            List<String> allergiesIntolerances, Pageable pageable);
+
     @Cacheable(value = "recipeCountCache", key = "#keyword")
     @Query(value = "{ $text: { $search: '?0' }}", count = true)
     long countByNameTextSearch(String keyword);
@@ -62,6 +72,16 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
             "{ tags: { $all: ?2 } } " +
             "] }", count = true)
     long countByNameCuisinesAndPreferences(String keyword, List<String> cuisines, List<String> preferences);
+
+    @Query(value = "{ $and: [ " +
+            "{ $text: { $search: ?0 } }, " +
+            "{ tags: { $in: ?1 } }, " +
+            "{ tags: { $all: ?2 } }, " +
+            "{ tags: { $nin: ?3 } } " +
+            "] }", count = true)
+    long countByNameCuisinesPreferencesExcludeAllergies(
+            String keyword, List<String> cuisines, List<String> preferences, 
+            List<String> allergiesIntolerances);
 
     @Query(value = " {ingredients: {$in: ?0}}", count = true)
     long countByIngredients(List<ObjectId> ingredientIds);
