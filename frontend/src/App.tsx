@@ -24,17 +24,19 @@ const App: React.FC = () => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-            setUser(currentUser);
-            if (currentUser) {
-                try {
-                    await registerOrUpdateUser(currentUser);
-                } catch (e) {
-                    console.error('Error registering or updating user:', e);
+            if (currentUser?.uid !== user?.uid) {  // Only update if user has changed
+                setUser(currentUser);
+                if (currentUser) {
+                    try {
+                        await registerOrUpdateUser(currentUser);
+                    } catch (e) {
+                        console.error('Error registering or updating user:', e);
+                    }
                 }
             }
         });
         return () => unsubscribe();
-    }, [user]);
+    }, []); // Remove user from dependency array
 
     return (
         <ThemeProvider>

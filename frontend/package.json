@@ -15,11 +15,9 @@
     "firebase": "^10.14.1",
     "framer-motion": "^11.12.0",
     "lucide-react": "^0.453.0",
-    "my-auth0-app": "file:",
     "postcss-cli": "^11.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
