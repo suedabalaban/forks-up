@@ -32,6 +32,13 @@ public class UserService {
         return u;
     }
 
+    public User getUserByFirebaseID(String firebaseId) {
+        User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        return u;
+    }
+
     public User insertUser(User user) {
         User u = userRepository.findUserByFirebaseId(user.getFirebaseId()).orElse(null);
         if (u != null) {

@@ -251,3 +251,19 @@ export const addUserPreferences = async (preferences: Preferences) => {
         throw error;
     }
 }
+
+export const getUserPreferences = async () => {
+    try {
+        const token = await getToken();
+        const response = await api.get('/user/preferences', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error retrieving user preferences:', error);
+        throw error;
+    }
+}

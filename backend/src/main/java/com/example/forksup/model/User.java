@@ -2,6 +2,7 @@ package com.example.forksup.model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -15,6 +16,7 @@ public class User {
     private ObjectId id;
 
     @Field("firebase_id")
+    @Indexed(unique = true)
     private String firebaseId;
 
     @Field("preferences")

@@ -1,7 +1,7 @@
-import {Navigate, Route, Routes, BrowserRouter} from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 import Login from "./pages/Login";
 import Layout from "./layout/Layout";
-import {UserDetails} from "./pages/UserDetails";
+import Profile from "./pages/Profile";
 import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
 import React, {useEffect, useState} from "react";
@@ -42,7 +42,7 @@ const App: React.FC = () => {
 
                 <Route path="/" element={<Layout/>}>
                     <Route path="/" element={<Home/>}/>
-                    <Route path="/user" element={<ProtectedRoute><UserDetails/></ProtectedRoute>}/>
+                    <Route path="/user" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
                     <Route path="/search" element={<ProtectedRoute><SearchRecipes/></ProtectedRoute>}/>
                     <Route path="/favorites" element={<ProtectedRoute><UserFavorites/></ProtectedRoute>}/>
                     <Route path="/pantry" element={<ProtectedRoute><UserIngredients/></ProtectedRoute>}/>

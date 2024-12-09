@@ -82,6 +82,7 @@ public class RecipeController {
                 .body(Page.empty());
         }
     }
+
     @GetMapping("/preferences")
     public ResponseEntity<Page<Recipe>> searchRecipesByPreferences(
             HttpServletRequest request,

@@ -13,9 +13,8 @@ interface NavbarProps {
 
 const menuItems = [
     { icon: UserRound, text: 'Profile', path: '/user' },
-    { icon: Star, text: 'Favorites', path: '/favorites' },
     { icon: ShoppingBag, text: 'Pantry', path: '/pantry' },
-    { icon: Utensils, text: 'Dietary Preferences', path: '/dietary-preferences' },
+    { icon: Star, text: 'Favorites', path: '/favorites' },
     { icon: Settings, text: 'Settings', path: '/settings' },
 ];
 

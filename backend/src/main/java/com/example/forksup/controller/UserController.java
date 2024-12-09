@@ -6,7 +6,6 @@ import com.example.forksup.repository.UserRepository;
 import com.example.forksup.service.UserService;
 import com.google.firebase.auth.FirebaseToken;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -125,32 +124,13 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping(path = "/preferences/all")
+    @GetMapping(path = "/preferences")
     public ResponseEntity<Preferences> getUserPreferences(HttpServletRequest request) {
         String uid = (String) request.getSession().getAttribute("uid");
-        Preferences userPreferences = userService.getUserPreferences(uid);
-        return ResponseEntity.ok(userPreferences);
+        User user = userRepository.findUserByFirebaseId(uid).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        return ResponseEntity.ok(user.getPreferences());
     }
-
-    @GetMapping(path = "/recipeHistory/all")
-    public ResponseEntity<List<RecipeHistory>> getUserRecipeHistory(HttpServletRequest request) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        List<RecipeHistory> recipeHistoryList = userService.getRecipeHistory(uid);
-        return new ResponseEntity<>(recipeHistoryList, HttpStatus.OK);
-    }
-
-    @PostMapping(path = "/recipeHistory/{recipeId}")
-    public ResponseEntity<String> addUserRecipeHistory(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        userService.addItemToRecipeHistory(uid, recipeId);
-        return new ResponseEntity<>(null,null ,HttpStatus.OK);
-    }
-
-    @DeleteMapping(path = "/recipeHistory/{recipeId}")
-    public ResponseEntity<Void> removeItemFromRecipeHistory(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        userService.removeItemFromRecipeHistory(uid, recipeId);
-        return ResponseEntity.noContent().build();
-    }
-
+    
 }
