@@ -171,9 +171,9 @@ public class RecipeService {
                 cuisines = new ArrayList<>();
             }
             
-            recipes = recipeRepository.findByNameCuisinesPreferencesIncludeAllergies(
+            recipes = recipeRepository.findByPreferences(
                     searchText, cuisines, otherPreferences, pageable);
-            total = recipeRepository.countByNameCuisinesPreferencesIncludeAllergies(
+            total = recipeRepository.countByPreferences(
                     searchText, cuisines, otherPreferences);
             
             return new PageImpl<>(recipes, pageable, total);
