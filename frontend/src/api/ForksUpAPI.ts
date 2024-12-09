@@ -267,3 +267,41 @@ export const getUserPreferences = async () => {
         throw error;
     }
 }
+
+// Gemini API - Diyet kısıtlamalarını kontrol et
+export const checkDietaryRestriction = async (recipeId: string, inputText: string) => {
+    try {
+        const token = await getToken();
+        const response = await api.post(`/gemini/recipe/${recipeId}/dietary`, 
+            { inputText },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error checking dietary restriction:', error);
+        throw error;
+    }
+};
+
+// Gemini API - Tarif adımlarını analiz et
+export const analyzeRecipeSteps = async (recipeId: string, inputText: string) => {
+    try {
+        const token = await getToken();
+        const response = await api.post(`/gemini/recipe/${recipeId}/steps`, 
+            { inputText },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error analyzing recipe steps:', error);
+        throw error;
+    }
+};

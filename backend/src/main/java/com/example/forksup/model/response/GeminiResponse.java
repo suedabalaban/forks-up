@@ -1,4 +1,4 @@
-package com.example.forksup.model;
+package com.example.forksup.model.response;
 
 public class GeminiResponse {
     private String response;

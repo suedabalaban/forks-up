@@ -3,6 +3,7 @@ import {Recipe} from "../model/Recipe";
 import React from "react";
 import {motion} from "framer-motion";
 import {getIngredientEmoji} from "../assets/ingredientEmojis";
+import { usePexelsImage } from "../hooks/usePexelsImage";
 
 type RecipeCardProps = {
     recipe: Recipe;
@@ -10,6 +11,9 @@ type RecipeCardProps = {
 };
 
 const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
+    const fallbackImage = 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg';
+    const { imageUrl, loading } = usePexelsImage(recipe.name, recipe.imageUrl || fallbackImage);
+
     return (
         <motion.div
             onClick={onClick}
@@ -26,9 +30,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
                 <motion.img
                     whileHover={{scale: 1.1}}
                     transition={{duration: 0.3}}
-                    src={recipe.imageUrl || 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg'}
+                    src={imageUrl}
                     alt={recipe.name}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover ${loading ? 'animate-pulse' : ''}`}
                     loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent">

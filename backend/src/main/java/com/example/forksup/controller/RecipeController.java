@@ -112,4 +112,5 @@ public class RecipeController {
         Page<Recipe> recipes = recipeService.searchRecipesByPantryItems(uid, page, size);
         return ResponseEntity.ok(recipes);
     }
+
 }

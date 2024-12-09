@@ -1,4 +1,4 @@
-package com.example.forksup.model;
+package com.example.forksup.model.request;
 
 public class GeminiRequest {
     private String inputText;

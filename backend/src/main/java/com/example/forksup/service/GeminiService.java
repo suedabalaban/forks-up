@@ -1,7 +1,7 @@
 package com.example.forksup.service;
 
 import com.example.forksup.exception.ResourceNotFoundException;
-import com.example.forksup.model.GeminiResponse;
+import com.example.forksup.model.response.GeminiResponse;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.repository.RecipeRepository;
 import com.example.forksup.service.prompt.RecipePromptBuilder;
