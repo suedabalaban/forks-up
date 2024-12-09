@@ -60,10 +60,10 @@ public class RecipeController {
             Page<Recipe> recipes;
             
             if (keyword != null && tags != null && uid.isEmpty()) {
-                recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(uid, keyword, tags, page, size);
-            }
-            else if (keyword != null && tags != null) {
                 recipes = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
+            }
+            else if (keyword != null && tags != null ) {
+                recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(uid,keyword, tags, page, size);
             }
             else if (keyword != null && tags == null) {
                 recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
@@ -72,12 +72,11 @@ public class RecipeController {
                 recipes = recipeService.searchRecipesByTags(tags, page, size);
             }
             else {
-                return ResponseEntity.badRequest()
-                    .body(Page.empty());
+                recipes = recipeService.searchRecipesByPantryItems(uid, page, size);
             }
-            
             return ResponseEntity.ok(recipes);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.internalServerError()
                 .body(Page.empty());
         }
@@ -97,6 +96,20 @@ public class RecipeController {
 
         Page<Recipe> recipes = recipeService.searchRecipesByUserPreferences(
                 keyword != null ? keyword : "", uid, page, size);
+        return ResponseEntity.ok(recipes);
+    }
+
+    @GetMapping("/searchPantry")
+    public ResponseEntity<Page<Recipe>> searchRecipesByPantryItems(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        if (uid == null) {
+            return new ResponseEntity<>(null, null, HttpStatus.UNAUTHORIZED);
+        }
+
+        Page<Recipe> recipes = recipeService.searchRecipesByPantryItems(uid, page, size);
         return ResponseEntity.ok(recipes);
     }
 }

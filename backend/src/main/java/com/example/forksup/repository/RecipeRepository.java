@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
-
+    //query methods
     @Query("{ $text: { $search: ?0 } }")
     List<Recipe> findByNameTextSearch(String keyword, Pageable pageable);
 
@@ -39,9 +39,10 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
             "{ tags: { $in: ?1 } }, " + // cuisines with OR operator
             "{ tags: { $all: ?2 } }, " + // other preferences with AND operator
             "] }")
-    List<Recipe> findByNameCuisinesPreferencesIncludeAllergies(
+    List<Recipe> findByPreferences(
             String keyword, List<String> cuisines, List<String> preferences, Pageable pageable);
 
+    //count methods
     @Cacheable(value = "recipeCountCache", key = "#keyword")
     @Query(value = "{ $text: { $search: '?0' }}", count = true)
     long countByNameTextSearch(String keyword);
@@ -62,12 +63,11 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
             "{ tags: { $in: ?1 } }, " +
             "{ tags: { $all: ?2 } }, " +
             "] }", count = true)
-    long countByNameCuisinesPreferencesIncludeAllergies(
+    long countByPreferences(
             String keyword, List<String> cuisines, List<String> preferences);
 
     @Query(value = " {ingredients: {$in: ?0}}", count = true)
     long countByIngredients(List<ObjectId> ingredientIds);
-
     @Query(value = "{tags: {$all: ?0}}", count = true)
     long countByTags(List<String> tags);
 }
