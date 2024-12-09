@@ -3,7 +3,8 @@ import {Recipe} from "../model/Recipe";
 import React from "react";
 import {motion} from "framer-motion";
 import {getIngredientEmoji} from "../assets/ingredientEmojis";
-import { usePexelsImage } from "../hooks/usePexelsImage";
+import {usePexelsImage} from "../hooks/usePexelsImage";
+import {getCountryFlagFromTags} from "../utils/countryFlags";
 
 type RecipeCardProps = {
     recipe: Recipe;
@@ -37,8 +38,15 @@ const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
                     <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <h3 className="text-xl font-semibold text-white mb-1">{recipe.name}</h3>
+                        <div className="flex justify-between items-center">
+                            <h3 className="text-xl font-semibold text-white mb-1">{recipe.name}</h3>
+                        </div>
                     </div>
+                </div>
+                <div className="absolute top-3 right-3">
+                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-2xl hover:bg-black/60 transition-all duration-300">
+                        {getCountryFlagFromTags(recipe.tags)}
+                    </span>
                 </div>
             </div>
             <motion.div
@@ -93,6 +101,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
                     </div>
                 </div>
             </motion.div>
+
         </motion.div>
     );
 };

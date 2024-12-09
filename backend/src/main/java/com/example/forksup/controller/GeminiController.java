@@ -1,18 +1,16 @@
 package com.example.forksup.controller;
 
-import com.example.forksup.exception.ResourceNotFoundException;
-import com.example.forksup.model.GeminiRequest;
-import com.example.forksup.model.GeminiResponse;
+import com.example.forksup.model.request.GeminiRequest;
+import com.example.forksup.model.response.GeminiResponse;
 import com.example.forksup.service.GeminiService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/gemini")
 public class GeminiController {
+    
     @Autowired
     private GeminiService geminiService;
 
@@ -51,4 +49,5 @@ public class GeminiController {
             return ResponseEntity.badRequest().build();
         }
     }
+
 }

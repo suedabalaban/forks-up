@@ -10,4 +10,5 @@ export type Recipe = {
     steps: string[];
     description: string;
     imageUrl?: string;
+    tags: string[];
 };
