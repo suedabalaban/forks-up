@@ -142,8 +142,7 @@ public class RecipeService {
         if (preferences != null) {
             List<String> cuisines = preferences.getCuisines();
             List<String> otherPreferences = new ArrayList<>();
-            List<String> allergiesIntolerances = new ArrayList<>();
-            
+
             DietaryRestrictions dietaryRestrictions = preferences.getDietaryRestrictions();
             if(dietaryRestrictions != null) {
                 if(dietaryRestrictions.getHealthConscious() != null){
@@ -153,7 +152,7 @@ public class RecipeService {
                     otherPreferences.addAll(dietaryRestrictions.getLifestyle());
                 }
                 if(dietaryRestrictions.getAllergiesIntolerances() != null){
-                    allergiesIntolerances.addAll(dietaryRestrictions.getAllergiesIntolerances());
+                    otherPreferences.addAll(dietaryRestrictions.getAllergiesIntolerances());
                 }
             }
             if(preferences.getPreparation_time() != null) {
@@ -172,10 +171,10 @@ public class RecipeService {
                 cuisines = new ArrayList<>();
             }
             
-            recipes = recipeRepository.findByNameCuisinesPreferencesExcludeAllergies(
-                    searchText, cuisines, otherPreferences, allergiesIntolerances, pageable);
-            total = recipeRepository.countByNameCuisinesPreferencesExcludeAllergies(
-                    searchText, cuisines, otherPreferences, allergiesIntolerances);
+            recipes = recipeRepository.findByNameCuisinesPreferencesIncludeAllergies(
+                    searchText, cuisines, otherPreferences, pageable);
+            total = recipeRepository.countByNameCuisinesPreferencesIncludeAllergies(
+                    searchText, cuisines, otherPreferences);
             
             return new PageImpl<>(recipes, pageable, total);
         }
