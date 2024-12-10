@@ -1,10 +1,11 @@
-import {UserRound} from "lucide-react";
+import {UserRound, Clock} from "lucide-react";
 import {Recipe} from "../model/Recipe";
 import React from "react";
 import {motion} from "framer-motion";
 import {getIngredientEmoji} from "../assets/ingredientEmojis";
 import {usePexelsImage} from "../hooks/usePexelsImage";
 import {getCountryFlagFromTags} from "../utils/countryFlags";
+import {getPreparationTimeFromTags} from "../utils/preparationTime";
 
 type RecipeCardProps = {
     recipe: Recipe;
@@ -48,6 +49,14 @@ const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
                         {getCountryFlagFromTags(recipe.tags)}
                     </span>
                 </div>
+                {getPreparationTimeFromTags(recipe.tags) && (
+                    <div className="absolute top-3 left-3">
+                        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/60 transition-all duration-300">
+                            <Clock size={16} />
+                            {getPreparationTimeFromTags(recipe.tags)}
+                        </span>
+                    </div>
+                )}
             </div>
             <motion.div
                 className="p-4"
