@@ -223,4 +223,16 @@ public class UserService {
         return user.getPreferences();
     }
 
+    public void updatePantryAfterRecipe(String firebaseId, List<String> ingredientIds) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+
+        if(ingredientIds != null && !ingredientIds.isEmpty()) {
+            for(String ingredientId : ingredientIds) {
+                removeIngredientFromPantry(firebaseId, ingredientId);
+            }
+            userRepository.save(user);
+        }
+    }
 }
