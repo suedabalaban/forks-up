@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, AlertCircle, Play, Pause } from 'lucide-react';
 import { Recipe } from '../model/Recipe';
 import { motion, AnimatePresence } from 'framer-motion';
 import RecipeDetails from "./RecipeDetails";
 import { createPortal } from 'react-dom';
 import { getPreparationTimeFromTags } from '../utils/preparationTime';
-import { addToRecipeHistory } from '../api/ForksUpAPI';
+import { addToRecipeHistory, getRecipeHistory, getLastRecipeHistory } from '../api/ForksUpAPI';
+import { RecipeHistory } from '../model/RecipeHistory';
+import { auth } from '../config/firebaseconfig';
 
 interface ActiveRecipeTimerProps {
     recipe: Recipe;
@@ -15,9 +17,27 @@ interface ActiveRecipeTimerProps {
 
 const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerClick, onClose }) => {
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+    const isHistoryAdded = useRef(false);
 
     const DEFAULT_TIME = 60 * 60;
     const [timeLeft, setTimeLeft] = useState<number>(() => {
+        // Önce localStorage'dan kayıtlı süreyi kontrol et
+        const savedTimeLeft = localStorage.getItem('activeRecipeTimeLeft');
+        const savedStartTime = localStorage.getItem('activeRecipeStartTime');
+        const savedRecipeId = localStorage.getItem('activeRecipeId');
+        
+        if (savedTimeLeft && savedStartTime && savedRecipeId === recipe.id) {
+            const elapsedSinceLastCheck = Math.floor(
+                (new Date().getTime() - parseInt(savedStartTime)) / 1000
+            );
+            const remainingTime = parseInt(savedTimeLeft) - elapsedSinceLastCheck;
+            if (remainingTime > 0) {
+                isHistoryAdded.current = true;
+                return remainingTime;
+            }
+        }
+
+        // Eğer localStorage'da kayıt yoksa normal hesaplamayı yap
         const preparationTimeStr = getPreparationTimeFromTags(recipe.tags);
         if (preparationTimeStr) {
             const hourMatch = preparationTimeStr.match(/(\d+)h/i);
@@ -32,6 +52,33 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
             if (minuteMatch) {
                 totalSeconds += parseInt(minuteMatch[1]) * 60;
             }
+
+            // Auth durumunu kontrol et ve sonra geçen süreyi hesapla
+            const checkAuthAndGetElapsedTime = async () => {
+                const currentUser = auth.currentUser;
+                if (currentUser) {
+                    try {
+                        const history = await getRecipeHistory();
+                        const lastRecipe = history.find((h: RecipeHistory) => h.recipe.id === recipe.id);
+                        if (lastRecipe) {
+                            const startTime = new Date(lastRecipe.startedAt).getTime();
+                            const currentTime = new Date().getTime();
+                            const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+                            return totalSeconds - elapsedSeconds;
+                        }
+                    } catch (error) {
+                        console.error('Error getting elapsed time:', error);
+                    }
+                }
+                return totalSeconds;
+            };
+
+            // Auth kontrolü ile geçen süreyi hesapla
+            checkAuthAndGetElapsedTime().then(remainingTime => {
+                if (remainingTime > 0) {
+                    setTimeLeft(remainingTime);
+                }
+            });
             
             return totalSeconds > 0 ? totalSeconds : DEFAULT_TIME;
         }
@@ -63,8 +110,13 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
     useEffect(() => {
         // Timer başlatıldığında tarif geçmişine ekle
         const addRecipeToHistory = async () => {
+            if (isHistoryAdded.current) {
+                return;
+            }
+
             try {
                 await addToRecipeHistory(recipe.id);
+                isHistoryAdded.current = true;
             } catch (error) {
                 console.error('Error adding recipe to history:', error);
             }
@@ -72,6 +124,15 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
         
         addRecipeToHistory();
     }, []); // Component mount olduğunda çalışır
+
+    // Timer kapandığında localStorage'ı temizle
+    useEffect(() => {
+        return () => {
+            localStorage.removeItem('activeRecipeTimeLeft');
+            localStorage.removeItem('activeRecipeStartTime');
+            localStorage.removeItem('activeRecipeId');
+        };
+    }, []);
 
     const formatTime = (seconds: number): string => {
         const hours = Math.floor(seconds / 3600);

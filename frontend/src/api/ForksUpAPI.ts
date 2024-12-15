@@ -398,3 +398,19 @@ export const updatePantryAfterRecipe = async (ingredientIds: string[]) => {
         throw error;
     }
 };
+
+// Son tarif geçmişini getir
+export const getLastRecipeHistory = async () => {
+    try {
+        const token = await getToken();
+        const response = await api.get('/user/recipeHistory/last', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error retrieving last recipe history:', error);
+        return null;
+    }
+};

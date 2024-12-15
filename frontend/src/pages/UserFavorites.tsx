@@ -5,13 +5,19 @@ import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
 import {Star} from "lucide-react";
 import {getFavoriteRecipes} from "../api/ForksUpAPI";
-import {Link} from "react-router-dom";
+import {Link, useOutletContext} from "react-router-dom";
 
-const SearchRecipes: React.FC = () => {
+interface OutletContextType {
+    onStartRecipe: (recipe: Recipe) => void;
+    showRecipeDetails: boolean;
+}
+
+const UserFavorites: React.FC = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
+    const { onStartRecipe } = useOutletContext<OutletContextType>();
 
     useEffect(() => {
         const fetchFavoriteRecipes = async () => {
@@ -94,6 +100,7 @@ const SearchRecipes: React.FC = () => {
                     <RecipeDetails
                         recipe={selectedRecipe}
                         onClose={handleClosePopup}
+                        onStartRecipe={onStartRecipe}
                     />
                 )}
             </div>
@@ -102,4 +109,4 @@ const SearchRecipes: React.FC = () => {
     );
 };
 
-export default SearchRecipes;
+export default UserFavorites;

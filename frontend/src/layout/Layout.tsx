@@ -6,6 +6,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LogoutModal from './components/LogoutModal';
 import { Recipe } from '../model/Recipe';
+import { getRecipeHistory, getLastRecipeHistory } from '../api/ForksUpAPI';
+import { getPreparationTimeFromTags } from '../utils/preparationTime';
 
 const Layout: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -17,10 +19,49 @@ const Layout: React.FC = () => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
+            if (currentUser) {
+                checkActiveRecipe();
+            }
         });
 
         return () => unsubscribe();
     }, []);
+
+    const checkActiveRecipe = async () => {
+        try {
+            const lastRecipe = await getLastRecipeHistory();
+            if (lastRecipe) {
+                const startTime = new Date(lastRecipe.startedAt).getTime();
+                const currentTime = new Date().getTime();
+                const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+
+                // Tarifin toplam süresini hesapla
+                const preparationTimeStr = getPreparationTimeFromTags(lastRecipe.recipe.tags);
+                if (preparationTimeStr) {
+                    const hourMatch = preparationTimeStr.match(/(\d+)h/i);
+                    const minuteMatch = preparationTimeStr.match(/(\d+)m/i);
+
+                    let totalSeconds = 0;
+                    if (hourMatch) {
+                        totalSeconds += parseInt(hourMatch[1]) * 3600;
+                    }
+                    if (minuteMatch) {
+                        totalSeconds += parseInt(minuteMatch[1]) * 60;
+                    }
+
+                    // Eğer süre dolmamışsa ve 0'dan büyükse timer'ı başlat
+                    if (totalSeconds > elapsedSeconds && totalSeconds > 0) {
+                        setActiveRecipe(lastRecipe.recipe);
+                        localStorage.setItem('activeRecipeTimeLeft', (totalSeconds - elapsedSeconds).toString());
+                        localStorage.setItem('activeRecipeStartTime', startTime.toString());
+                        localStorage.setItem('activeRecipeId', lastRecipe.recipe.id);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error checking active recipe:', error);
+        }
+    };
 
     const handleLogoutClick = async () => {
         setIsLogoutModalOpen(true);

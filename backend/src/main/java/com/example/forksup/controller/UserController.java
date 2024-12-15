@@ -162,4 +162,11 @@ public class UserController {
         userService.updatePantryAfterRecipe(uid, ingredientIds);
         return ResponseEntity.ok(ingredientIds);
     }
+
+    @GetMapping(path = "/recipeHistory/last")
+    public ResponseEntity<RecipeHistory> getLastRecipeHistory(HttpServletRequest request) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        RecipeHistory lastRecipe = userService.getLastRecipeHistory(uid);
+        return new ResponseEntity<>(lastRecipe, HttpStatus.OK);
+    }
 }

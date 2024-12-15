@@ -19,7 +19,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
     return (
         <motion.div
             onClick={onClick}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-0"
             whileHover={{
                 scale: 1.03,
                 transition: {duration: 0.2}

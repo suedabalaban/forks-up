@@ -235,4 +235,17 @@ public class UserService {
             userRepository.save(user);
         }
     }
+
+    public RecipeHistory getLastRecipeHistory(String firebaseId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        
+        if (user.getRecipeHistory() == null || user.getRecipeHistory().isEmpty()) {
+            return null;
+        }
+        
+        // En son eklenen tarifi döndür
+        return user.getRecipeHistory().get(user.getRecipeHistory().size() - 1);
+    }
 }

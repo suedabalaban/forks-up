@@ -4,14 +4,20 @@ import RecipeDetails from "../components/RecipeDetails";
 import {Recipe} from "../model/Recipe";
 import {History} from "lucide-react";
 import {getRecipeHistory} from "../api/ForksUpAPI";
-import {Link} from "react-router-dom";
+import {Link, useOutletContext} from "react-router-dom";
 import {RecipeHistory as RecipeHistoryType} from "../model/RecipeHistory";
+
+interface OutletContextType {
+    onStartRecipe: (recipe: Recipe) => void;
+    showRecipeDetails: boolean;
+}
 
 const RecipeHistory: React.FC = () => {
     const [recipeHistory, setRecipeHistory] = useState<RecipeHistoryType[]>([]);
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
+    const { onStartRecipe } = useOutletContext<OutletContextType>();
 
     useEffect(() => {
         const fetchRecipeHistory = async () => {
@@ -112,6 +118,7 @@ const RecipeHistory: React.FC = () => {
                     <RecipeDetails
                         recipe={selectedRecipe}
                         onClose={handleClosePopup}
+                        onStartRecipe={onStartRecipe}
                     />
                 )}
             </div>
