@@ -55,31 +55,26 @@ public class RecipeController {
             @RequestParam(defaultValue = "9") int size
     ) {
         String uid = (String) request.getSession().getAttribute("uid");
-        
-        try {
-            Page<Recipe> recipes;
-            
-            if (keyword != null && tags != null && uid.isEmpty()) {
-                recipes = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
-            }
-            else if (keyword != null && tags != null ) {
-                recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(uid,keyword, tags, page, size);
-            }
-            else if (keyword != null && tags == null) {
-                recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
-            }
-            else if (keyword == null && tags != null) {
-                recipes = recipeService.searchRecipesByTags(tags, page, size);
-            }
-            else {
-                recipes = recipeService.searchRecipesByPantryItems(uid, page, size);
-            }
-            return ResponseEntity.ok(recipes);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.internalServerError()
-                .body(Page.empty());
+
+        Page<Recipe> recipes;
+
+        if (keyword != null && tags != null && uid.isEmpty()) {
+            recipes = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
         }
+        else if (keyword != null && tags != null ) {
+            recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(uid,keyword, tags, page, size);
+        }
+        else if (keyword != null && tags == null) {
+            recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
+        }
+        else if (keyword == null && tags != null) {
+            recipes = recipeService.searchRecipesByTags(tags, page, size);
+        }
+        else {
+            recipes = recipeService.searchRecipesByPantryItems(uid, page, size);
+        }
+        return ResponseEntity.ok(recipes);
+
     }
 
     @GetMapping("/preferences")

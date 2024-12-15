@@ -18,6 +18,7 @@ import DietaryPreferences from "./pages/DietaryPreferences";
 import {registerOrUpdateUser} from "./api/ForksUpAPI";
 import Settings from "./pages/Settings";
 import {ThemeProvider} from "./context/ThemeContext";
+import RecipeHistory from "./pages/RecipeHistory";
 
 const App: React.FC = () => {
     const [user, setUser] = useState<any>(null);
@@ -51,6 +52,7 @@ const App: React.FC = () => {
                     <Route path="/dietary-preferences"
                            element={<ProtectedRoute><DietaryPreferences/></ProtectedRoute>}/>
                     <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
+                    <Route path="/history" element={<ProtectedRoute><RecipeHistory/></ProtectedRoute>}/>
 
                 </Route>
 

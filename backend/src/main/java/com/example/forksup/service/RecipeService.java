@@ -114,11 +114,11 @@ public class RecipeService {
     public Page<Recipe> searchRecipesByPantryItems(String firebaseId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseId);
-        
+
         List<ObjectId> ingredientIds = pantryItems.stream()
                 .map(item -> item.getIngredient().getObjectId())
                 .collect(Collectors.toList());
-        
+
         List<Recipe> recipes = recipeRepository.findByIngredientsIn(ingredientIds, pageable);
         long total = recipeRepository.countByIngredients(ingredientIds);
 
@@ -129,7 +129,7 @@ public class RecipeService {
         Pageable pageable = PageRequest.of(page, size);
         List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseId);
         Preferences preferences = userService.getUserPreferences(firebaseId);
-        
+
         List<ObjectId> ingredientIds = new ArrayList<>();
         if (pantryItems != null && !pantryItems.isEmpty()) {
             ingredientIds = pantryItems.stream()
@@ -166,19 +166,19 @@ public class RecipeService {
 
             List<Recipe> recipes;
             long total;
-            
+
             if (cuisines == null) {
                 cuisines = new ArrayList<>();
             }
-            
+
             recipes = recipeRepository.findByPreferences(
                     searchText, cuisines, otherPreferences, pageable);
             total = recipeRepository.countByPreferences(
                     searchText, cuisines, otherPreferences);
-            
+
             return new PageImpl<>(recipes, pageable, total);
         }
-        
+
         return Page.empty(pageable);
     }
 }

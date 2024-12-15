@@ -5,10 +5,13 @@ import { auth } from "../config/firebaseconfig";
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LogoutModal from './components/LogoutModal';
+import { Recipe } from '../model/Recipe';
 
 const Layout: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+    const [activeRecipe, setActiveRecipe] = useState<Recipe | null>(null);
+    const [showRecipeDetails, setShowRecipeDetails] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,18 +36,38 @@ const Layout: React.FC = () => {
         }
     };
 
+    const handleStartRecipe = (recipe: Recipe) => {
+        setActiveRecipe(recipe);
+        setShowRecipeDetails(false);
+    };
+
+    const handleTimerClick = () => {
+        setShowRecipeDetails(true);
+    };
+
+    const handleCloseTimer = () => {
+        setActiveRecipe(null);
+        setShowRecipeDetails(false);
+    };
+
     return (
         <div className="min-h-full flex flex-col">
-            <Navbar user={user} handleLogout={handleLogoutClick} />
-            
+            <Navbar 
+                user={user} 
+                handleLogout={handleLogoutClick}
+                activeRecipe={activeRecipe}
+                onTimerClick={handleTimerClick}
+                onCloseTimer={handleCloseTimer}
+            />
+
             <main className="flex-1">
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <Outlet />
+                    <Outlet context={{ onStartRecipe: handleStartRecipe, showRecipeDetails }} />
                 </div>
             </main>
 
             <Footer />
-            
+
             <LogoutModal
                 isOpen={isLogoutModalOpen}
                 onClose={() => setIsLogoutModalOpen(false)}

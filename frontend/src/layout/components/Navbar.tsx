@@ -1,32 +1,59 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'firebase/auth';
-import { Moon, Sun, Search, UserRound, Settings, ShoppingBag, Star, Utensils } from 'lucide-react';
+import { Moon, Sun, Search, UserRound, Settings, ShoppingBag, Star, Utensils, Heart, History } from 'lucide-react';
 import Button from '@mui/material/Button';
 import RecipesIcon from '../../assets/RecipesIcon';
 import { useTheme } from '../../context/ThemeContext';
+import { Recipe } from '../../model/Recipe';
+import ActiveRecipeTimer from "../../components/ActiveRecipeTimer";
 
 interface NavbarProps {
     user: User | null;
     handleLogout: () => Promise<void>;
+    activeRecipe: Recipe | null;
+    onTimerClick: () => void;
+    onCloseTimer: () => void;
 }
 
 const menuItems = [
     { icon: UserRound, text: 'Profile', path: '/user' },
     { icon: ShoppingBag, text: 'Pantry', path: '/pantry' },
     { icon: Star, text: 'Favorites', path: '/favorites' },
+    { icon: History, text: 'History', path: '/history' },
     { icon: Settings, text: 'Settings', path: '/settings' },
 ];
 
-const Navbar: React.FC<NavbarProps> = ({ user, handleLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTimerClick, onCloseTimer }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [isPersonalized, setIsPersonalized] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
+    const tooltipTimer = React.useRef<NodeJS.Timeout>();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
+
+    const handleMouseEnter = () => {
+        tooltipTimer.current = setTimeout(() => {
+            setShowTooltip(true);
+        }, 350);
+    };
+
+    const handleMouseLeave = () => {
+        if (tooltipTimer.current) {
+            clearTimeout(tooltipTimer.current);
+        }
+        setShowTooltip(false);
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchTerm.trim()) {
-            navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+            const searchParams = new URLSearchParams();
+            searchParams.append('q', searchTerm.trim());
+            if (isPersonalized) {
+                searchParams.append('personalized', 'true');
+            }
+            navigate(`/search?${searchParams.toString()}`);
         }
     };
 
@@ -47,24 +74,77 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout }) => {
                     </div>
 
                     <div className="flex-1 max-w-xl px-8">
-                        <form onSubmit={handleSearch} className="relative">
-                            <input
-                                type="text"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Search recipes..."
-                                className="w-full px-4 py-2 pr-12 rounded-full border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-                            />
-                            <button
-                                type="submit"
-                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
+                        <form onSubmit={handleSearch} className="relative flex items-center gap-2">
+                            <div className="relative flex-1">
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Search recipes..."
+                                    className="w-full px-4 py-2 pr-12 rounded-full border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                />
+                                <button
+                                    type="submit"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
                                 <Search size={20}/>
                             </button>
+                            </div>
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsPersonalized(!isPersonalized)}
+                                    onMouseEnter={handleMouseEnter}
+                                    onMouseLeave={handleMouseLeave}
+                                    className={`px-4 py-2 rounded-full transition-all transform hover:scale-105 flex items-center gap-2 ${
+                                        isPersonalized 
+                                        ? 'bg-gradient-to-r from-purple-700 to-blue-600 text-white' 
+                                        : 'bg-white/5 backdrop-blur-sm text-gray-600 dark:text-gray-400'
+                                    }`}
+                                >
+                                    <Heart 
+                                        className={`w-5 h-5 transition-colors ${
+                                            isPersonalized 
+                                            ? 'fill-white stroke-white' 
+                                            : 'fill-none stroke-current'
+                                        }`}
+                                    />
+                                    For You
+                                </button>
+                                
+                                {showTooltip && (
+                                    <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 px-4 py-3 bg-gray-900 text-white text-sm rounded-lg whitespace-normal w-72 shadow-lg z-50">
+                                        <div className="relative">
+                                            <div className="absolute -top-1 left-1/2 -translate-x-1/2 transform -rotate-45 w-2 h-2 bg-gray-900"></div>
+                                            <div className="space-y-2">
+                                                <p className="flex items-center gap-2">
+                                                    <span>🎯</span>
+                                                    <span>Shows personalized recipe recommendations</span>
+                                                </p>
+                                                <p className="flex items-center gap-2">
+                                                    <span>🥘</span>
+                                                    <span>Based on your dietary preferences</span>
+                                                </p>
+                                                <p className="flex items-center gap-2">
+                                                    <span>🧺</span>
+                                                    <span>Uses ingredients from your pantry</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </form>
                     </div>
 
                     <div className="flex items-center space-x-4">
+                        {activeRecipe && (
+                            <ActiveRecipeTimer
+                                recipe={activeRecipe}
+                                onTimerClick={onTimerClick}
+                                onClose={onCloseTimer}
+                            />
+                        )}
                         {user ? (
                             <div className="relative group">
                                 <div className="flex items-center space-x-3 cursor-pointer">

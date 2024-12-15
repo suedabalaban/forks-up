@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Close } from "@mui/icons-material";
-import { Star, UserRound, Users, Printer } from "lucide-react";
+import { Star, UserRound, Users, Printer, PlayCircle, Timer } from "lucide-react";
 import { auth } from "../config/firebaseconfig";
 import axios from "axios";
 import { Recipe } from "../model/Recipe";
@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 type RecipeDetailsProps = {
     recipe: Recipe;
     onClose: () => void;
+    onStartRecipe?: (recipe: Recipe) => void;
 };
 
 type YouTubeVideo = {
@@ -19,7 +20,7 @@ type YouTubeVideo = {
     thumbnail: string;
 };
 
-const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose}) => {
+const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRecipe}) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [videos, setVideos] = useState<YouTubeVideo[]>([]);
     const [loading, setLoading] = useState(false);
@@ -147,6 +148,10 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose}) => {
         printWindow.print();
     };
 
+    const handleStartRecipe = () => {
+        onStartRecipe?.(recipe);
+    };
+
     return (
         <AnimatePresence>
             <motion.div
@@ -158,9 +163,9 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose}) => {
             >
                 <motion.div
                     className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-6xl w-full mx-4 max-h-[85vh] flex flex-row overflow-hidden relative"
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.9, opacity: 0 }}
+                    initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.95, opacity: 0, y: 10 }}
                     transition={{ type: "spring", damping: 25 }}
                     onClick={(e) => e.stopPropagation()}
                 >
@@ -173,7 +178,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose}) => {
                     >
                         <div className="max-w-3xl">
                             <motion.button
-                                className="absolute top-6 right-6 p-2 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                className="absolute top-6 right-6 p-2 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded-full"
                                 onClick={onClose}
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
@@ -188,23 +193,36 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose}) => {
                                         {recipe.name}
                                     </h2>
                                     <div className="flex items-center gap-2">
-                                        <button
+                                        <motion.button
+                                            onClick={handleStartRecipe}
+                                            whileHover={{ scale: 1.1, backgroundColor: "rgb(147 51 234 / 0.2)" }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="p-2 rounded-full bg-purple-500/10 dark:bg-purple-500/20 hover:bg-purple-500/20 dark:hover:bg-purple-500/30 transition-all duration-300"
+                                            title="Start Cooking"
+                                        >
+                                            <Timer className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+                                        </motion.button>
+                                        <motion.button
                                             onClick={toggleFavorite}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
                                             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                                             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                                         >
                                             <Star
-                                                className={`w-8 h-8 transition-colors duration-200
+                                                className={`w-7 h-7 transition-colors duration-200
                                                 ${isFavorite ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300'}`}
                                             />
-                                        </button>
-                                        <button 
+                                        </motion.button>
+                                        <motion.button 
                                             onClick={handlePrint}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
                                             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                                             title="Print Recipe"
                                         >
                                             <Printer className="w-7 h-7 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300" />
-                                        </button>
+                                        </motion.button>
                                     </div>
                                 </div>
                                 <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">

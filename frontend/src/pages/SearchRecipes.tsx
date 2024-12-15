@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {useSearchParams} from 'react-router-dom';
+import {useSearchParams, useOutletContext} from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
 import {ChevronLeft, ChevronRight, ChevronsRight, ChevronsLeft} from 'lucide-react';
 import RecipeDetails from "../components/RecipeDetails";
@@ -7,7 +7,12 @@ import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
 import TagFilters from "../components/TagFilter";
 import tags from "../assets/tags.json"
-import {getRecipes} from "../api/ForksUpAPI";
+import {getPersonalizedRecipes, getRecipes} from "../api/ForksUpAPI";
+
+interface OutletContextType {
+    onStartRecipe: (recipe: Recipe) => void;
+    showRecipeDetails: boolean;
+}
 
 const SearchRecipes: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -15,6 +20,7 @@ const SearchRecipes: React.FC = () => {
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { onStartRecipe, showRecipeDetails } = useOutletContext<OutletContextType>();
 
     const [page, setPage] = useState(0);
     const [pageSize] = useState(9);
@@ -43,25 +49,35 @@ const SearchRecipes: React.FC = () => {
     const fetchRecipes = async (pageNumber = page) => {
         const searchTerm = searchParams.get('q');
         const searchTag = searchParams.get('tag');
-        
+        const isPersonalized = searchParams.get('personalized') === 'true';
+
         // Combine URL tag parameter with selected tags from the component state
         const allTags = [...selectedTags];
         if (searchTag && !selectedTags.includes(searchTag)) {
             allTags.push(searchTag);
         }
 
-        if (!searchTerm?.trim() && allTags.length === 0) return;
-
         setIsLoading(true);
         setError(null);
 
         try {
-            const data = await getRecipes(
-                searchTerm || undefined,
-                allTags.length > 0 ? allTags : undefined,
-                undefined, // pantryItems parameter
-                pageNumber
-            );
+            let data
+            if (isPersonalized) {
+                 data = await getPersonalizedRecipes(
+                    searchTerm || undefined,
+                    pageNumber,
+                    pageSize
+                );
+            } else {
+                data = await getRecipes(
+                    searchTerm || undefined,
+                    allTags.length > 0 ? allTags : undefined,
+                    undefined, // pantryItems parameter
+                    pageNumber,
+                    pageSize
+                );
+            }
+
 
             if (data.content.length > 0) {
                 setRecipes(data.content);
@@ -125,6 +141,23 @@ const SearchRecipes: React.FC = () => {
         // Reset to first page when tags change
         setPage(0);
     };
+
+    useEffect(() => {
+        if (!showRecipeDetails) {
+            setSelectedRecipe(null);
+        }
+    }, [showRecipeDetails]);
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const recipeId = urlParams.get('recipeId');
+        if (recipeId && recipes.length > 0) {
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (recipe) {
+                setSelectedRecipe(recipe);
+            }
+        }
+    }, [recipes]);
 
     return (
         <div className="max-w-[90rem] mx-auto flex flex-row dark:bg-gray-900">
@@ -282,7 +315,11 @@ const SearchRecipes: React.FC = () => {
                 )}
 
                 {selectedRecipe && (
-                    <RecipeDetails recipe={selectedRecipe} onClose={handleClosePopup}/>
+                    <RecipeDetails 
+                        recipe={selectedRecipe} 
+                        onClose={handleClosePopup}
+                        onStartRecipe={onStartRecipe}
+                    />
                 )}
             </div>
         </div>

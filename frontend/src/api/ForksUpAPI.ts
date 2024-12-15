@@ -150,11 +150,11 @@ export const getRecipes = async (
     tags?: string[],
     pantryItems?: string[],
     page: number = 0,
-    size: number = 9
+    size: number = 9,
 ): Promise<any> => {
     try {
         const params = new URLSearchParams();
-        
+
         // Add parameters only if they are defined
         if (keyword) {
             params.append('keyword', keyword);
@@ -165,12 +165,40 @@ export const getRecipes = async (
         if (pantryItems && pantryItems.length > 0) {
             pantryItems.forEach(item => params.append('pantryItems', item));
         }
-        
+
         params.append('page', page.toString());
         params.append('size', size.toString());
 
         const token = await getToken();
         const response = await api.get(`/recipes/search?${params.toString()}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error retrieving recipes:', error);
+        throw error;
+    }
+};
+
+//
+export const getPersonalizedRecipes = async (
+    keyword?: string,
+    page: number = 0,
+    size: number = 9,
+): Promise<any> => {
+    try {
+        const params = new URLSearchParams();
+        // Add parameters only if they are defined
+        if (keyword) {
+            params.append('keyword', keyword);
+        }
+        params.append('page', page.toString());
+        params.append('size', size.toString());
+
+        const token = await getToken();
+        const response = await api.get(`/recipes/preferences?${params.toString()}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -227,12 +255,12 @@ export const registerOrUpdateUser = async (user: any) => {
 export interface DietaryRestrictions {
     health_conscious: string[]
     allergies_intolerances: string[]
-    lifestyle: string[] 
+    lifestyle: string[]
 }
 
 export interface Preferences {
     dietary_restrictions: DietaryRestrictions
-    cuisines: string[] 
+    cuisines: string[]
     preparation_time: string
 }
 
@@ -272,7 +300,7 @@ export const getUserPreferences = async () => {
 export const checkDietaryRestriction = async (recipeId: string, inputText: string) => {
     try {
         const token = await getToken();
-        const response = await api.post(`/gemini/recipe/${recipeId}/dietary`, 
+        const response = await api.post(`/gemini/recipe/${recipeId}/dietary`,
             { inputText },
             {
                 headers: {
@@ -291,7 +319,7 @@ export const checkDietaryRestriction = async (recipeId: string, inputText: strin
 export const analyzeRecipeSteps = async (recipeId: string, inputText: string) => {
     try {
         const token = await getToken();
-        const response = await api.post(`/gemini/recipe/${recipeId}/steps`, 
+        const response = await api.post(`/gemini/recipe/${recipeId}/steps`,
             { inputText },
             {
                 headers: {
@@ -302,6 +330,71 @@ export const analyzeRecipeSteps = async (recipeId: string, inputText: string) =>
         return response.data;
     } catch (error) {
         console.error('Error analyzing recipe steps:', error);
+        throw error;
+    }
+};
+
+// Tarif geçmişini getir
+export const getRecipeHistory = async () => {
+    try {
+        const token = await getToken();
+        const response = await api.get('/user/recipeHistory/all', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error retrieving recipe history:', error);
+        throw error;
+    }
+};
+
+// Tarif geçmişine ekle
+export const addToRecipeHistory = async (recipeId: string) => {
+    try {
+        const token = await getToken();
+        await api.post(`/user/recipeHistory/${recipeId}`, null, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        console.error('Error adding to recipe history:', error);
+        throw error;
+    }
+};
+
+// Tarif geçmişinden kaldır
+export const removeFromRecipeHistory = async (recipeId: string) => {
+    try {
+        const token = await getToken();
+        await api.delete(`/user/recipeHistory/${recipeId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        console.error('Error removing from recipe history:', error);
+        throw error;
+    }
+};
+
+// Tarif yapıldıktan sonra malzeme miktarlarını güncelle
+export const updatePantryAfterRecipe = async (ingredientIds: string[]) => {
+    try {
+        const token = await getToken();
+        const response = await api.put('/user/recipeHistory/update', null, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                ingredientIds: ingredientIds
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating pantry after recipe:', error);
         throw error;
     }
 };
