@@ -8,6 +8,7 @@ import {Recipe} from "../model/Recipe";
 import TagFilters from "../components/TagFilter";
 import tags from "../assets/tags.json"
 import {getPersonalizedRecipes, getRecipes} from "../api/ForksUpAPI";
+import AIChat from '../components/AIChat';
 
 interface OutletContextType {
     onStartRecipe: (recipe: Recipe) => void;
@@ -321,6 +322,8 @@ const SearchRecipes: React.FC = () => {
                         onStartRecipe={onStartRecipe}
                     />
                 )}
+                
+                <AIChat recipe={selectedRecipe} />
             </div>
         </div>
     );

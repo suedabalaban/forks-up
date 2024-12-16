@@ -125,15 +125,6 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
         addRecipeToHistory();
     }, []); // Component mount olduğunda çalışır
 
-    // Timer kapandığında localStorage'ı temizle
-    useEffect(() => {
-        return () => {
-            localStorage.removeItem('activeRecipeTimeLeft');
-            localStorage.removeItem('activeRecipeStartTime');
-            localStorage.removeItem('activeRecipeId');
-        };
-    }, []);
-
     const formatTime = (seconds: number): string => {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);

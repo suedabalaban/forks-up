@@ -33,9 +33,6 @@ public class RecipeService {
     @Autowired
     private UserRepository userRepository;
 
-    @Cacheable(value = "recipeSearchCache",
-            key = "#keyword + #page + #size",
-            unless = "#result.isEmpty()")
     public Page<Recipe> searchRecipesByKeyword(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -48,9 +45,6 @@ public class RecipeService {
         return new PageImpl<>(recipes, pageable, total);
     }
 
-    @Cacheable(value = "recipeSearchCache",
-            key = "#keyword + #tags + #page + #size",
-            unless = "#result.isEmpty()")
     public Page<Recipe> searchRecipesByKeywordAndTags(String keyword, List<String> tags, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -71,9 +65,6 @@ public class RecipeService {
         return new PageImpl<>(recipes, pageable, total);
     }
 
-    @Cacheable(value = "recipeSearchCache",
-            key = "#tags",
-            unless = "#result.isEmpty()")
     public Page<Recipe> searchRecipesByTags(List<String> tags, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -82,10 +73,6 @@ public class RecipeService {
         return new PageImpl<>(recipes, pageable, total);
     }
 
-
-    @Cacheable(value = "recipeSearchCache",
-            key = "#keyword + #tags + #page + #size",
-            unless = "#result.isEmpty()")
     public Page<Recipe> searchRecipesByKeywordTagsAndPantryItems(
             String firebaseId, String keyword, List<String> tags, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -108,9 +95,7 @@ public class RecipeService {
 
         return new PageImpl<>(recipes, pageable, total);
     }
-    @Cacheable(value = "recipeSearchCache",
-            key = "{#firebaseId, #page, #size}",
-            unless = "#result.isEmpty()")
+
     public Page<Recipe> searchRecipesByPantryItems(String firebaseId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseId);

@@ -219,7 +219,7 @@ const DietaryPreferences: React.FC = () => {
           <div className="space-y-6">
             {preferences.health_conscious.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold mb-2">Health Consciousness</h3>
+                <h3 className="text-lg font-semibold mb-2 dark:text-gray-300">Health Consciousness</h3>
                 <div className="flex flex-wrap gap-2">
                   {preferences.health_conscious.map(tag => (
                     <span key={tag} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full">
@@ -232,7 +232,7 @@ const DietaryPreferences: React.FC = () => {
 
             {preferences.allergies_intolerances.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold mb-2">Allergies and Intolerances</h3>
+                <h3 className="text-lg font-semibold mb-2 dark:text-gray-300">Allergies and Intolerances</h3>
                 <div className="flex flex-wrap gap-2">
                   {preferences.allergies_intolerances.map(tag => (
                     <span key={tag} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full">
@@ -245,7 +245,7 @@ const DietaryPreferences: React.FC = () => {
 
             {preferences.lifestyle.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold mb-2">Lifestyle</h3>
+                <h3 className="text-lg font-semibold mb-2 dark:text-gray-300">Lifestyle</h3>
                 <div className="flex flex-wrap gap-2">
                   {preferences.lifestyle.map(tag => (
                     <span key={tag} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full">
@@ -258,7 +258,7 @@ const DietaryPreferences: React.FC = () => {
 
             {preferences.selectedCuisines.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold mb-2">Preferred Cuisines</h3>
+                <h3 className="text-lg font-semibold mb-2 dark:text-gray-300">Preferred Cuisines</h3>
                 <div className="flex flex-wrap gap-2">
                   {preferences.selectedCuisines.map(cuisine => (
                     <span key={cuisine} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full">
