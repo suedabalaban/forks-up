@@ -2,17 +2,16 @@ package com.example.forksup.service;
 
 import com.example.forksup.model.*;
 import com.example.forksup.repository.IngredientRepository;
+import com.example.forksup.repository.recipe.RecipeRepository;
 import com.example.forksup.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
-
-import com.example.forksup.repository.RecipeRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,137 +32,82 @@ public class RecipeService {
     @Autowired
     private UserRepository userRepository;
 
-    public Page<Recipe> searchRecipesByKeyword(String keyword, int page, int size) {
+    public Page<Recipe> searchRecipes(
+            String keyword,
+            List<String> tags,
+            List<String> ingredients,
+            int page,
+            int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
-
-        String searchText = Arrays.stream(keyword.trim().split("\\s+"))
-                .map(word -> "\"" + word + "\"")
-                .collect(Collectors.joining(" "));
-
-        List<Recipe> recipes = recipeRepository.findByNameTextSearch(searchText, pageable);
-        long total = recipeRepository.countByNameTextSearch(searchText);
-        return new PageImpl<>(recipes, pageable, total);
-    }
-
-    public Page<Recipe> searchRecipesByKeywordAndTags(String keyword, List<String> tags, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        String searchText = keyword == null || keyword.trim().isEmpty() ? "" :
-                Arrays.stream(keyword.trim().split("\\s+"))
-                        .map(word -> "\"" + word + "\"")
-                        .collect(Collectors.joining(" "));
-        List<Recipe> recipes;
-        long total;
-
-        if (tags == null || tags.isEmpty()) {
-            recipes = recipeRepository.findByNameTextSearch(searchText, pageable);
-            total = recipeRepository.countByNameTextSearch(searchText);
-        } else {
-            recipes = recipeRepository.findByNameAndTags(searchText, tags, pageable);
-            total = recipeRepository.countByNameAndTags(searchText, tags);
+        List<Ingredient> ingredientIds = null;
+        if (ingredients != null && !ingredients.isEmpty()) {
+            ingredientIds = ingredientRepository.findIngredientsByNameIn(ingredients);
         }
-        return new PageImpl<>(recipes, pageable, total);
+        return recipeRepository.searchRecipes(keyword, tags, ingredientIds, null, pageable);
     }
 
-    public Page<Recipe> searchRecipesByTags(List<String> tags, int page, int size) {
+    public Page<Recipe> searchRecipesByPreferences(
+            String uid,
+            String keyword,
+            List<String> tags,
+            List<String> ingredients,
+            int page,
+            int size
+    ) {
         Pageable pageable = PageRequest.of(page, size);
 
-        List<Recipe> recipes = recipeRepository.findByTagsIn(tags, pageable);
-        long total = recipeRepository.countByTags(tags);
-        return new PageImpl<>(recipes, pageable, total);
-    }
+        List<Ingredient> ingredientIds = new ArrayList<>();
+        if (ingredients != null && !ingredients.isEmpty()) {
+            ingredientIds = ingredientRepository.findIngredientsByNameIn(ingredients);
+        }
 
-    public Page<Recipe> searchRecipesByKeywordTagsAndPantryItems(
-            String firebaseId, String keyword, List<String> tags, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseId);
+        List<PantryItem> pantryItems = userService.getUserPantryItems(uid);
+        Preferences preferences = userService.getUserPreferences(uid);
 
-        List<ObjectId> ingredientIds = pantryItems.stream()
-                .map(item -> item.getIngredient().getObjectId())
-                .collect(Collectors.toList());
-
-        String searchText = keyword == null || keyword.trim().isEmpty() ? "" :
-                Arrays.stream(keyword.trim().split("\\s+"))
-                        .map(word -> "\"" + word + "\"")
-                        .collect(Collectors.joining(" "));
-
-        List<Recipe> recipes;
-        long total;
-
-        recipes = recipeRepository.findByNameTagsAndIngredients(searchText, tags, ingredientIds, pageable);
-        total = recipeRepository.countByNameTagsAndIngredients(searchText, tags, ingredientIds);
-
-        return new PageImpl<>(recipes, pageable, total);
-    }
-
-    public Page<Recipe> searchRecipesByPantryItems(String firebaseId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseId);
-
-        List<ObjectId> ingredientIds = pantryItems.stream()
-                .map(item -> item.getIngredient().getObjectId())
-                .collect(Collectors.toList());
-
-        List<Recipe> recipes = recipeRepository.findByIngredientsIn(ingredientIds, pageable);
-        long total = recipeRepository.countByIngredients(ingredientIds);
-
-        return new PageImpl<>(recipes, pageable, total);
-    }
-
-    public Page<Recipe> searchRecipesByUserPreferences(String keyword, String firebaseId, int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-        List<PantryItem> pantryItems = userService.getUserPantryItems(firebaseId);
-        Preferences preferences = userService.getUserPreferences(firebaseId);
-
-        List<ObjectId> ingredientIds = new ArrayList<>();
         if (pantryItems != null && !pantryItems.isEmpty()) {
-            ingredientIds = pantryItems.stream()
-                    .filter(item -> item.getIngredient() != null)
-                    .map(item -> item.getIngredient().getObjectId())
-                    .filter(Objects::nonNull)
-                    .toList();
+            ingredientIds.addAll(pantryItems.stream()
+                    .map(PantryItem::getIngredient)
+                    .toList());
+        }
+
+        List<String> otherTags = new ArrayList<>();
+        List<String> cuisineTags = new ArrayList<>();
+
+        if (tags != null) {
+            otherTags.addAll(tags);
         }
 
         if (preferences != null) {
-            List<String> cuisines = preferences.getCuisines();
-            List<String> otherPreferences = new ArrayList<>();
+            if (preferences.getDietaryRestrictions() != null) {
+                DietaryRestrictions restrictions = preferences.getDietaryRestrictions();
 
-            DietaryRestrictions dietaryRestrictions = preferences.getDietaryRestrictions();
-            if(dietaryRestrictions != null) {
-                if(dietaryRestrictions.getHealthConscious() != null){
-                    otherPreferences.addAll(dietaryRestrictions.getHealthConscious());
+                if (restrictions.getHealthConscious() != null) {
+                    otherTags.addAll(restrictions.getHealthConscious());
                 }
-                if(dietaryRestrictions.getLifestyle() != null){
-                    otherPreferences.addAll(dietaryRestrictions.getLifestyle());
+
+                if (restrictions.getAllergiesIntolerances() != null) {
+                    otherTags.addAll(restrictions.getAllergiesIntolerances());
                 }
-                if(dietaryRestrictions.getAllergiesIntolerances() != null){
-                    otherPreferences.addAll(dietaryRestrictions.getAllergiesIntolerances());
+
+                if (restrictions.getLifestyle() != null) {
+                    otherTags.addAll(restrictions.getLifestyle());
                 }
             }
-            if(preferences.getPreparation_time() != null) {
-                otherPreferences.add(preferences.getPreparation_time());
+
+            if (preferences.getCuisines() != null) {
+                cuisineTags.addAll(preferences.getCuisines());
             }
-
-            String searchText = keyword == null || keyword.trim().isEmpty() ? "" :
-                    Arrays.stream(keyword.trim().split("\\s+"))
-                            .map(word -> "\"" + word + "\"")
-                            .collect(Collectors.joining(" "));
-
-            List<Recipe> recipes;
-            long total;
-
-            if (cuisines == null) {
-                cuisines = new ArrayList<>();
-            }
-
-            recipes = recipeRepository.findByPreferences(
-                    searchText, cuisines, otherPreferences, pageable);
-            total = recipeRepository.countByPreferences(
-                    searchText, cuisines, otherPreferences);
-
-            return new PageImpl<>(recipes, pageable, total);
         }
 
-        return Page.empty(pageable);
+        return recipeRepository.searchRecipesWithPreferences(
+                keyword,
+                cuisineTags,
+                otherTags,
+                ingredientIds,
+                null,
+                pageable
+        );
     }
+
 }

@@ -3,7 +3,7 @@ package com.example.forksup.service;
 import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.*;
 import com.example.forksup.repository.IngredientRepository;
-import com.example.forksup.repository.RecipeRepository;
+import com.example.forksup.repository.recipe.RecipeRepository;
 import com.example.forksup.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

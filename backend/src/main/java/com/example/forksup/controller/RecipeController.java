@@ -1,12 +1,9 @@
 package com.example.forksup.controller;
 
-import com.example.forksup.model.Ingredient;
 import com.example.forksup.model.Recipe;
-import com.example.forksup.repository.RecipeRepository;
+import com.example.forksup.repository.recipe.RecipeRepository;
 import com.example.forksup.service.RecipeService;
-import com.google.firebase.auth.FirebaseToken;
 
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,60 +48,30 @@ public class RecipeController {
             HttpServletRequest request,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) List<String> ingredients,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size
     ) {
         String uid = (String) request.getSession().getAttribute("uid");
 
-        Page<Recipe> recipes;
-
-        if (keyword != null && tags != null && uid.isEmpty()) {
-            recipes = recipeService.searchRecipesByKeywordAndTags(keyword, tags, page, size);
-        }
-        else if (keyword != null && tags != null ) {
-            recipes = recipeService.searchRecipesByKeywordTagsAndPantryItems(uid,keyword, tags, page, size);
-        }
-        else if (keyword != null && tags == null) {
-            recipes = recipeService.searchRecipesByKeyword(keyword, page, size);
-        }
-        else if (keyword == null && tags != null) {
-            recipes = recipeService.searchRecipesByTags(tags, page, size);
-        }
-        else {
-            recipes = recipeService.searchRecipesByPantryItems(uid, page, size);
-        }
+        Page<Recipe> recipes = recipeService.searchRecipes(keyword, tags, ingredients, page, size);
         return ResponseEntity.ok(recipes);
-
     }
 
     @GetMapping("/preferences")
     public ResponseEntity<Page<Recipe>> searchRecipesByPreferences(
             HttpServletRequest request,
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) List<String> ingredients,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "9") int size) {
 
         String uid = (String) request.getSession().getAttribute("uid");
         if (uid == null) {
             return new ResponseEntity<>(null, null, HttpStatus.UNAUTHORIZED);
         }
-
-        Page<Recipe> recipes = recipeService.searchRecipesByUserPreferences(
-                keyword != null ? keyword : "", uid, page, size);
-        return ResponseEntity.ok(recipes);
-    }
-
-    @GetMapping("/searchPantry")
-    public ResponseEntity<Page<Recipe>> searchRecipesByPantryItems(
-            HttpServletRequest request,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        if (uid == null) {
-            return new ResponseEntity<>(null, null, HttpStatus.UNAUTHORIZED);
-        }
-
-        Page<Recipe> recipes = recipeService.searchRecipesByPantryItems(uid, page, size);
+        Page<Recipe> recipes = recipeService.searchRecipesByPreferences(uid, keyword, tags, ingredients, page, size);
         return ResponseEntity.ok(recipes);
     }
 

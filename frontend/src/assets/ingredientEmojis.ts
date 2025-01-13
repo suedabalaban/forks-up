@@ -122,7 +122,6 @@ export const ingredientMap: { [key: string]: string } = {
 
     // Beverages
     'coffee': '☕',
-    'tea': '🫖',
     'wine': '🍷',
     'beer': '🍺',
     'juice': '🧃',
