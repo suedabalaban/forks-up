@@ -47,7 +47,7 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-        new Set(['dietary_restrictions'])
+        new Set([''])
     );
 
     useEffect(() => {
