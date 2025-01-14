@@ -2,6 +2,7 @@ package com.example.forksup.model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -42,6 +43,7 @@ public class Recipe {
     @Field("steps")
     private List<String> steps;
 
+    @Indexed
     @Field("tags")
     private List<String> tags;
 
