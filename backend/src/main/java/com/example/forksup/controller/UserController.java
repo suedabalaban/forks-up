@@ -158,9 +158,11 @@ public class UserController {
     public ResponseEntity<Void> addIngredientToPantry(
             HttpServletRequest request,
             @RequestParam String ingredientId,
-            @RequestParam Integer quantity) {
+            @RequestParam Integer quantity,
+            @RequestParam String unit
+    ) {
         String uid = (String) request.getSession().getAttribute("uid");
-        userService.addIngredientToPantry(uid, ingredientId, quantity);
+        userService.addIngredientToPantry(uid, ingredientId, quantity, unit);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -178,9 +180,10 @@ public class UserController {
     public ResponseEntity<PantryItem> updateIngredientQuantity(
             HttpServletRequest request,
             @PathVariable String ingredientId,
-            @RequestParam Integer quantity) {
+            @RequestParam Integer quantity,
+            @RequestParam String unit) {
         String uid = (String) request.getSession().getAttribute("uid");
-        PantryItem updatedItem = userService.updateIngredientQuantity(uid, ingredientId, quantity);
+        PantryItem updatedItem = userService.updateIngredientQuantity(uid, ingredientId, quantity, unit);
         return ResponseEntity.ok(updatedItem);
     }
 

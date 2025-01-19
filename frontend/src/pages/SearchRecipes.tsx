@@ -107,6 +107,11 @@ const SearchRecipes: React.FC = () => {
         }
     };
 
+    // Add this new useEffect for scrolling
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [page]);
+
     const handleFirstPage = () => handlePageChange(0);
     const handleLastPage = () => handlePageChange(totalPages - 1);
     const handlePreviousPage = () => handlePageChange(page - 1);

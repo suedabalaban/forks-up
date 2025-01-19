@@ -32,7 +32,7 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
         Query query = new Query();
 
         if (name != null && !name.isEmpty()) {
-            query.addCriteria(TextCriteria.forDefaultLanguage().matching(name)); // Case-insensitive
+            query.addCriteria(TextCriteria.forDefaultLanguage().matchingPhrase(name)); // Case-insensitive
         }
         if (tags != null && !tags.isEmpty()) {
             query.addCriteria(Criteria.where("tags").all(tags));
@@ -65,7 +65,7 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
         Query query = new Query();
 
         if (name != null && !name.isEmpty()) {
-            query.addCriteria(TextCriteria.forDefaultLanguage().matching(name));
+            query.addCriteria(TextCriteria.forDefaultLanguage().matchingPhrase(name));
         }
 
         // Create separate criteria for cuisine tags and other tags

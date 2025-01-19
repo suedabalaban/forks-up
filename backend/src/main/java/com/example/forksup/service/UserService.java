@@ -100,7 +100,7 @@ public class UserService {
         return u.getPantryItems();
     }
 
-    public void addIngredientToPantry(String firebaseId, String ingredientId, Integer quantity) {
+    public void addIngredientToPantry(String firebaseId, String ingredientId, Integer quantity, String unit) {
         User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
@@ -120,15 +120,16 @@ public class UserService {
             PantryItem newPantryItem = new PantryItem();
             newPantryItem.setIngredient(i);
             newPantryItem.setQuantity(quantity);
+            newPantryItem.setMeasurementUnit(unit);
             pantryItems.add(newPantryItem);
         } else {
-            existingPantryItem.setQuantity(existingPantryItem.getQuantity() + quantity);
+            existingPantryItem.setQuantity(quantity);
         }
         u.setPantryItems(pantryItems);
         userRepository.save(u);
     }
 
-    public PantryItem updateIngredientQuantity(String firebaseId, String ingredientId, Integer quantity) {
+    public PantryItem updateIngredientQuantity(String firebaseId, String ingredientId, Integer quantity, String unit) {
         User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
@@ -143,6 +144,7 @@ public class UserService {
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found in pantry"));
         pantryItem.setQuantity(quantity);
+        pantryItem.setMeasurementUnit(unit);
 
         userRepository.save(u);
         return pantryItem;
