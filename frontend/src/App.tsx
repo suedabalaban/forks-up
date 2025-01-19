@@ -37,7 +37,7 @@ const App: React.FC = () => {
             }
         });
         return () => unsubscribe();
-    }, []); // Remove user from dependency array
+    }, []);
 
     return (
         <ThemeProvider>

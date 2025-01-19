@@ -96,7 +96,7 @@ export const getPantryItems = async () => {
 };
 
 //
-export const addIngredient = async (ingredientId: string) => {
+export const addIngredient = async (ingredientId: string, quantity: number, unit: string) => {
     try {
         const token = await getToken();
         return await api.post('/user/pantry', null, {
@@ -105,7 +105,8 @@ export const addIngredient = async (ingredientId: string) => {
             },
             params: {
                 ingredientId,
-                quantity: 1
+                quantity,
+                unit
             }
         });
     } catch (error) {
@@ -115,14 +116,17 @@ export const addIngredient = async (ingredientId: string) => {
 };
 
 //
-export const updateQuantity = async (ingredientId: string, quantity: number) => {
+export const updateQuantity = async (ingredientId: string, quantity: number, unit: string) => {
     try {
         const token = await getToken();
         return await api.put(`/user/pantry/${ingredientId}`, null, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
-            params: { quantity }
+            params: {
+                quantity,
+                unit
+            }
         });
     } catch (error) {
         console.error('Error updating quantity:', error);

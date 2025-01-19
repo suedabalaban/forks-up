@@ -4,6 +4,7 @@ import {PantryItem} from "../model/PantryItem";
 import {Ingredient} from "../model/Ingredient";
 import {addIngredient, getIngredients, getPantryItems, removeIngredient} from "../api/ForksUpAPI";
 import { getIngredientEmoji } from '../assets/ingredientEmojis';
+import { measurementUnits, MeasurementUnit } from '../assets/MeasurementUnit';
 
 const Pantry = () => {
     const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
@@ -12,6 +13,11 @@ const Pantry = () => {
     const [loading, setLoading] = useState(false);
     const [searchLoading, setSearchLoading] = useState(false);
     const [error, setError] = useState('');
+    const [selectedUnit, setSelectedUnit] = useState<MeasurementUnit>('PIECE');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
+    const [modalQuantity, setModalQuantity] = useState(1);
+    const [modalUnit, setModalUnit] = useState<MeasurementUnit>('PIECE');
 
     useEffect(() => {
         fetchPantryItems();
@@ -54,16 +60,16 @@ const Pantry = () => {
 
     const HandleAddIngredient = async (ingredientId: string) => {
         try {
-            await addIngredient(ingredientId);
+            await addIngredient(ingredientId, 1, selectedUnit);
             await fetchPantryItems();
         } catch (err) {
             setError('An error occurred while adding the ingredient');
         }
     };
 
-    const HandleUpdateQuantity = async (ingredientId: string, quantity: number) => {
+    const HandleUpdateQuantity = async (ingredientId: string, quantity: number, unit: string) => {
         try {
-            await addIngredient(ingredientId)
+            await addIngredient(ingredientId, quantity, unit)
             await fetchPantryItems();
         } catch (err) {
             setError('An error occurred while updating the quantity\n');
@@ -78,6 +84,53 @@ const Pantry = () => {
             setError('An error occurred while deleting the ingredient\n');
         }
     };
+
+    const openAddModal = (ingredient: Ingredient) => {
+        setSelectedIngredient(ingredient);
+        setModalQuantity(1);
+        setModalUnit('PIECE');
+        setIsModalOpen(true);
+    };
+
+    const handleModalSubmit = async () => {
+        if (!selectedIngredient) return;
+
+        try {
+            await addIngredient(selectedIngredient.id, modalQuantity, modalUnit);
+            await fetchPantryItems();
+            setIsModalOpen(false);
+        } catch (err) {
+            setError('An error occurred while adding/updating the ingredient');
+        }
+    };
+
+    const renderSearchResults = () => (
+        <div className="space-y-2">
+            {searchResults.map(ingredient => (
+                <div
+                    key={ingredient.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-purple-50 dark:hover:bg-gray-600 transition-all duration-300"
+                >
+                    <span className="text-gray-700 dark:text-gray-300">
+                        <span className="mr-2">{getIngredientEmoji(ingredient.name.toLowerCase())}</span>
+                        {ingredient.name}
+                    </span>
+                    <button
+                        onClick={() => openAddModal(ingredient)}
+                        className="p-2 hover:bg-purple-100 dark:hover:bg-gray-600 rounded-full transition-all duration-300"
+                    >
+                        <Plus size={20} className="text-purple-600 dark:text-purple-300" />
+                    </button>
+                </div>
+            ))}
+            {searchQuery && searchResults.length === 0 && (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <span className="text-2xl mb-2 block">🔍</span>
+                    No ingredients found
+                </div>
+            )}
+        </div>
+    );
 
     return (
         <div className="container mx-auto p-4 ">
@@ -121,31 +174,7 @@ const Pantry = () => {
                                     <p className="text-purple-600 dark:text-purple-300">Searching for ingredients...</p>
                                 </div>
                             ) : (
-                                <div className="space-y-2">
-                                    {searchResults.map(ingredient => (
-                                        <div
-                                            key={ingredient.id}
-                                            className="flex items-center justify-between p-4 border rounded-lg hover:bg-purple-50 dark:hover:bg-gray-600 transition-all duration-300"
-                                        >
-                                            <span className="text-gray-700 dark:text-gray-300">
-                                                <span className="mr-2">{getIngredientEmoji(ingredient.name.toLowerCase())}</span>
-                                                {ingredient.name}
-                                            </span>
-                                            <button
-                                                onClick={() => HandleAddIngredient(ingredient.id)}
-                                                className="p-2 hover:bg-purple-100 dark:hover:bg-gray-600 rounded-full transition-all duration-300"
-                                            >
-                                                <Plus size={20} className="text-purple-600 dark:text-purple-300" />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    {searchQuery && searchResults.length === 0 && (
-                                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                                            <span className="text-2xl mb-2 block">🔍</span>
-                                            No ingredients found
-                                        </div>
-                                    )}
-                                </div>
+                                renderSearchResults()
                             )}
                         </div>
                     </div>
@@ -173,26 +202,30 @@ const Pantry = () => {
                                         </span>
                                         <div className="flex items-center gap-3">
                                             <button
-                                                onClick={() => HandleUpdateQuantity(item.ingredient.id, Math.max(0, item.quantity - 1))}
+                                                onClick={() => HandleUpdateQuantity(item.ingredient.id, Math.max(0, item.quantity - 1), item.measurementUnit)}
                                                 className="p-2 hover:bg-purple-100 dark:hover:bg-gray-600 rounded-full transition-all duration-300"
                                             >
-                                                <Minus size={18} className="text-purple-600 dark:text-purple-300" />
+                                                <Minus size={18} className="text-purple-600 dark:text-purple-300"/>
                                             </button>
 
-                                            <span className="w-8 text-center font-semibold text-purple-700 dark:text-purple-300">{item.quantity}</span>
+                                            <span
+                                                className="w-16 text-center font-semibold text-purple-700 dark:text-purple-300 flex items-center justify-center gap-x-2.5">
+                                                <span>{item.quantity}</span>
+                                                <span>{item.measurementUnit.toLowerCase()}</span>
+                                            </span>
 
                                             <button
-                                                onClick={() => HandleUpdateQuantity(item.ingredient.id, item.quantity + 1)}
+                                                onClick={() => HandleUpdateQuantity(item.ingredient.id, item.quantity + 1, item.measurementUnit)}
                                                 className="p-2 hover:bg-purple-100 dark:hover:bg-gray-600 rounded-full transition-all duration-300"
                                             >
-                                                <Plus size={18} className="text-purple-600 dark:text-purple-300" />
+                                                <Plus size={18} className="text-purple-600 dark:text-purple-300"/>
                                             </button>
 
                                             <button
                                                 onClick={() => handleRemoveIngredient(item.ingredient.id)}
                                                 className="p-2 hover:bg-red-100 dark:hover:bg-red-900 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 ml-2"
                                             >
-                                                <Trash2 size={18} className="text-red-600 dark:text-red-300" />
+                                                <Trash2 size={18} className="text-red-600 dark:text-red-300"/>
                                             </button>
                                         </div>
                                     </div>
@@ -209,6 +242,59 @@ const Pantry = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Add Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
+                        <h2 className="text-xl font-semibold mb-4 text-purple-800 dark:text-purple-400">
+                            Add {selectedIngredient?.name} to Pantry
+                        </h2>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Quantity
+                                </label>
+                                <input
+                                    type="number"
+                                    value={modalQuantity}
+                                    onChange={(e) => setModalQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                    min="1"
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Unit
+                                </label>
+                                <select
+                                    value={modalUnit}
+                                    onChange={(e) => setModalUnit(e.target.value as MeasurementUnit)}
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700"
+                                >
+                                    {measurementUnits.map(unit => (
+                                        <option key={unit} value={unit}>{unit.toLowerCase()}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex justify-end space-x-3 mt-6">
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleModalSubmit}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                                >
+                                    Add to Pantry
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
