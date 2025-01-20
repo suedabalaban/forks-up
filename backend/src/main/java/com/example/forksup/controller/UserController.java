@@ -5,11 +5,14 @@ import com.example.forksup.model.*;
 import com.example.forksup.repository.UserRepository;
 import com.example.forksup.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -56,6 +59,8 @@ public class UserController {
         User u = userService.insertUser(new User(
                 null,
                 uid,
+                null,
+                null,
                 null,
                 null,
                 null)
@@ -326,4 +331,44 @@ public class UserController {
         return new ResponseEntity<>(lastRecipe, HttpStatus.OK);
     }
 
+    /**
+     * Uploads a user's avatar image and stores it in the user's profile.
+     * This endpoint allows the user to upload an image file (e.g., .jpg, .png)
+     * as their avatar, which is then saved in the user's profile in the database.
+     *
+     * @param request HTTP request containing user session information, used to retrieve the user's ID.
+     * @param avatar The avatar image file to be uploaded, received as a MultipartFile.
+     * @return ResponseEntity with a success message if the avatar is uploaded successfully.
+     * @throws RuntimeException if there is an error while processing the file (e.g., file read error).
+     * @throws IllegalArgumentException if the uploaded file is empty or invalid.
+     */
+    @PostMapping(path = "/avatar")
+    public ResponseEntity<String> uploadAvatar(
+            HttpServletRequest request,
+            @RequestParam MultipartFile avatar
+    ) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        userService.uploadAvatar(uid, avatar);
+        return ResponseEntity.ok("Avatar uploaded successfully.");
+    }
+
+    /**
+     * Updates the description of the currently logged-in user.
+     * This endpoint allows the user to update their profile description,
+     * which will be stored in the user's profile in the database.
+     * The description should not exceed 200 characters.
+     *
+     * @param request     HTTP request containing the user session, used to retrieve the user ID.
+     * @param description The new description text to be updated in the user's profile.
+     * @return ResponseEntity with the updated description and HTTP status OK.
+     */
+    @PutMapping(path = "/description")
+    public ResponseEntity<String> updateDescription(
+            HttpServletRequest request,
+            @RequestParam String description
+    ) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        userService.updateDescription(uid, description);
+        return new ResponseEntity<>(description, HttpStatus.OK);
+    }
 }

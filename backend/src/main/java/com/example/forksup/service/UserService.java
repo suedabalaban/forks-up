@@ -8,7 +8,9 @@ import com.example.forksup.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -247,7 +249,34 @@ public class UserService {
             return null;
         }
         
-        // En son eklenen tarifi döndür
+        // En son eklenen tarifi döndür - tmm
         return user.getRecipeHistory().get(user.getRecipeHistory().size() - 1);
+    }
+
+    public void uploadAvatar(String firebaseId, MultipartFile avatar) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        if (avatar != null && !avatar.isEmpty()) {
+            try {
+                user.setAvatar(avatar.getBytes());
+                userRepository.save(user);
+            } catch (IOException e) {
+                throw new RuntimeException("Error processing the upload file", e);
+            }
+        } else {
+            throw new IllegalArgumentException("Avatar file is empty or null.");
+        }
+    }
+
+    public void updateDescription(String firebaseId, String description) {
+        if (description.length() > 200) {
+            throw new IllegalArgumentException("Description cannot exceed 200 characters.");
+        }
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        user.setDescription(description);
+        userRepository.save(user);
     }
 }

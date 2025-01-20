@@ -32,6 +32,12 @@ public class User {
     @Field("recipe_history")
     private List<RecipeHistory> recipeHistory;
 
+    @Field("avatar")
+    private byte[] avatar;
+
+    @Field("description")
+    private String description;
+
     public User() {}
 
     public User (
@@ -39,7 +45,9 @@ public class User {
             String firebaseId,
             Preferences preferences,
             List<PantryItem> pantryItems,
-            List<Recipe> favorites
+            List<Recipe> favorites,
+            byte[] avatar,
+            String description
     )
     {
         this.id = id;
@@ -47,6 +55,9 @@ public class User {
         this.preferences = preferences;
         this.pantryItems = pantryItems;
         this.favorites = favorites;
+        this.avatar = avatar;
+        this.description = description;
+
     }
 
     public String getId() {return id != null ? id.toHexString() : null;}
@@ -82,4 +93,16 @@ public class User {
     public List<RecipeHistory> getRecipeHistory() {return recipeHistory;}
 
     public void setRecipeHistory(List<RecipeHistory> recipeHistory) {this.recipeHistory = recipeHistory;}
+
+    public byte[] getAvatar() {return avatar;}
+
+    public void setAvatar(byte[] avatar) {this.avatar = avatar;}
+
+    public String getDescription() {return description;}
+
+    public void setDescription(String description) {
+        if(description != null && description.length() > 200 ){
+            throw new IllegalArgumentException("Description must be at most 200 characters long.");
+        }
+        this.description = description;}
 }
