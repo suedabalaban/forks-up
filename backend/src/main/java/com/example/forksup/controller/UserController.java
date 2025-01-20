@@ -254,7 +254,7 @@ public class UserController {
      * @param request HTTP request containing user session
      * @return ResponseEntity with List of RecipeHistory objects
      */
-    @GetMapping(path = "/recipeHistory/all")
+    @GetMapping(path = "/history/all")
     public ResponseEntity<List<RecipeHistory>> getUserRecipeHistory(HttpServletRequest request) {
         String uid = (String) request.getSession().getAttribute("uid");
         List<RecipeHistory> recipeHistoryList = userService.getRecipeHistory(uid);
@@ -270,7 +270,7 @@ public class UserController {
      * @param recipeId Unique identifier of the cooked recipe
      * @return ResponseEntity with HTTP 200 (OK) on successful addition
      */
-    @PostMapping(path = "/recipeHistory/{recipeId}")
+    @PostMapping(path = "/history/{recipeId}")
     public ResponseEntity<String> addUserRecipeHistory(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
         String uid = (String) request.getSession().getAttribute("uid");
         userService.addItemToRecipeHistory(uid, recipeId);
@@ -286,7 +286,7 @@ public class UserController {
      * @param recipeId Unique identifier of the recipe to remove
      * @return ResponseEntity with HTTP 204 (NO_CONTENT) on successful removal
      */
-    @DeleteMapping(path = "/recipeHistory/{recipeId}")
+    @DeleteMapping(path = "/history/{recipeId}")
     public ResponseEntity<Void> removeItemFromRecipeHistory(HttpServletRequest request, @PathVariable("recipeId") String recipeId) {
         String uid = (String) request.getSession().getAttribute("uid");
         userService.removeItemFromRecipeHistory(uid, recipeId);
@@ -302,7 +302,7 @@ public class UserController {
      * @param ingredientIds List of ingredients used in the recipe
      * @return ResponseEntity with list of updated ingredient IDs
      */
-    @PutMapping(path = "/recipeHistory/update")
+    @PutMapping(path = "/history/update")
     public ResponseEntity<List<String>> updatePantryAfterRecipe(
             HttpServletRequest request,
             @RequestParam List<String> ingredientIds) {
@@ -319,7 +319,7 @@ public class UserController {
      * @param request HTTP request containing user session
      * @return ResponseEntity with most recent RecipeHistory object
      */
-    @GetMapping(path = "/recipeHistory/last")
+    @GetMapping(path = "/history/last")
     public ResponseEntity<RecipeHistory> getLastRecipeHistory(HttpServletRequest request) {
         String uid = (String) request.getSession().getAttribute("uid");
         RecipeHistory lastRecipe = userService.getLastRecipeHistory(uid);

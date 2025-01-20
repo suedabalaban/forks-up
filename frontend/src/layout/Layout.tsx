@@ -10,7 +10,10 @@ import { getRecipeHistory, getLastRecipeHistory } from '../api/ForksUpAPI';
 import { getPreparationTimeFromTags } from '../utils/preparationTime';
 
 const Layout: React.FC = () => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null>(() => {
+        const savedUser = localStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const [activeRecipe, setActiveRecipe] = useState<Recipe | null>(null);
     const [showRecipeDetails, setShowRecipeDetails] = useState(false);
@@ -18,6 +21,11 @@ const Layout: React.FC = () => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                localStorage.setItem('user', JSON.stringify(currentUser));
+            } else {
+                localStorage.removeItem('user');
+            }
             setUser(currentUser);
             if (currentUser) {
                 checkActiveRecipe();

@@ -342,7 +342,7 @@ export const analyzeRecipeSteps = async (recipeId: string, inputText: string) =>
 export const getRecipeHistory = async () => {
     try {
         const token = await getToken();
-        const response = await api.get('/user/recipeHistory/all', {
+        const response = await api.get('/user/history/all', {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -358,7 +358,7 @@ export const getRecipeHistory = async () => {
 export const addToRecipeHistory = async (recipeId: string) => {
     try {
         const token = await getToken();
-        await api.post(`/user/recipeHistory/${recipeId}`, null, {
+        await api.post(`/user/history/${recipeId}`, null, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -373,7 +373,7 @@ export const addToRecipeHistory = async (recipeId: string) => {
 export const removeFromRecipeHistory = async (recipeId: string) => {
     try {
         const token = await getToken();
-        await api.delete(`/user/recipeHistory/${recipeId}`, {
+        await api.delete(`/user/history/${recipeId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -388,7 +388,7 @@ export const removeFromRecipeHistory = async (recipeId: string) => {
 export const updatePantryAfterRecipe = async (ingredientIds: string[]) => {
     try {
         const token = await getToken();
-        const response = await api.put('/user/recipeHistory/update', null, {
+        const response = await api.put('/user/history/update', null, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -407,7 +407,7 @@ export const updatePantryAfterRecipe = async (ingredientIds: string[]) => {
 export const getLastRecipeHistory = async () => {
     try {
         const token = await getToken();
-        const response = await api.get('/user/recipeHistory/last', {
+        const response = await api.get('/user/history/last', {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
