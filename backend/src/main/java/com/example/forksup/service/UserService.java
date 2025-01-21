@@ -7,10 +7,15 @@ import com.example.forksup.repository.recipe.RecipeRepository;
 import com.example.forksup.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +30,9 @@ public class UserService {
 
     @Autowired
     private IngredientRepository ingredientRepository;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     public User getUserById(String id) {
         ObjectId idObj = new ObjectId(id);
@@ -285,5 +293,30 @@ public class UserService {
         );
         user.setDescription(description);
         userRepository.save(user);
+    }
+
+    public User generateAvatar(String firebaseId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        String prompt = user.getDescription();
+        
+        String encodedPrompt = UriUtils.encode(prompt, StandardCharsets.UTF_8);
+        
+        String url = "https://image.pollinations.ai/prompt/" + encodedPrompt +
+                     "?model=flux-pro&safe=true&private=true&width=184&height=184&nologo=true";
+
+        try {
+            ResponseEntity<byte[]> response = restTemplate.getForEntity(url, byte[].class);
+            
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                user.setAvatar(response.getBody());
+                return userRepository.save(user);
+            } else {
+                throw new RuntimeException("Failed to generate avatar: " + response.getStatusCode());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating avatar: " + e.getMessage(), e);
+        }
     }
 }

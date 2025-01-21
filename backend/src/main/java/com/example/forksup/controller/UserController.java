@@ -373,6 +373,25 @@ public class UserController {
         return ResponseEntity.ok(user.getAvatar());
     }
     /**
+     * Generates the user's avatar.
+     *
+     * This method uses the UID obtained from the session to create an avatar
+     * by making a request to the external API. The image data returned from
+     * the API is saved in the user's avatar field.
+     *
+     * @param request HTTP request object, used to obtain the UID from the session.
+     * @return ResponseEntity<User> The updated user object along with the HTTP response.
+     * @throws ResourceNotFoundException If the user cannot be found.
+     * @throws RuntimeException If an error occurs during the API request.
+     */
+    @PostMapping(path = "/generate-avatar")
+    public ResponseEntity<User> generateAvatar(HttpServletRequest request) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        User updatedUser = userService.generateAvatar(uid);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    /**
      * Updates the description of the currently logged-in user.
      * This endpoint allows the user to update their profile description,
      * which will be stored in the user's profile in the database.
@@ -382,7 +401,7 @@ public class UserController {
      * @param description The new description text to be updated in the user's profile.
      * @return ResponseEntity with the updated description and HTTP status OK.
      */
-    @PutMapping(path = "/description")
+    @PostMapping(path = "/description")
     public ResponseEntity<String> updateDescription(
             HttpServletRequest request,
             @RequestParam String description
