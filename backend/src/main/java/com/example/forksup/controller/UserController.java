@@ -4,6 +4,7 @@ import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.*;
 import com.example.forksup.repository.UserRepository;
 import com.example.forksup.service.UserService;
+import com.google.api.Http;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -351,7 +352,26 @@ public class UserController {
         userService.uploadAvatar(uid, avatar);
         return ResponseEntity.ok("Avatar uploaded successfully.");
     }
-
+    /**
+     * Retrieves the avatar image of the currently logged-in user.
+     * This endpoint fetches the avatar image stored in the user's profile
+     * and returns it as a byte array. The image can be used in frontend applications
+     * to display the user's profile picture.
+     *
+     * @param request HTTP request containing user session information, used to retrieve the user's ID.
+     * @return ResponseEntity containing the avatar image as a byte array with an HTTP status of 200 (OK).
+     *         If the user does not have an avatar, the response body will be empty.
+     * @throws ResourceNotFoundException if the user is not found in the database.
+     */
+    @GetMapping(path = "/avatar")
+    public ResponseEntity<byte[]> getAvatar(HttpServletRequest request) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        User user = userRepository.findUserByFirebaseId(uid).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        userService.getAvatar(uid);
+        return ResponseEntity.ok(user.getAvatar());
+    }
     /**
      * Updates the description of the currently logged-in user.
      * This endpoint allows the user to update their profile description,

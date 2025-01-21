@@ -269,6 +269,13 @@ public class UserService {
         }
     }
 
+    public void getAvatar(String firebaseId){
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        user.getAvatar();
+    }
+
     public void updateDescription(String firebaseId, String description) {
         if (description.length() > 200) {
             throw new IllegalArgumentException("Description cannot exceed 200 characters.");
