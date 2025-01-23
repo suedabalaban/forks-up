@@ -110,4 +110,66 @@ public class RecipeService {
         );
     }
 
+    public Page<Recipe> searchRecipesByIngredientsMatch(
+            String uid,
+            String keyword,
+            List<String> tags,
+            List<String> ingredients,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<Ingredient> ingredientIds = new ArrayList<>();
+        if (ingredients != null && !ingredients.isEmpty()) {
+            ingredientIds = ingredientRepository.findIngredientsByNameIn(ingredients);
+        }
+
+        List<PantryItem> pantryItems = userService.getUserPantryItems(uid);
+        Preferences preferences = userService.getUserPreferences(uid);
+
+        if (pantryItems != null && !pantryItems.isEmpty()) {
+            ingredientIds.addAll(pantryItems.stream()
+                    .map(PantryItem::getIngredient)
+                    .toList());
+        }
+
+        List<String> otherTags = new ArrayList<>();
+        List<String> cuisineTags = new ArrayList<>();
+
+        if (tags != null) {
+            otherTags.addAll(tags);
+        }
+
+        if (preferences != null) {
+            if (preferences.getDietaryRestrictions() != null) {
+                DietaryRestrictions restrictions = preferences.getDietaryRestrictions();
+
+                if (restrictions.getHealthConscious() != null) {
+                    otherTags.addAll(restrictions.getHealthConscious());
+                }
+
+                if (restrictions.getAllergiesIntolerances() != null) {
+                    otherTags.addAll(restrictions.getAllergiesIntolerances());
+                }
+
+                if (restrictions.getLifestyle() != null) {
+                    otherTags.addAll(restrictions.getLifestyle());
+                }
+            }
+
+            if (preferences.getCuisines() != null) {
+                cuisineTags.addAll(preferences.getCuisines());
+            }
+        }
+
+        return recipeRepository.searchRecipesWithIngredientsMatch(
+                keyword,
+                cuisineTags,
+                otherTags,
+                ingredientIds,
+                null,
+                pageable
+        );
+    }
 }

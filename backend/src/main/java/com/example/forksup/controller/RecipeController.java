@@ -137,4 +137,20 @@ public class RecipeController {
         return ResponseEntity.ok(recipes);
     }
 
+    @GetMapping("/preferences/ingredients-match")
+    public ResponseEntity<Page<Recipe>> searchRecipesByIngredientsMatch(
+            HttpServletRequest request,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) List<String> ingredients,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size) {
+
+        String uid = (String) request.getSession().getAttribute("uid");
+        if (uid == null) {
+            return new ResponseEntity<>(null, null, HttpStatus.UNAUTHORIZED);
+        }
+        Page<Recipe> recipes = recipeService.searchRecipesByIngredientsMatch(uid, keyword, tags, ingredients, page, size);
+        return ResponseEntity.ok(recipes);
+    }
 }

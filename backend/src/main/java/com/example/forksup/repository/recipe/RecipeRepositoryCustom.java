@@ -22,4 +22,12 @@ public interface RecipeRepositoryCustom {
             List<Ingredient> ingredients,
             Integer servings,
             Pageable pageable);
+
+    Page<Recipe> searchRecipesWithIngredientsMatch(
+            String name,
+            List<String> cuisineTags,
+            List<String> otherTags,
+            List<Ingredient> userIngredients,
+            Integer servings,
+            Pageable pageable);
 }
