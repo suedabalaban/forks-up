@@ -176,17 +176,17 @@ const SearchRecipes: React.FC = () => {
             <div className="flex-1 px-8 py-6 min-h-[52rem] dark:text-gray-100">
                 {isLoading && <LoadingPage/>}
 
-                {error && !isLoading && (
-                    <div className="text-center text-gray-600 dark:text-gray-400 flex items-center justify-center">
-                        <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4">
-                            <p className="text-red-600 dark:text-red-400">{error}</p>
-                        </div>
-                    </div>
-                )}
-
-                {!isLoading && !error && (
+                {!isLoading && (
                     <>
-                        {(!searchParams.get('q')?.trim() && !searchParams.get('tag')?.trim() && selectedTags.length === 0) ? (
+                        {error && (
+                            <div className="text-center text-gray-600 dark:text-gray-400 flex items-center justify-center mb-8">
+                                <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4">
+                                    <p className="text-red-600 dark:text-red-400">{error}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {(error || (!searchParams.get('q')?.trim() && !searchParams.get('tag')?.trim() && selectedTags.length === 0)) && (
                             // Discover Recipes Section
                             <div className="max-w-4xl mx-auto">
                                 <div className="text-center mb-12">
@@ -248,7 +248,9 @@ const SearchRecipes: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                        ) : (
+                        )}
+
+                        {recipes.length > 0 && (
                             // Recipe List Section
                             <>
                                 {recipes.length > 0 && (
@@ -332,6 +334,7 @@ const SearchRecipes: React.FC = () => {
             </div>
         </div>
     );
+
 };
 
 export default SearchRecipes;
