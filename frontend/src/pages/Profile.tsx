@@ -11,7 +11,8 @@ import {
     deleteUser
 } from "firebase/auth";
 import DietaryPreferences from "./DietaryPreferences";
-import { User as UserIcon, X } from 'lucide-react';
+import {KeyRound, ShieldAlert, Trash2, User as UserIcon, X} from 'lucide-react';
+import { motion } from "framer-motion";
 
 const GoogleIcon: React.FC = () => (
     <svg className="w-5 h-5 inline-block ml-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -190,172 +191,217 @@ const Profile: React.FC = () => {
     }
 
     return (
-        <div className="max-w-2xl mx-auto p-6 space-y-2">
+        <div className="max-w-3xl mx-auto p-4 md:p-6 space-y-6">
             {/* Message Banners */}
             {successMessage && (
-                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative flex items-center justify-between shadow-lg">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md"
+                >
+                    <div className="bg-green-100/90 backdrop-blur-sm border border-green-300 text-green-700 px-4 py-3 rounded-xl relative flex items-center justify-between shadow-lg dark:bg-green-900/30 dark:border-green-800 dark:text-green-200">
                         <p className="flex-1 mr-2">{successMessage}</p>
                         <button
                             onClick={() => setSuccessMessage("")}
-                            className="text-green-700 hover:text-green-900 focus:outline-none"
+                            className="text-green-700 hover:text-green-900 dark:text-green-200 dark:hover:text-green-100"
                         >
                             <X size={18} />
                         </button>
                     </div>
-                </div>
-            )}
-            {errorMessage && (
-                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex items-center justify-between shadow-lg">
-                        <p className="flex-1 mr-2">{errorMessage}</p>
-                        <button
-                            onClick={() => setErrorMessage("")}
-                            className="text-red-700 hover:text-red-900 focus:outline-none"
-                        >
-                            <X size={18} />
-                        </button>
-                    </div>
-                </div>
+                </motion.div>
             )}
 
-            {/* Profile Header with Photo */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
-                <div className="flex items-center space-x-4 mb-6">
-                    {user.photoURL ? (
-                        <div className="flex items-center space-x-3 cursor-pointer">
-                            <div
-                                className="w-14 h-14 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                                        <span className="text-purple-600 text-2xl dark:text-purple-300 font-medium">
-                                            {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
-                                        </span>
+            {/* Profile Header */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border dark:border-gray-700"
+            >
+                <div className="flex items-center gap-4 mb-6">
+                    <div className="relative group">
+                        {user.photoURL ? (
+                            <img
+                                src={user.photoURL}
+                                alt="Profile"
+                                className="w-20 h-20 rounded-full object-cover border-4 border-purple-100 dark:border-purple-900/50"
+                            />
+                        ) : (
+                            <div className="w-20 h-20 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center border-4 border-purple-100 dark:border-purple-900/30">
+                                <UserIcon size={36} className="text-purple-600 dark:text-purple-400"/>
                             </div>
-                        </div>
-                    ) : (
-                        <div
-                            className="h-20 w-20 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                            <UserIcon size={40} className="text-purple-600 dark:text-purple-300"/>
-                        </div>
-                    )}
+                        )}
+                    </div>
                     <div>
-                        <h1 className="text-2xl font-bold dark:text-white">
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                             {user.displayName || 'Account Settings'}
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
+                        <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                            {user.email}
+                            {!isEmailProvider() && <GoogleIcon />}
+                        </p>
                     </div>
                 </div>
 
+                {/* Profile Form */}
                 <div className="space-y-6">
-                    {/* Profile Information */}
-                    <div className="space-y-4">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="space-y-4"
+                    >
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Name
+                                Display Name
                             </label>
                             <input
                                 type="text"
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
-                                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                placeholder="Enter your name"
+                                className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                                placeholder="Your name"
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Email {!isEmailProvider() && <GoogleIcon />}
+                                Email Address
                             </label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${!isEmailProvider() ? 'cursor-not-allowed bg-gray-100 dark:bg-gray-600' : ''}`}
-                                placeholder="Enter your email"
+                                className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 ${
+                                    !isEmailProvider()
+                                        ? 'cursor-not-allowed bg-gray-50 dark:bg-gray-600/30 text-gray-400 dark:text-gray-500'
+                                        : 'focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white'
+                                }`}
                                 disabled={!isEmailProvider()}
-                                title={!isEmailProvider() ? "Google account users cannot change their email" : ""}
                             />
-                            {!user.emailVerified && (
-                                <p className="text-yellow-600 dark:text-yellow-500 text-sm mt-1">
-                                    ⚠️ Email not verified
-                                </p>
+                            {!user.emailVerified && isEmailProvider() && (
+                                <div className="mt-2 flex items-center gap-2 text-yellow-600 dark:text-yellow-400 text-sm">
+                                    <ShieldAlert size={16} />
+                                    <span>Email not verified</span>
+                                </div>
                             )}
                         </div>
 
                         {showPasswordInput && (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Current Password (Required for changes)
-                                </label>
-                                <input
-                                    type="password"
-                                    value={currentPassword}
-                                    onChange={(e) => setCurrentPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                    placeholder="Enter your current password"
-                                />
-                            </div>
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="space-y-4"
+                            >
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Current Password
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={currentPassword}
+                                        onChange={(e) => setCurrentPassword(e.target.value)}
+                                        className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        placeholder="••••••••"
+                                    />
+                                </div>
+                            </motion.div>
                         )}
 
                         <button
                             onClick={handleUpdateProfile}
                             disabled={isLoading}
-                            className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 dark:bg-purple-500 dark:hover:bg-purple-600"
+                            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 px-4 rounded-xl font-medium transition-all
+                            disabled:opacity-50 disabled:cursor-not-allowed dark:bg-purple-500 dark:hover:bg-purple-600 flex items-center justify-center gap-2"
                         >
-                            {isLoading ? "Updating..." : "Save Changes"}
+                            {isLoading ? (
+                                <div className="animate-spin h-5 w-5 border-2 border-white/30 border-t-white rounded-full" />
+                            ) : (
+                                'Save Changes'
+                            )}
                         </button>
-                    </div>
+                    </motion.div>
 
-                    {/* Security Settings */}
+                    {/* Security Section */}
                     {isEmailProvider() && (
-                        <div className="pt-6 border-t dark:border-gray-700">
-                            <h2 className="text-lg font-semibold mb-4 dark:text-white">Security</h2>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="pt-6 border-t dark:border-gray-700 space-y-4"
+                        >
+                            <div className="flex items-center gap-2 text-gray-900 dark:text-white">
+                                <KeyRound size={20} className="text-purple-600 dark:text-purple-400" />
+                                <h2 className="text-lg font-semibold">Security</h2>
+                            </div>
+
                             <button
                                 onClick={handleResetPassword}
-                                className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 mb-4 dark:bg-gray-700 dark:hover:bg-gray-600"
+                                className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600/50
+                                rounded-xl transition-colors text-gray-700 dark:text-gray-200"
                             >
-                                Reset Password
+                                <span>Change Password</span>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">Last changed 2 weeks ago</span>
                             </button>
-                        </div>
+                        </motion.div>
                     )}
 
+                    {/* Dietary Preferences */}
+                    <DietaryPreferences />
 
-                </div>
-                
-                <DietaryPreferences />
-
-                {/* Account Deletion */}
-                <div className="pt-6 border-t dark:border-gray-700">
-                    <h2 className="text-lg font-semibold mb-4 text-red-600 dark:text-red-500">Danger Zone</h2>
-                    {!showDeleteConfirm ? (
-                        <button
-                            onClick={() => setShowDeleteConfirm(true)}
-                            className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-600"
-                        >
-                            Delete Account
-                        </button>
-                    ) : (
-                        <div className="space-y-4">
-                            <p className="text-red-600 dark:text-red-500 text-sm">
-                                ⚠️ This action cannot be undone. Your account and all data will be permanently deleted.
-                            </p>
-                            <div className="flex space-x-4">
-                                <button
-                                    onClick={handleDeleteAccount}
-                                    className="flex-1 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-600"
-                                >
-                                    Yes, Delete My Account
-                                </button>
-                                <button
-                                    onClick={() => setShowDeleteConfirm(false)}
-                                    className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-700 dark:hover:bg-gray-600"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
+                    {/* Danger Zone */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="pt-6 border-t dark:border-gray-700 space-y-4"
+                    >
+                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                            <Trash2 size={20} className="text-red-600 dark:text-red-400" />
+                            <h2 className="text-lg font-semibold">Danger Zone</h2>
                         </div>
-                    )}
+
+                        {!showDeleteConfirm ? (
+                            <button
+                                onClick={() => setShowDeleteConfirm(true)}
+                                className="w-full px-4 py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/40
+                                text-red-600 dark:text-red-400 rounded-xl transition-colors flex items-center justify-between"
+                            >
+                                <span>Delete Account</span>
+                                <span className="text-sm">Permanent action</span>
+                            </button>
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="space-y-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-xl"
+                            >
+                                <div className="flex items-start gap-2 text-red-600 dark:text-red-400">
+                                    <ShieldAlert size={20} className="flex-shrink-0 mt-1" />
+                                    <p className="text-sm">
+                                        This action cannot be undone. All your data including recipes, preferences,
+                                        and account information will be permanently deleted from our servers.
+                                    </p>
+                                </div>
+
+                                <div className="flex gap-3 justify-end">
+                                    <button
+                                        onClick={() => setShowDeleteConfirm(false)}
+                                        className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleDeleteAccount}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg
+                                        dark:bg-red-500 dark:hover:bg-red-600 flex items-center gap-2"
+                                    >
+                                        <Trash2 size={16} />
+                                        Delete Account
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 };

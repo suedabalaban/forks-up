@@ -352,6 +352,7 @@ public class UserController {
         userService.uploadAvatar(uid, avatar);
         return ResponseEntity.ok("Avatar uploaded successfully.");
     }
+
     /**
      * Retrieves the avatar image of the currently logged-in user.
      * This endpoint fetches the avatar image stored in the user's profile
@@ -372,6 +373,7 @@ public class UserController {
         userService.getAvatar(uid);
         return ResponseEntity.ok(user.getAvatar());
     }
+
     /**
      * Generates the user's avatar.
      *
@@ -410,4 +412,5 @@ public class UserController {
         userService.updateDescription(uid, description);
         return new ResponseEntity<>(description, HttpStatus.OK);
     }
+
 }

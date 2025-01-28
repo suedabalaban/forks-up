@@ -179,4 +179,5 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
 
         return new PageImpl<>(pageContent, pageable, filteredRecipes.size());
     }
+
 }

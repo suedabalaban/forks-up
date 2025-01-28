@@ -44,15 +44,16 @@ const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
                         </div>
                     </div>
                 </div>
-                <div className="absolute top-3 right-3">
-                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm text-2xl hover:bg-black/60 transition-all duration-300">
+                <div className="absolute top-3 right-3 flex gap-2">
+                    <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-black/30 backdrop-blur-sm text-2xl border border-white/10 hover:bg-black/40 transition-colors">
                         {getCountryFlagFromTags(recipe.tags)}
                     </span>
                 </div>
+
                 {getPreparationTimeFromTags(recipe.tags) && (
                     <div className="absolute top-3 left-3">
-                        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/60 transition-all duration-300">
-                            <Clock size={16} />
+                        <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/30 backdrop-blur-sm text-white text-sm font-medium border border-white/10 hover:bg-black/40 transition-colors">
+                            <Clock size={16} className="text-amber-400" />
                             {getPreparationTimeFromTags(recipe.tags)}
                         </span>
                     </div>
@@ -68,25 +69,21 @@ const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
                     {recipe.description}
                 </p>
                 <div className="space-y-2">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-2">
                         {recipe.ingredients.slice(0, 3).map((ingredient, idx) => (
                             <motion.span
                                 key={idx}
-                                className="inline-block bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full px-2 py-1 text-xs"
-                                whileHover={{scale: 1.1}}
-                                transition={{duration: 0.2}}
+                                className="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 rounded-lg px-3 py-1.5 text-xs font-medium transition-all hover:-translate-y-0.5"
+                                whileHover={{scale: 1.05}}
                             >
-                                {ingredient.name} {getIngredientEmoji(ingredient.name)}
+                                {getIngredientEmoji(ingredient.name)} {ingredient.name}
                             </motion.span>
                         ))}
                         {recipe.ingredients.length > 3 && (
-                            <motion.span
-                                className="inline-block bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full px-2 py-1 text-xs"
-                                whileHover={{scale: 1.1}}
-                                transition={{duration: 0.2}}
-                            >
-                                +{recipe.ingredients.length - 3} more
-                            </motion.span>
+                            <span
+                                className="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 rounded-lg px-3 py-1.5 text-xs font-medium">
+                            +{recipe.ingredients.length - 3} more
+                        </span>
                         )}
                     </div>
 
