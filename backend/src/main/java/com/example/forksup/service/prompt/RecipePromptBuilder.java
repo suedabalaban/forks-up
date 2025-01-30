@@ -1,4 +1,4 @@
- package com.example.forksup.service.prompt;
+package com.example.forksup.service.prompt;
 
 import com.example.forksup.model.Recipe;
 import java.util.List;
@@ -6,60 +6,70 @@ import java.util.List;
 public class RecipePromptBuilder {
     private final Recipe recipe;
     private final String question;
-    private boolean useIngredients;
-    private boolean useSteps;
 
     public RecipePromptBuilder(Recipe recipe, String question) {
         this.recipe = recipe;
         this.question = question;
     }
 
-    public RecipePromptBuilder withIngredients() {
-        if (useSteps) {
-            throw new IllegalStateException("Cannot analyze both ingredients and steps. Choose one.");
-        }
-        this.useIngredients = true;
-        return this;
-    }
-
-    public RecipePromptBuilder withSteps() {
-        if (useIngredients) {
-            throw new IllegalStateException("Cannot analyze both ingredients and steps. Choose one.");
-        }
-        this.useSteps = true;
-        return this;
-    }
-
     public String build() {
-        if (!useIngredients && !useSteps) {
-            throw new IllegalStateException("Must choose either ingredients or steps for analysis.");
+        StringBuilder promptBuilder = new StringBuilder();
+
+        if (recipe.getName() != null && !recipe.getName().isEmpty()) {
+            promptBuilder.append("Recipe Name: ")
+                    .append(recipe.getName())
+                    .append("\t");
         }
 
-        StringBuilder promptBuilder = new StringBuilder();
-        
-        if (useIngredients) {
-            List<String> ingredients = recipe.getIngredientsRawStr();
-            if (ingredients == null || ingredients.isEmpty()) {
-                throw new IllegalArgumentException("Recipe has no ingredients");
-            }
-            promptBuilder.append("Ingredients: ")
-                       .append(String.join(", ", ingredients))
-                       .append("\n\n");
+        if (recipe.getDescription() != null && !recipe.getDescription().isEmpty()
+                && recipe.getDescription().length() < 200) {
+            promptBuilder.append("Description: ")
+                    .append(recipe.getDescription())
+                    .append("\t");
         }
-        
-        if (useSteps) {
-            List<String> steps = recipe.getSteps();
-            if (steps == null || steps.isEmpty()) {
-                throw new IllegalArgumentException("Recipe has no steps");
-            }
-            promptBuilder.append("Steps:\n")
-                       .append(String.join("\n", steps))
-                       .append("\n\n");
+
+        promptBuilder.append("Servings: ")
+                .append(recipe.getServings());
+        if (recipe.getServing_size() != null && !recipe.getServing_size().isEmpty()) {
+            promptBuilder.append(" (")
+                    .append(recipe.getServing_size())
+                    .append(")");
         }
-        
-        promptBuilder.append("Based on the provided information, ")
-                    .append(question);
-        
+        promptBuilder.append("\t");
+
+        List<String> ingredients = recipe.getIngredientsRawStr();
+        if (ingredients != null && !ingredients.isEmpty()) {
+            promptBuilder.append("Ingredients:\n");
+            for (String ingredient : ingredients) {
+                promptBuilder.append("- ")
+                        .append(ingredient)
+                        .append("\t");
+            }
+            promptBuilder.append("\t");
+        }
+
+        List<String> steps = recipe.getSteps();
+        if (steps != null && !steps.isEmpty()) {
+            promptBuilder.append("Instructions:\n");
+            for (int i = 0; i < steps.size(); i++) {
+                promptBuilder.append(i + 1)
+                        .append(". ")
+                        .append(steps.get(i))
+                        .append("\t");
+            }
+            promptBuilder.append("\t");
+        }
+
+        List<String> tags = recipe.getTags();
+        if (tags != null && !tags.isEmpty()) {
+            promptBuilder.append("Tags: ")
+                    .append(String.join(", ", tags))
+                    .append("\t");
+        }
+
+        promptBuilder.append("Based on the recipe information above, ")
+                .append(question);
+
         return promptBuilder.toString();
     }
 }

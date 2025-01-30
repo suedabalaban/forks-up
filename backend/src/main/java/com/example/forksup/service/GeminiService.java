@@ -16,6 +16,33 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GeminiService {
+
+    private static final String SYSTEM_INSTRUCTIONS = """
+         You are a friendly and enthusiastic cooking assistant who loves helping people with recipes.
+        Your responses should be:
+        - Warm and encouraging
+        - Personal and conversational in tone
+        - Specific to the recipe being discussed
+        - Helpful and practical
+        - Brief but informative
+        
+        When analyzing recipes:
+        - Be understanding and empathetic about cooking concerns
+        - Explain clearly but gently
+        - Suggest alternatives when appropriate
+        - Be supportive and confidence-building
+        - Acknowledge the cook's effort
+        - Use positive language
+        
+        Remember to:
+        - Show enthusiasm for cooking
+        - Be encouraging about trying new recipes
+        - Keep responses concise but friendly
+        - Consider health and dietary aspects respectfully
+        
+        Always maintain a helpful and positive tone while providing accurate information.
+        """;
+
     @Value("${gemini.api.key}")
     private String apiKey;
 
@@ -72,28 +99,10 @@ public class GeminiService {
         }
     }
 
-    public GeminiResponse checkDietaryRestriction(String recipeId, String restriction) {
-        String cacheKey = recipeId + "-is-" + restriction.toLowerCase().trim();
-        
-        String cachedResponse = responseCache.get(cacheKey);
-        if (cachedResponse != null) {
-            return new GeminiResponse(cachedResponse);
-        }
+    public GeminiResponse analyzeRecipe(String recipeId, String question) {
+        // Generate a unique cache key based on the recipe ID and question
+        String cacheKey = recipeId + "-" + question.toLowerCase().trim();
 
-        Recipe recipe = getRecipe(recipeId);
-        String prompt = new RecipePromptBuilder(recipe, 
-                "explain in one short sentence if this recipe is " + restriction + " or not.")
-                .withIngredients()
-                .build();
-        
-        GeminiResponse response = sendGeminiRequest(prompt);
-        responseCache.put(cacheKey, response.getResponse());
-        return response;
-    }
-
-    public GeminiResponse analyzeRecipeSteps(String recipeId, String question) {
-        String cacheKey = recipeId + "-steps-" + question.toLowerCase().trim();
-        
         String cachedResponse = responseCache.get(cacheKey);
         if (cachedResponse != null) {
             return new GeminiResponse(cachedResponse);
@@ -101,12 +110,10 @@ public class GeminiService {
 
         Recipe recipe = getRecipe(recipeId);
         String prompt = new RecipePromptBuilder(recipe, question)
-                .withSteps()
                 .build();
-        
+
         GeminiResponse response = sendGeminiRequest(prompt);
         responseCache.put(cacheKey, response.getResponse());
         return response;
     }
-
 }
