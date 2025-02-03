@@ -19,6 +19,8 @@ import {registerOrUpdateUser} from "./api/ForksUpAPI";
 import Settings from "./pages/Settings";
 import {ThemeProvider} from "./context/ThemeContext";
 import RecipeHistory from "./pages/RecipeHistory";
+import { PantryProvider } from './context/PantryContext';
+import ChatBot from './components/ChatBot/ChatBot';
 
 const App: React.FC = () => {
     const [user, setUser] = useState<any>(null);
@@ -40,34 +42,37 @@ const App: React.FC = () => {
     }, []);
 
     return (
-        <ThemeProvider>
-            <Routes>
+        <PantryProvider>
+            <ThemeProvider>
+                <Routes>
 
-                <Route path="/" element={<Layout/>}>
-                    <Route path="/" element={<Home/>}/>
-                    <Route path="/user" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
-                    <Route path="/search" element={<ProtectedRoute><SearchRecipes/></ProtectedRoute>}/>
-                    <Route path="/favorites" element={<ProtectedRoute><UserFavorites/></ProtectedRoute>}/>
-                    <Route path="/pantry" element={<ProtectedRoute><UserIngredients/></ProtectedRoute>}/>
-                    <Route path="/dietary-preferences"
-                           element={<ProtectedRoute><DietaryPreferences/></ProtectedRoute>}/>
-                    <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
-                    <Route path="/history" element={<ProtectedRoute><RecipeHistory/></ProtectedRoute>}/>
+                    <Route path="/" element={<Layout/>}>
+                        <Route path="/" element={<Home/>}/>
+                        <Route path="/user" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
+                        <Route path="/search" element={<ProtectedRoute><SearchRecipes/></ProtectedRoute>}/>
+                        <Route path="/favorites" element={<ProtectedRoute><UserFavorites/></ProtectedRoute>}/>
+                        <Route path="/pantry" element={<ProtectedRoute><UserIngredients/></ProtectedRoute>}/>
+                        <Route path="/dietary-preferences"
+                            element={<ProtectedRoute><DietaryPreferences/></ProtectedRoute>}/>
+                        <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
+                        <Route path="/history" element={<ProtectedRoute><RecipeHistory/></ProtectedRoute>}/>
 
-                </Route>
+                    </Route>
 
-                <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>}>
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path="/signup" element={<SignUp/>}/>
-                    <Route path="/forgot-password" element={<ForgotPassword/>}/>
-                    <Route path="/reset-password" element={<ResetPassword/>}/>
-                </Route>
+                    <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>}>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="/signup" element={<SignUp/>}/>
+                        <Route path="/forgot-password" element={<ForgotPassword/>}/>
+                        <Route path="/reset-password" element={<ResetPassword/>}/>
+                    </Route>
 
-                <Route path="/">
-                </Route>
+                    <Route path="/">
+                    </Route>
 
-            </Routes>
-        </ThemeProvider>
+                </Routes>
+                <ChatBot />
+            </ThemeProvider>
+        </PantryProvider>
     );
 };
 
