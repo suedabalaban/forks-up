@@ -137,7 +137,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipes);
     }
 
-    @GetMapping("/preferences/ingredients-match")
+    @GetMapping(value = "/preferences/ingredients-match")
     public ResponseEntity<Page<Recipe>> searchRecipesByIngredientsMatch(
             HttpServletRequest request,
             @RequestParam(required = false) String keyword,

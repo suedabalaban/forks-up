@@ -418,3 +418,33 @@ export const getLastRecipeHistory = async () => {
         return null;
     }
 };
+
+interface RecipeReview {
+    recipeId: string;
+    rating: number;
+    comment: string;
+    image?: File;
+}
+
+export const submitRecipeReview = async (review: RecipeReview) => {
+    try {
+        const token = await getToken();
+        const formData = new FormData();
+        formData.append('rating', review.rating.toString());
+        formData.append('comment', review.comment);
+        if (review.image) {
+            formData.append('image', review.image);
+        }
+
+        const response = await api.post(`/recipes/${review.recipeId}/review`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error submitting recipe review:', error);
+        throw error;
+    }
+};
