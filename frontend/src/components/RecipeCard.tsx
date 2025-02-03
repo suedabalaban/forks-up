@@ -1,11 +1,12 @@
 import {UserRound, Clock} from "lucide-react";
 import {Recipe} from "../model/Recipe";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {motion} from "framer-motion";
 import {getIngredientEmoji} from "../assets/ingredientEmojis";
 import {usePexelsImage} from "../hooks/usePexelsImage";
 import {getCountryFlagFromTags} from "../utils/countryFlags";
 import {getPreparationTimeFromTags} from "../utils/preparationTime";
+import { usePantry } from '../context/PantryContext';
 
 type RecipeCardProps = {
     recipe: Recipe;
@@ -13,8 +14,23 @@ type RecipeCardProps = {
 };
 
 const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
+    const { pantryIngredients } = usePantry();
     const fallbackImage = 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg';
     const { imageUrl, loading } = usePexelsImage(recipe.name, recipe.imageUrl || fallbackImage);
+
+    // Helper function to check if ingredient exists in pantry
+    const isIngredientInPantry = (ingredientName: string) => {
+        return pantryIngredients.some(pantryItem =>
+            ingredientName.toLowerCase().includes(pantryItem) || pantryItem.includes(ingredientName.toLowerCase())
+        );
+    };
+
+    // Sort ingredients to show pantry items first
+    const sortedIngredients = [...recipe.ingredients].sort((a, b) => {
+        const aInPantry = isIngredientInPantry(a.name);
+        const bInPantry = isIngredientInPantry(b.name);
+        return bInPantry ? 1 : aInPantry ? -1 : 0;
+    });
 
     return (
         <motion.div
@@ -70,15 +86,22 @@ const RecipeCard: React.FC<RecipeCardProps> = ({recipe, onClick}) => {
                 </p>
                 <div className="space-y-2">
                     <div className="flex flex-wrap gap-2">
-                        {recipe.ingredients.slice(0, 3).map((ingredient, idx) => (
-                            <motion.span
-                                key={idx}
-                                className="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 rounded-lg px-3 py-1.5 text-xs font-medium transition-all hover:-translate-y-0.5"
-                                whileHover={{scale: 1.05}}
-                            >
-                                {getIngredientEmoji(ingredient.name)} {ingredient.name}
-                            </motion.span>
-                        ))}
+                        {sortedIngredients.slice(0, 3).map((ingredient, index) => {
+                            const inPantry = isIngredientInPantry(ingredient.name);
+                            return (
+                                <motion.span
+                                    key={index}
+                                    className={`inline-flex items-center gap-1 ${
+                                        inPantry 
+                                            ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200'
+                                            : 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200'
+                                    } rounded-lg px-3 py-1.5 text-xs font-medium transition-all hover:-translate-y-0.5`}
+                                    whileHover={{scale: 1.05}}
+                                >
+                                    {getIngredientEmoji(ingredient.name)} {ingredient.name}
+                                </motion.span>
+                            );
+                        })}
                         {recipe.ingredients.length > 3 && (
                             <span
                                 className="inline-flex items-center gap-1 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 rounded-lg px-3 py-1.5 text-xs font-medium">

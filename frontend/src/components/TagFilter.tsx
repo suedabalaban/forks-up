@@ -49,6 +49,7 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
         new Set([''])
     );
+    const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         const urlTag = searchParams.get('tag');
@@ -85,6 +86,16 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
         setExpandedCategories(newExpanded);
     };
 
+    const toggleSubcategory = (subcategory: string): void => {
+        const newExpanded = new Set(expandedSubcategories);
+        if (newExpanded.has(subcategory)) {
+            newExpanded.delete(subcategory);
+        } else {
+            newExpanded.add(subcategory);
+        }
+        setExpandedSubcategories(newExpanded);
+    };
+
     const renderTags = (tags: string[]): React.ReactNode => {
         return tags.map((tag) => (
             <div
@@ -107,12 +118,24 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
         parentExpanded: boolean = true
     ): React.ReactNode => {
         const displayName = name.replace(/_/g, ' ');
+        const isExpanded = expandedSubcategories.has(name);
+
         return (
             <div key={name} className={`${!parentExpanded ? 'hidden' : ''} mb-4`}>
-                <div className="font-medium text-gray-700 dark:text-gray-300 py-2 px-2 ml-4 border-b border-gray-300 dark:border-gray-600">
-                    {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
+                <div 
+                    onClick={() => toggleSubcategory(name)}
+                    className="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 py-2 px-2 ml-4 border-b border-gray-300 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+                >
+                    {isExpanded ? (
+                        <ChevronDown size={16} className="text-gray-500 dark:text-gray-400" />
+                    ) : (
+                        <ChevronRight size={16} className="text-gray-500 dark:text-gray-400" />
+                    )}
+                    <span>
+                        {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
+                    </span>
                 </div>
-                <div className="mt-2">
+                <div className={`mt-2 transition-all duration-300 ${!isExpanded ? 'hidden' : ''}`}>
                     {renderTags(tags)}
                 </div>
             </div>

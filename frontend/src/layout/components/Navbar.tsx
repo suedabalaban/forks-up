@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'firebase/auth';
-import { Moon, Sun, Search, UserRound, Settings, ShoppingBag, Star, Utensils, Heart, History } from 'lucide-react';
+import { Moon, Sun, Search, UserRound, Settings, ShoppingBag, Star, Heart, History } from 'lucide-react';
 import Button from '@mui/material/Button';
 import RecipesIcon from '../../assets/RecipesIcon';
 import { useTheme } from '../../context/ThemeContext';
@@ -58,37 +58,37 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
     };
 
     return (
-        <nav className="bg-white dark:bg-gray-800 shadow-md">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="flex justify-between items-center h-16">
+        <nav className="bg-white dark:bg-gray-900 shadow-lg">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="flex justify-between items-center h-20">
                     <div className="flex items-center">
                         <Link
                             to="/"
                             className="flex items-center space-x-3 text-purple-700 hover:opacity-90 transition-opacity"
                         >
-                            <RecipesIcon className="fill-purple-700 stroke-purple-700 h-11 w-11"/>
-                            <span className="text-2xl font-bold bg-gradient-to-r from-purple-700 to-blue-600 bg-clip-text text-transparent">
-                                    Forks Up!
-                                </span>
+                            <RecipesIcon className="fill-purple-700 stroke-purple-700 h-12 w-12"/>
+                            <span className="text-3xl font-bold bg-gradient-to-r from-purple-700 to-blue-600 bg-clip-text text-transparent">
+                                Forks Up!
+                            </span>
                         </Link>
                     </div>
 
-                    <div className="flex-1 max-w-xl px-8">
-                        <form onSubmit={handleSearch} className="relative flex items-center gap-2">
+                    <div className="flex-1 max-w-xl px-10">
+                        <form onSubmit={handleSearch} className="relative flex items-center gap-3">
                             <div className="relative flex-1">
                                 <input
                                     type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Search recipes..."
-                                    className="w-full px-4 py-2 pr-12 rounded-full border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                    className="w-full px-5 py-2.5 pr-14 rounded-full border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300"
                                 />
                                 <button
                                     type="submit"
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                                 >
-                                <Search size={20}/>
-                            </button>
+                                    <Search size={22}/>
+                                </button>
                             </div>
                             <div className="relative">
                                 <button
@@ -96,26 +96,26 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                     onClick={() => setIsPersonalized(!isPersonalized)}
                                     onMouseEnter={handleMouseEnter}
                                     onMouseLeave={handleMouseLeave}
-                                    className={`px-4 py-2 rounded-full transition-all transform hover:scale-105 flex items-center gap-2 ${
-                                        isPersonalized 
-                                        ? 'bg-gradient-to-r from-purple-700 to-blue-600 text-white' 
-                                        : 'bg-white/5 backdrop-blur-sm text-gray-600 dark:text-gray-400'
+                                    className={`px-5 py-2.5 rounded-full transition-all transform hover:scale-105 flex items-center gap-2 ${
+                                        isPersonalized
+                                            ? 'bg-gradient-to-r from-purple-700 to-blue-600 text-white shadow-lg'
+                                            : 'bg-white/5 backdrop-blur-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                     }`}
                                 >
-                                    <Heart 
-                                        className={`w-5 h-5 transition-colors ${
-                                            isPersonalized 
-                                            ? 'fill-white stroke-white' 
-                                            : 'fill-none stroke-current'
+                                    <Heart
+                                        className={`w-6 h-6 transition-colors ${
+                                            isPersonalized
+                                                ? 'fill-white stroke-white'
+                                                : 'fill-none stroke-current'
                                         }`}
                                     />
                                     For You
                                 </button>
-                                
+
                                 {showTooltip && (
-                                    <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 px-4 py-3 bg-gray-900 text-white text-sm rounded-lg whitespace-normal w-72 shadow-lg z-50">
+                                    <div className="absolute left-1/2 top-full mt-3 -translate-x-1/2 px-4 py-3 bg-gray-900 text-white text-sm rounded-lg whitespace-normal w-80 shadow-lg z-50">
                                         <div className="relative">
-                                            <div className="absolute -top-1 left-1/2 -translate-x-1/2 transform -rotate-45 w-2 h-2 bg-gray-900"></div>
+                                            <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 transform -rotate-45 w-3 h-3 bg-gray-900"></div>
                                             <div className="space-y-2">
                                                 <p className="flex items-center gap-2">
                                                     <span>🎯</span>
@@ -137,7 +137,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                         </form>
                     </div>
 
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-6">
                         {activeRecipe && (
                             <ActiveRecipeTimer
                                 recipe={activeRecipe}
@@ -148,15 +148,15 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                         {user ? (
                             <div className="relative group">
                                 <div className="flex items-center space-x-3 cursor-pointer">
-                                    <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                                        <span className="text-purple-600 dark:text-purple-300 font-medium">
+                                    <div className="w-11 h-11 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center shadow-md">
+                                        <span className="text-purple-600 dark:text-purple-300 font-medium text-lg">
                                             {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg py-2 z-50 transition-all duration-200 border border-gray-100 dark:border-gray-700">
-                                    <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                                <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 absolute right-0 mt-3 w-60 bg-white dark:bg-gray-800 rounded-xl shadow-xl py-2 z-50 transition-all duration-200 border border-gray-100 dark:border-gray-700">
+                                    <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                                         <p className="text-sm font-medium text-gray-900 dark:text-white">{user.displayName}</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                                     </div>
@@ -166,25 +166,25 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                             <Link
                                                 key={index}
                                                 to={item.path}
-                                                className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 transition-colors"
+                                                className="flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 transition-colors"
                                             >
-                                                <IconComponent className="w-4 h-4 mr-3 stroke-purple-600 dark:stroke-purple-400"/>
+                                                <IconComponent className="w-5 h-5 mr-3 stroke-purple-600 dark:stroke-purple-400"/>
                                                 <span>{item.text}</span>
                                             </Link>
                                         );
                                     })}
                                     <button
                                         onClick={toggleTheme}
-                                        className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 transition-colors"
+                                        className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-gray-700 transition-colors"
                                     >
                                         {theme === 'dark' ? (
                                             <>
-                                                <Sun className="w-4 h-4 mr-3 text-yellow-500" />
+                                                <Sun className="w-5 h-5 mr-3 text-yellow-500" />
                                                 <span>Light Mode</span>
                                             </>
                                         ) : (
                                             <>
-                                                <Moon className="w-4 h-4 mr-3 text-gray-500" />
+                                                <Moon className="w-5 h-5 mr-3 text-gray-500" />
                                                 <span>Dark Mode</span>
                                             </>
                                         )}
@@ -192,7 +192,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                     <div className="border-t border-gray-100 dark:border-gray-700 mt-2 pt-2">
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                                            className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                                         >
                                             Logout
                                         </button>
@@ -204,7 +204,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                 <Link to="/login">
                                     <Button
                                         variant="outlined"
-                                        className="!text-purple-600 dark:!text-purple-400 !border-purple-600 dark:!border-purple-400 hover:!bg-purple-50 dark:hover:!bg-purple-900/20"
+                                        className="!text-purple-600 dark:!text-purple-400 !border-purple-600 dark:!border-purple-400 hover:!bg-purple-50 dark:hover:!bg-purple-900/20 !px-6 !py-2 !rounded-full !transition-all !duration-300"
                                     >
                                         Login
                                     </Button>
@@ -212,7 +212,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                 <Link to="/signup">
                                     <Button
                                         variant="contained"
-                                        className="!bg-purple-600 dark:!bg-purple-500 hover:!bg-purple-700 dark:hover:!bg-purple-600 !text-white"
+                                        className="!bg-purple-600 dark:!bg-purple-500 hover:!bg-purple-700 dark:hover:!bg-purple-600 !text-white !px-6 !py-2.5 !rounded-full !transition-all !duration-300"
                                     >
                                         Sign Up
                                     </Button>

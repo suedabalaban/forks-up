@@ -4,9 +4,10 @@ import { Star, UserRound, Users, Printer, PlayCircle, Timer } from "lucide-react
 import { auth } from "../config/firebaseconfig";
 import axios from "axios";
 import { Recipe } from "../model/Recipe";
-import {addFavorite, checkFavoriteStatus, removeFavorite} from "../api/ForksUpAPI";
+import {addFavorite, checkFavoriteStatus, removeFavorite, getPantryItems} from "../api/ForksUpAPI";
 import { getIngredientEmoji } from "../assets/ingredientEmojis";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePantry } from '../context/PantryContext';
 
 type RecipeDetailsProps = {
     recipe: Recipe;
@@ -21,6 +22,7 @@ type YouTubeVideo = {
 };
 
 const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRecipe}) => {
+    const { pantryIngredients } = usePantry();
     const [isFavorite, setIsFavorite] = useState(false);
     const [videos, setVideos] = useState<YouTubeVideo[]>([]);
     const [loading, setLoading] = useState(false);
@@ -75,6 +77,13 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
 
         fetchYouTubeVideos();
     }, [recipe.id, recipe.name]);
+
+    // Add helper function to check pantry ingredients
+    const isIngredientInPantry = (ingredientName: string) => {
+        return pantryIngredients.some(pantryItem =>
+            ingredientName.toLowerCase().includes(pantryItem) || pantryItem.includes(ingredientName.toLowerCase())
+        );
+    };
 
     const toggleFavorite = async () => {
         try {
@@ -254,20 +263,27 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                                     <span>Ingredients</span>
                                 </h3>
                                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {recipe.ingredientsRawStr?.map((ingredient, index) => (
-                                        <motion.li
-                                            key={index}
-                                            className="flex items-center gap-3 text-gray-600 dark:text-gray-300"
-                                            initial={{ x: -20, opacity: 0 }}
-                                            animate={{ x: 0, opacity: 1 }}
-                                            transition={{ delay: index * 0.1 }}
-                                        >
-                                            <span className="w-8 h-8 flex items-center justify-center bg-gray-50 dark:bg-gray-700/50 rounded-lg text-lg">
-                                                {getIngredientEmoji(ingredient) || '•'}
-                                            </span>
-                                            <span>{ingredient}</span>
-                                        </motion.li>
-                                    ))}
+                                    {recipe.ingredientsRawStr?.map((ingredient, index) => {
+                                        const inPantry = isIngredientInPantry(ingredient);
+                                        return (
+                                            <motion.li
+                                                key={index}
+                                                className="flex items-center gap-3 text-gray-600 dark:text-gray-300"
+                                                initial={{ x: -20, opacity: 0 }}
+                                                animate={{ x: 0, opacity: 1 }}
+                                                transition={{ delay: index * 0.1 }}
+                                            >
+                                                <span className={`w-8 h-8 flex items-center justify-center rounded-lg text-lg ${
+                                                    inPantry 
+                                                        ? 'bg-emerald-100 dark:bg-emerald-900/40'
+                                                        : 'bg-red-100 dark:bg-red-900/40'
+                                                }`}>
+                                                    {getIngredientEmoji(ingredient) || '•'}
+                                                </span>
+                                                <span>{ingredient}</span>
+                                            </motion.li>
+                                        );
+                                    })}
                                 </ul>
                             </motion.div>
 

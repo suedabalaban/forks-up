@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import RecipeDetails from "./RecipeDetails";
 import { createPortal } from 'react-dom';
 import { getPreparationTimeFromTags } from '../utils/preparationTime';
-import { addToRecipeHistory, getRecipeHistory, getLastRecipeHistory } from '../api/ForksUpAPI';
+import { addToRecipeHistory, getRecipeHistory } from '../api/ForksUpAPI';
 import { RecipeHistory } from '../model/RecipeHistory';
 import { auth } from '../config/firebaseconfig';
 import ReviewModal from './ReviewModal';
@@ -22,11 +22,10 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
 
     const DEFAULT_TIME = 60 * 60;
     const [timeLeft, setTimeLeft] = useState<number>(() => {
-        // Önce localStorage'dan kayıtlı süreyi kontrol et
         const savedTimeLeft = localStorage.getItem('activeRecipeTimeLeft');
         const savedStartTime = localStorage.getItem('activeRecipeStartTime');
         const savedRecipeId = localStorage.getItem('activeRecipeId');
-        
+
         if (savedTimeLeft && savedStartTime && savedRecipeId === recipe.id) {
             const elapsedSinceLastCheck = Math.floor(
                 (new Date().getTime() - parseInt(savedStartTime)) / 1000
@@ -38,23 +37,21 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
             }
         }
 
-        // Eğer localStorage'da kayıt yoksa normal hesaplamayı yap
         const preparationTimeStr = getPreparationTimeFromTags(recipe.tags);
         if (preparationTimeStr) {
             const hourMatch = preparationTimeStr.match(/(\d+)h/i);
             const minuteMatch = preparationTimeStr.match(/(\d+)m/i);
-            
+
             let totalSeconds = 0;
-            
+
             if (hourMatch) {
                 totalSeconds += parseInt(hourMatch[1]) * 3600;
             }
-            
+
             if (minuteMatch) {
                 totalSeconds += parseInt(minuteMatch[1]) * 60;
             }
 
-            // Auth durumunu kontrol et ve sonra geçen süreyi hesapla
             const checkAuthAndGetElapsedTime = async () => {
                 const currentUser = auth.currentUser;
                 if (currentUser) {
@@ -74,18 +71,17 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
                 return totalSeconds;
             };
 
-            // Auth kontrolü ile geçen süreyi hesapla
             checkAuthAndGetElapsedTime().then(remainingTime => {
                 if (remainingTime > 0) {
                     setTimeLeft(remainingTime);
                 }
             });
-            
+
             return totalSeconds > 0 ? totalSeconds : DEFAULT_TIME;
         }
         return DEFAULT_TIME;
     });
-    const [totalTime] = useState<number>(() => timeLeft); // Toplam süreyi başlangıçta kaydet
+    const [totalTime] = useState<number>(() => timeLeft);
     const [isPaused, setIsPaused] = useState(false);
     const [isAlmostDone, setIsAlmostDone] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
@@ -93,7 +89,7 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
-        
+
         if (!isPaused && timeLeft > 0) {
             timer = setInterval(() => {
                 setTimeLeft(prev => {
@@ -101,7 +97,6 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
                     if (newTime === 0) {
                         setShowReviewModal(true);
                     }
-                    // Son 5 dakika kaldığında isAlmostDone'ı true yap
                     if (newTime <= 300 && !isAlmostDone) {
                         setIsAlmostDone(true);
                     }
@@ -114,7 +109,6 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
     }, [isPaused, timeLeft]);
 
     useEffect(() => {
-        // Timer başlatıldığında tarif geçmişine ekle
         const addRecipeToHistory = async () => {
             if (isHistoryAdded.current) {
                 return;
@@ -127,9 +121,9 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
                 console.error('Error adding recipe to history:', error);
             }
         };
-        
+
         addRecipeToHistory();
-    }, []); // Component mount olduğunda çalışır
+    }, []);
 
     const formatTime = (seconds: number): string => {
         const hours = Math.floor(seconds / 3600);
@@ -146,7 +140,7 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
 
     const getProgressColor = () => {
         const progress = timeLeft / totalTime;
-        
+
         if (isAlmostDone) return 'from-red-500 to-orange-500';
         if (progress > 0.6) return 'from-green-500 to-emerald-500';
         if (progress > 0.3) return 'from-yellow-500 to-orange-500';
@@ -159,7 +153,6 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
         return 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200';
     };
 
-    // İbrelerin açılarını hesapla
     const getHandAngles = () => {
         const totalSeconds = timeLeft;
         const hours = Math.floor(totalSeconds / 3600);
@@ -187,7 +180,7 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
             onClose();
         }
     };
-    
+
     return (
         <>
             <motion.div
@@ -206,10 +199,8 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
                                 </div>
                             ) : (
                                 <div className="relative w-10 h-10">
-                                    {/* Saat kadranı */}
                                     <div className="absolute inset-0 rounded-full border-2 border-purple-600/20 dark:border-purple-400/20" />
 
-                                    {/* Saat ibresi */}
                                     <motion.div
                                         className="absolute w-[2px] h-[8px] bg-purple-800 dark:bg-purple-300 rounded-full"
                                         style={{
@@ -222,7 +213,6 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
                                         transition={{ duration: 0.5 }}
                                     />
 
-                                    {/* Dakika ibresi */}
                                     <motion.div
                                         className="absolute w-[1.5px] h-[12px] bg-purple-600 dark:bg-purple-400 rounded-full"
                                         style={{
@@ -235,7 +225,6 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
                                         transition={{ duration: 0.5 }}
                                     />
 
-                                    {/* Saniye ibresi */}
                                     <motion.div
                                         className="absolute w-[1px] h-[14px] bg-purple-500 dark:bg-purple-400 rounded-full"
                                         style={{
@@ -248,12 +237,10 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
                                         transition={{ duration: 0.5 }}
                                     />
 
-                                    {/* Merkez noktası */}
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         <div className="w-2 h-2 rounded-full bg-purple-600 dark:bg-purple-400 shadow-sm" />
                                     </div>
 
-                                    {/* İlerleme halkası */}
                                     <svg className="absolute inset-0 w-full h-full -rotate-90">
                                         <circle
                                             className="text-purple-600/10 dark:text-purple-400/10"
@@ -327,7 +314,7 @@ const ActiveRecipeTimer: React.FC<ActiveRecipeTimerProps> = ({ recipe, onTimerCl
                     document.getElementById('root')!
                 )}
             </motion.div>
-            
+
             {showReviewModal && (
                 <ReviewModal
                     recipe={recipe}
