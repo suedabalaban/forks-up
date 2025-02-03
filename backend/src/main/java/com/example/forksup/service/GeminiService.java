@@ -109,11 +109,23 @@ public class GeminiService {
         }
 
         Recipe recipe = getRecipe(recipeId);
-        String prompt = new RecipePromptBuilder(recipe, question)
+        String prompt = SYSTEM_INSTRUCTIONS + "\n" + new RecipePromptBuilder(recipe, question)
                 .build();
 
         GeminiResponse response = sendGeminiRequest(prompt);
         responseCache.put(cacheKey, response.getResponse());
         return response;
     }
+
+    public List<String> getPredefinedQuestions() {
+        return List.of(
+                "Bu tarif vegan beslenmeye uygun mu?",
+                "Bu tarif vejetaryen beslenmeye uygun mu?",
+                "Bu tarif diyet beslenmeye uygun mu?",
+                "Bu tarif kaç kalori içeriyor?",
+                "Bu tarifin pişirme süresi ne kadar?",
+                "Bu tarif için alternatif malzemeler nelerdir?"
+        );
+    }
+
 }

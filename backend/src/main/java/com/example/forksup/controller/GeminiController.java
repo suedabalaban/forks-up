@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/gemini")
 public class GeminiController {
@@ -39,7 +41,7 @@ public class GeminiController {
      *         - HTTP 400 (BAD_REQUEST) for invalid input or processing errors.
      *         - Error message if the question exceeds the length limit.
      */
-    @PostMapping("/recipe/{recipeId}")
+    @PostMapping("/{recipeId}")
     public ResponseEntity<GeminiResponse> analyzeRecipe(
             @PathVariable String recipeId,
             @RequestBody GeminiRequest request) {
@@ -56,7 +58,10 @@ public class GeminiController {
             return ResponseEntity.badRequest().build();
         }
     }
-
+    @GetMapping("/questions")
+    public List<String> getPredefinedQuestions(){
+        return geminiService.getPredefinedQuestions();
+    }
     /**
      * Provides AI-powered analysis of recipe steps using Google's Gemini.
      * This endpoint allows users to ask questions about recipe preparation and receives
