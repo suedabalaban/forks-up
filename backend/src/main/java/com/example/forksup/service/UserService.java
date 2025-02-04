@@ -5,6 +5,7 @@ import com.example.forksup.model.*;
 import com.example.forksup.repository.IngredientRepository;
 import com.example.forksup.repository.recipe.RecipeRepository;
 import com.example.forksup.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -277,14 +278,14 @@ public class UserService {
         }
     }
 
-    public void getAvatar(String firebaseId){
+    public byte[] getAvatar(String firebaseId){
         User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
-        user.getAvatar();
+        return user.getAvatar();
     }
 
-    public void updateDescription(String firebaseId, String description) {
+    public void addDescription(String firebaseId, String description) {
         if (description.length() > 200) {
             throw new IllegalArgumentException("Description cannot exceed 200 characters.");
         }

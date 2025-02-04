@@ -25,6 +25,7 @@ public class GeminiService {
         - Specific to the recipe being discussed
         - Helpful and practical
         - Brief but informative
+        - Respond in the same language as the query.
         
         When analyzing recipes:
         - Be understanding and empathetic about cooking concerns
