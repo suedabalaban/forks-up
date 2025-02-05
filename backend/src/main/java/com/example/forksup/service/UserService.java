@@ -320,4 +320,29 @@ public class UserService {
             throw new RuntimeException("Error generating avatar: " + e.getMessage(), e);
         }
     }
+
+    public void addUserReview(String firebaseId, String recipeId, String review, Byte rating, MultipartFile image) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        Recipe recipe = recipeRepository.findById(new ObjectId(recipeId)).orElseThrow(() ->
+                new ResourceNotFoundException("Recipe not found")
+        );
+
+        RecipeHistory historyItem = user.getRecipeHistory().stream()
+                .filter(item -> item.getRecipe().getId().equals(recipe.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe history not found for this user"));
+        historyItem.setReview(review);
+        historyItem.setRating(rating);
+
+        if (image != null && !image.isEmpty()) {
+            try {
+                historyItem.setRecipeImage(image.getBytes());
+                userRepository.save(user);
+            } catch (IOException e) {
+                throw new RuntimeException("Error processing the upload file", e);
+            }
+        }
+    }
 }

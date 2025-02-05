@@ -418,4 +418,29 @@ public class UserController {
         return new ResponseEntity<>(description, HttpStatus.OK);
     }
 
+    /**
+     * This endpoint allows users to submit a review for a recipe.
+     * The review includes the recipe's ID, a text review, a rating (0-5),
+     * and optionally an image related to the review.
+     *
+     * @param request The HttpServletRequest object containing the session info, especially the user ID.
+     * @param recipeId The ID of the recipe being reviewed.
+     * @param review The text content of the review.
+     * @param rating The rating for the recipe, a byte value between 0 and 5.
+     * @param image An optional image related to the review. Can be null.
+     * @return A ResponseEntity containing a success message when the review is successfully added.
+     * @throws ResourceNotFoundException if the recipe or user is not found.
+     */
+    @PostMapping(path = "/review", consumes = "multipart/form-data")
+    public ResponseEntity<String> addReview(
+            HttpServletRequest request,
+            @RequestPart("recipeId") String recipeId,
+            @RequestPart("review") String review,
+            @RequestPart("rating") Byte rating,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        userService.addUserReview(uid, recipeId, review, rating, image);
+        return ResponseEntity.ok("Review added successfully.");
+    }
 }
