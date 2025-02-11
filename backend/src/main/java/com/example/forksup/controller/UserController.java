@@ -4,9 +4,11 @@ import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.*;
 import com.example.forksup.repository.UserRepository;
 import com.example.forksup.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.Http;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.Response;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -364,14 +367,10 @@ public class UserController {
      *         If the user does not have an avatar, the response body will be empty.
      * @throws ResourceNotFoundException if the user is not found in the database.
      */
-    @GetMapping(path = "/avatar")
+    @GetMapping(path = "/avatar", produces = "image/jpeg")
     public ResponseEntity<byte[]> getAvatar(HttpServletRequest request) {
         String uid = (String) request.getSession().getAttribute("uid");
-        User user = userRepository.findUserByFirebaseId(uid).orElseThrow(() ->
-                new ResourceNotFoundException("User not found")
-        );
-        userService.getAvatar(uid);
-        return ResponseEntity.ok(user.getAvatar());
+        return ResponseEntity.ok( userService.getAvatar(uid));
     }
 
     /**
@@ -400,17 +399,48 @@ public class UserController {
      * The description should not exceed 200 characters.
      *
      * @param request     HTTP request containing the user session, used to retrieve the user ID.
-     * @param description The new description text to be updated in the user's profile.
+     * @param requestBody The new description text to be updated in the user's profile.
      * @return ResponseEntity with the updated description and HTTP status OK.
      */
     @PostMapping(path = "/description")
-    public ResponseEntity<String> updateDescription(
+    public ResponseEntity<String> addDescription(
             HttpServletRequest request,
-            @RequestParam String description
+            @RequestBody Map<String, String> requestBody
     ) {
         String uid = (String) request.getSession().getAttribute("uid");
-        userService.updateDescription(uid, description);
+        String description = requestBody.get("description");
+
+        if (description == null) {
+            return new ResponseEntity<>("Description is missing", HttpStatus.BAD_REQUEST);
+        }
+
+        userService.addDescription(uid, description);
         return new ResponseEntity<>(description, HttpStatus.OK);
     }
 
+    /**
+     * This endpoint allows users to submit a review for a recipe.
+     * The review includes the recipe's ID, a text review, a rating (0-5),
+     * and optionally an image related to the review.
+     *
+     * @param request The HttpServletRequest object containing the session info, especially the user ID.
+     * @param recipeId The ID of the recipe being reviewed.
+     * @param review The text content of the review.
+     * @param rating The rating for the recipe, a byte value between 0 and 5.
+     * @param image An optional image related to the review. Can be null.
+     * @return A ResponseEntity containing a success message when the review is successfully added.
+     * @throws ResourceNotFoundException if the recipe or user is not found.
+     */
+    @PostMapping(path = "/review", consumes = "multipart/form-data")
+    public ResponseEntity<String> addReview(
+            HttpServletRequest request,
+            @RequestPart("recipeId") String recipeId,
+            @RequestPart("review") String review,
+            @RequestPart("rating") Byte rating,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        userService.addUserReview(uid, recipeId, review, rating, image);
+        return ResponseEntity.ok("Review added successfully.");
+    }
 }

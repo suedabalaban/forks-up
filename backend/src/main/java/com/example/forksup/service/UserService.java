@@ -5,6 +5,7 @@ import com.example.forksup.model.*;
 import com.example.forksup.repository.IngredientRepository;
 import com.example.forksup.repository.recipe.RecipeRepository;
 import com.example.forksup.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -277,14 +278,14 @@ public class UserService {
         }
     }
 
-    public void getAvatar(String firebaseId){
+    public byte[] getAvatar(String firebaseId){
         User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
-        user.getAvatar();
+        return user.getAvatar();
     }
 
-    public void updateDescription(String firebaseId, String description) {
+    public void addDescription(String firebaseId, String description) {
         if (description.length() > 200) {
             throw new IllegalArgumentException("Description cannot exceed 200 characters.");
         }
@@ -317,6 +318,31 @@ public class UserService {
             }
         } catch (Exception e) {
             throw new RuntimeException("Error generating avatar: " + e.getMessage(), e);
+        }
+    }
+
+    public void addUserReview(String firebaseId, String recipeId, String review, Byte rating, MultipartFile image) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        Recipe recipe = recipeRepository.findById(new ObjectId(recipeId)).orElseThrow(() ->
+                new ResourceNotFoundException("Recipe not found")
+        );
+
+        RecipeHistory historyItem = user.getRecipeHistory().stream()
+                .filter(item -> item.getRecipe().getId().equals(recipe.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe history not found for this user"));
+        historyItem.setReview(review);
+        historyItem.setRating(rating);
+
+        if (image != null && !image.isEmpty()) {
+            try {
+                historyItem.setRecipeImage(image.getBytes());
+                userRepository.save(user);
+            } catch (IOException e) {
+                throw new RuntimeException("Error processing the upload file", e);
+            }
         }
     }
 }
