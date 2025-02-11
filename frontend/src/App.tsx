@@ -53,7 +53,8 @@ const App: React.FC = () => {
                         <Route path="/favorites" element={<ProtectedRoute><UserFavorites/></ProtectedRoute>}/>
                         <Route path="/pantry" element={<ProtectedRoute><UserIngredients/></ProtectedRoute>}/>
                         <Route path="/dietary-preferences"
-                            element={<ProtectedRoute><DietaryPreferences/></ProtectedRoute>}/>
+                            element={<ProtectedRoute><DietaryPreferences/></ProtectedRoute>}
+                        />
                         <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
                         <Route path="/history" element={<ProtectedRoute><RecipeHistory/></ProtectedRoute>}/>
 

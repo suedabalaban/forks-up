@@ -11,4 +11,5 @@ export type Recipe = {
     description: string;
     imageUrl?: string;
     tags: string[];
+    searchTerms: string[];
 };

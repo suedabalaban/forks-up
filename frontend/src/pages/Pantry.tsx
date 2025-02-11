@@ -322,7 +322,7 @@ const Pantry = () => {
                                     value={modalQuantity}
                                     onChange={(e) => setModalQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                                     min="1"
-                                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 bg-gray-50 dark:text-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                 />
                             </div>
 
@@ -333,7 +333,7 @@ const Pantry = () => {
                                 <select
                                     value={modalUnit}
                                     onChange={(e) => setModalUnit(e.target.value as MeasurementUnit)}
-                                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 bg-gray-50 dark:text-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                 >
                                     {measurementUnits.map(unit => (
                                         <option

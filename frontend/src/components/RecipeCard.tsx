@@ -1,6 +1,5 @@
 import {UserRound, Clock} from "lucide-react";
 import {Recipe} from "../model/Recipe";
-import React, {useEffect, useState} from "react";
 import {motion} from "framer-motion";
 import {getIngredientEmoji} from "../assets/ingredientEmojis";
 import {usePexelsImage} from "../hooks/usePexelsImage";

@@ -133,7 +133,6 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                 
                 <div class="info">
                     <p><strong>Servings:</strong> ${recipe.servings}</p>
-                    <p><strong>Serving Size:</strong> ${recipe.serving_size.slice(2)}</p>
                 </div>
 
                 <h2>🥘 Ingredients</h2>
@@ -238,15 +237,23 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                                     {recipe.description}
                                 </p>
                                 
+                                {/* Search Terms */}
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {recipe.searchTerms.map((term, index) => (
+                                        <span
+                                            key={index}
+                                            className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm"
+                                        >
+                                            {term}
+                                        </span>
+                                    ))}
+                                </div>
+                                
                                 {/* Recipe Info */}
                                 <div className="flex items-center gap-6 text-gray-600 dark:text-gray-300">
                                     <div className="flex items-center gap-2">
                                         <Users className="w-5 h-5" />
                                         <span>Serves {recipe.servings}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-medium">Serving Size:</span>
-                                        <span>{recipe.serving_size.slice(2)}</span>
                                     </div>
                                 </div>
                             </div>

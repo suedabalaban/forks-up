@@ -8,7 +8,6 @@ import {Recipe} from "../model/Recipe";
 import TagFilters from "../components/TagFilter";
 import tags from "../assets/tags.json"
 import {getPersonalizedRecipes, getRecipes} from "../api/ForksUpAPI";
-import AIChat from '../components/AIChat';
 
 interface OutletContextType {
     onStartRecipe: (recipe: Recipe) => void;
@@ -51,6 +50,8 @@ const SearchRecipes: React.FC = () => {
         const searchTerm = searchParams.get('q');
         const searchTag = searchParams.get('tag');
         const isPersonalized = searchParams.get('personalized') === 'true';
+
+        if (searchTerm == null && searchTag == null) {return}
 
         // Combine URL tag parameter with selected tags from the component state
         const allTags = [...selectedTags];
@@ -329,8 +330,7 @@ const SearchRecipes: React.FC = () => {
                         onStartRecipe={onStartRecipe}
                     />
                 )}
-                
-                <AIChat recipe={selectedRecipe} />
+
             </div>
         </div>
     );
