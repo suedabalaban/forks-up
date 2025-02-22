@@ -3,8 +3,8 @@ import {Search, Plus, Minus, Trash2, X} from 'lucide-react';
 import {PantryItem} from "../model/PantryItem";
 import {Ingredient} from "../model/Ingredient";
 import {addIngredient, getIngredients, getPantryItems, removeIngredient} from "../api/ForksUpAPI";
-import { getIngredientEmoji } from '../assets/ingredientEmojis';
-import { measurementUnits, MeasurementUnit } from '../assets/MeasurementUnit';
+import { getIngredientEmoji } from '../utils/ingredientEmojis';
+import { measurementUnits, MeasurementUnit } from '../utils/MeasurementUnit';
 import {AnimatePresence, motion} from 'framer-motion';
 
 const Pantry = () => {

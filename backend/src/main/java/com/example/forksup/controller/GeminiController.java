@@ -58,10 +58,12 @@ public class GeminiController {
             return ResponseEntity.badRequest().build();
         }
     }
+
     @GetMapping("/questions")
     public List<String> getPredefinedQuestions(){
         return geminiService.getPredefinedQuestions();
     }
+
     /**
      * Provides AI-powered analysis of recipe steps using Google's Gemini.
      * This endpoint allows users to ask questions about recipe preparation and receives

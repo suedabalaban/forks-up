@@ -4,18 +4,14 @@ import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.*;
 import com.example.forksup.repository.UserRepository;
 import com.example.forksup.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.Http;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.coyote.Response;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -431,16 +427,35 @@ public class UserController {
      * @return A ResponseEntity containing a success message when the review is successfully added.
      * @throws ResourceNotFoundException if the recipe or user is not found.
      */
-    @PostMapping(path = "/review", consumes = "multipart/form-data")
+    @PostMapping(path = "/review", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> addReview(
             HttpServletRequest request,
             @RequestPart("recipeId") String recipeId,
             @RequestPart("review") String review,
-            @RequestPart("rating") Byte rating,
+            @RequestPart("rating") String rating,
             @RequestPart(value = "image", required = false) MultipartFile image
     ) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        userService.addUserReview(uid, recipeId, review, rating, image);
-        return ResponseEntity.ok("Review added successfully.");
+        System.out.println(review);
+        try {
+            byte ratingValue = Byte.parseByte(rating);
+            if (ratingValue < 0 || ratingValue > 5) {
+                return ResponseEntity.badRequest().body("Rating must be between 0 and 5");
+            }
+            
+            String uid = (String) request.getSession().getAttribute("uid");
+            if (uid == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            }
+            
+            userService.addUserReview(uid, recipeId, review, ratingValue, image);
+            return ResponseEntity.ok("Review added successfully.");
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("Invalid rating format");
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error submitting review: " + e.getMessage());
+        }
     }
 }

@@ -101,7 +101,6 @@ public class GeminiService {
     }
 
     public GeminiResponse analyzeRecipe(String recipeId, String question) {
-        // Generate a unique cache key based on the recipe ID and question
         String cacheKey = recipeId + "-" + question.toLowerCase().trim();
 
         String cachedResponse = responseCache.get(cacheKey);

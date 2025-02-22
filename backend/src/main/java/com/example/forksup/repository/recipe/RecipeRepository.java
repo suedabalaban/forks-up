@@ -21,4 +21,6 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId>, Rec
     @Query(value = "{ $text: { $search: '?0' }}", count = true)
     long countByName(String keyword);
 
+
+
 }

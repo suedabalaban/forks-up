@@ -5,7 +5,6 @@ import com.example.forksup.model.*;
 import com.example.forksup.repository.IngredientRepository;
 import com.example.forksup.repository.recipe.RecipeRepository;
 import com.example.forksup.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -329,20 +328,35 @@ public class UserService {
                 new ResourceNotFoundException("Recipe not found")
         );
 
+        // Check if recipe history exists, if not create it
+        if (user.getRecipeHistory() == null) {
+            user.setRecipeHistory(new ArrayList<>());
+        }
+
+        // Find the history item or create a new one
         RecipeHistory historyItem = user.getRecipeHistory().stream()
                 .filter(item -> item.getRecipe().getId().equals(recipe.getId()))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Recipe history not found for this user"));
+                .orElseGet(() -> {
+                    RecipeHistory newItem = new RecipeHistory(recipe);
+                    user.getRecipeHistory().add(newItem);
+                    return newItem;
+                });
+
+        // Update the history item
         historyItem.setReview(review);
         historyItem.setRating(rating);
 
+        // Process image if provided
         if (image != null && !image.isEmpty()) {
             try {
                 historyItem.setRecipeImage(image.getBytes());
-                userRepository.save(user);
             } catch (IOException e) {
                 throw new RuntimeException("Error processing the upload file", e);
             }
         }
+
+        // Save the updated user document
+        userRepository.save(user);
     }
 }

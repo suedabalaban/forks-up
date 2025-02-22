@@ -1,7 +1,7 @@
 import {UserRound, Clock} from "lucide-react";
 import {Recipe} from "../model/Recipe";
 import {motion} from "framer-motion";
-import {getIngredientEmoji} from "../assets/ingredientEmojis";
+import {getIngredientEmoji} from "../utils/ingredientEmojis";
 import {usePexelsImage} from "../hooks/usePexelsImage";
 import {getCountryFlagFromTags} from "../utils/countryFlags";
 import {getPreparationTimeFromTags} from "../utils/preparationTime";

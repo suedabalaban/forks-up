@@ -5,7 +5,7 @@ import { auth } from "../config/firebaseconfig";
 import axios from "axios";
 import { Recipe } from "../model/Recipe";
 import {addFavorite, checkFavoriteStatus, removeFavorite, getPantryItems} from "../api/ForksUpAPI";
-import { getIngredientEmoji } from "../assets/ingredientEmojis";
+import { getIngredientEmoji } from "../utils/ingredientEmojis";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePantry } from '../context/PantryContext';
 

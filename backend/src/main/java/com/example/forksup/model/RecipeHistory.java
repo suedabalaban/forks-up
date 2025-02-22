@@ -25,6 +25,7 @@ public class RecipeHistory {
         this.recipe = recipe;
         startedAt = new Date();
     }
+
     public Recipe getRecipe() {return recipe;}
 
     public void setRecipe(Recipe recipe) {this.recipe = recipe;}
@@ -44,4 +45,5 @@ public class RecipeHistory {
     public byte[] getRecipeImage() {return recipeImage;}
 
     public void setRecipeImage(byte[] recipeImage) {this.recipeImage = recipeImage;}
+
 }

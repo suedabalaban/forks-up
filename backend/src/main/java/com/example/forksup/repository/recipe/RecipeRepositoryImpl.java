@@ -2,26 +2,17 @@ package com.example.forksup.repository.recipe;
 
 import com.example.forksup.model.Ingredient;
 import com.example.forksup.model.Recipe;
-import com.mongodb.client.model.Sorts;
-import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
-import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
-import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -147,7 +138,7 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
         if (userIngredients != null && !userIngredients.isEmpty()) {
             // Create a set of ingredient IDs for faster lookup
             Set<String> userIngredientIds = userIngredients.stream()
-                    .map(ingredient -> ingredient.getId())
+                    .map(Ingredient::getId)
                     .collect(Collectors.toSet());
 
             // Filter recipes based on ingredient match percentage
@@ -159,7 +150,7 @@ public class RecipeRepositoryImpl implements RecipeRepositoryCustom {
 
                         // Count matching ingredients
                         long matchingCount = recipe.getIngredients().stream()
-                                .map(ingredient -> ingredient.getId())
+                                .map(Ingredient::getId)
                                 .filter(userIngredientIds::contains)
                                 .count();
 
