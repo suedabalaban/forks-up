@@ -24,7 +24,6 @@ const Pantry = () => {
         fetchPantryItems();
     }, []);
 
-    // Ingredient arama
     useEffect(() => {
         const HandleSearchIngredients = async () => {
             if (searchQuery.trim() === '') {
@@ -225,7 +224,7 @@ const Pantry = () => {
                     ) : (
                         <div className="space-y-3">
                             <AnimatePresence>
-                                {pantryItems.map(item => (
+                                {pantryItems && pantryItems.map(item => (
                                     <motion.div
                                         key={item.ingredient.id}
                                         initial={{ opacity: 0, x: -10 }}

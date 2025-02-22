@@ -3,9 +3,9 @@ import {Star, Image as ImageIcon, X, Plus, Minus, Search, Trash2} from 'lucide-r
 import { Recipe } from '../model/Recipe';
 import { PantryItem } from '../model/PantryItem';
 import { Ingredient } from '../model/Ingredient';
-import {getPantryItems, updateQuantity, getIngredients, addIngredient, removeIngredient} from '../api/ForksUpAPI';
-import { getIngredientEmoji } from '../assets/ingredientEmojis';
-import { measurementUnits, MeasurementUnit } from '../assets/MeasurementUnit';
+import {getPantryItems, updateQuantity, getIngredients, addIngredient, removeIngredient, submitRecipeReview} from '../api/ForksUpAPI';
+import { getIngredientEmoji } from '../utils/ingredientEmojis';
+import { measurementUnits, MeasurementUnit } from '../utils/MeasurementUnit';
 import {AnimatePresence, motion} from "framer-motion";
 
 interface ReviewModalProps {
@@ -28,6 +28,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ recipe, onClose }) => {
     const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
     const [newItemQuantity, setNewItemQuantity] = useState(1);
     const [newItemUnit, setNewItemUnit] = useState<MeasurementUnit>('PIECE');
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
         fetchPantryItems();
@@ -102,10 +103,19 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ recipe, onClose }) => {
 
     const handleSubmit = async () => {
         try {
-            // TODO: Add API call to submit review
-            onClose();
+            await submitRecipeReview({
+                recipeId: recipe.id,
+                rating,
+                comment,
+                image: image || undefined
+            });
+            setShowSuccess(true);
+            setTimeout(() => {
+                onClose();
+            }, 2000);
         } catch (error) {
             console.error('Error submitting review:', error);
+            setError('Failed to submit review. Please try again.');
         }
     };
 
@@ -284,7 +294,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ recipe, onClose }) => {
                 ) : (
                     <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                         <AnimatePresence>
-                            {pantryItems.map(item => (
+                            {pantryItems && pantryItems.map(item => (
                                 <motion.div
                                     key={item.ingredient.id}
                                     initial={{ opacity: 0, x: -10 }}
@@ -365,6 +375,11 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ recipe, onClose }) => {
                 Submit Review
             </button>
         </div>
+        {showSuccess && (
+            <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in-out">
+                Review submitted successfully! 🎉
+            </div>
+        )}
     </div>
 </div>
     );

@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LogoutModal from './components/LogoutModal';
 import { Recipe } from '../model/Recipe';
-import { getRecipeHistory, getLastRecipeHistory } from '../api/ForksUpAPI';
+import { getRecipeHistory, getLastRecipeFromHistory } from '../api/ForksUpAPI';
 import { getPreparationTimeFromTags } from '../utils/preparationTime';
 
 const Layout: React.FC = () => {
@@ -37,7 +37,7 @@ const Layout: React.FC = () => {
 
     const checkActiveRecipe = async () => {
         try {
-            const lastRecipe = await getLastRecipeHistory();
+            const lastRecipe = await getLastRecipeFromHistory();
             if (lastRecipe) {
                 const startTime = new Date(lastRecipe.startedAt).getTime();
                 const currentTime = new Date().getTime();

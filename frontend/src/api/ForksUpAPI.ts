@@ -8,7 +8,6 @@ const api = axios.create({
     },
 });
 
-// Token al ve başlık oluştur
 const getToken = async () => {
     const token = await auth.currentUser?.getIdToken();
     if (!token) {
@@ -17,7 +16,6 @@ const getToken = async () => {
     return token
 };
 
-// Favori durumunu kontrol eden fonksiyon
 export const checkFavoriteStatus = async (recipeId: string) => {
     try {
         const token = await getToken();
@@ -33,7 +31,6 @@ export const checkFavoriteStatus = async (recipeId: string) => {
     }
 };
 
-// Favori ekleme fonksiyonu
 export const addFavorite = async (recipeId: string) => {
     try {
         const token = await getToken();
@@ -48,7 +45,6 @@ export const addFavorite = async (recipeId: string) => {
     }
 };
 
-// Favori kaldırma fonksiyonu
 export const removeFavorite = async (recipeId: string) => {
     try {
         const token = await getToken();
@@ -63,7 +59,6 @@ export const removeFavorite = async (recipeId: string) => {
     }
 };
 
-//
 export const getIngredients = async (searchQuery: string) => {
     try {
         const token = await getToken();
@@ -79,7 +74,6 @@ export const getIngredients = async (searchQuery: string) => {
     }
 };
 
-//
 export const getPantryItems = async () => {
     try {
         const token = await getToken();
@@ -95,7 +89,6 @@ export const getPantryItems = async () => {
     }
 };
 
-//
 export const addIngredient = async (ingredientId: string, quantity: number, unit: string) => {
     try {
         const token = await getToken();
@@ -115,7 +108,6 @@ export const addIngredient = async (ingredientId: string, quantity: number, unit
     }
 };
 
-//
 export const updateQuantity = async (ingredientId: string, quantity: number, unit: string) => {
     try {
         const token = await getToken();
@@ -134,7 +126,6 @@ export const updateQuantity = async (ingredientId: string, quantity: number, uni
     }
 };
 
-//
 export const removeIngredient = async (ingredientId: string) => {
     try {
         const token = await getToken();
@@ -186,7 +177,6 @@ export const getRecipes = async (
     }
 };
 
-//
 export const getPersonalizedRecipes = async (
     keyword?: string,
     page: number = 0,
@@ -214,7 +204,6 @@ export const getPersonalizedRecipes = async (
     }
 };
 
-// Favori tarifleri getir
 export const getFavoriteRecipes = async () => {
     try {
         const token = await getToken(); // Token al
@@ -233,7 +222,6 @@ export const getFavoriteRecipes = async () => {
     }
 };
 
-// Kullanıcıyı kaydet veya güncelle
 export const registerOrUpdateUser = async (user: any) => {
     try {
         if (!user) return;
@@ -268,7 +256,6 @@ export interface Preferences {
     preparation_time: string
 }
 
-//
 export const addUserPreferences = async (preferences: Preferences) => {
     try {
         const token = await getToken();
@@ -300,7 +287,6 @@ export const getUserPreferences = async () => {
     }
 }
 
-// Gemini API - Diyet kısıtlamalarını kontrol et
 export const checkDietaryRestriction = async (recipeId: string, inputText: string) => {
     try {
         const token = await getToken();
@@ -338,7 +324,6 @@ export const analyzeRecipeSteps = async (recipeId: string, inputText: string) =>
     }
 };
 
-// Tarif geçmişini getir
 export const getRecipeHistory = async () => {
     try {
         const token = await getToken();
@@ -354,7 +339,6 @@ export const getRecipeHistory = async () => {
     }
 };
 
-// Tarif geçmişine ekle
 export const addToRecipeHistory = async (recipeId: string) => {
     try {
         const token = await getToken();
@@ -369,7 +353,7 @@ export const addToRecipeHistory = async (recipeId: string) => {
     }
 };
 
-// Tarif geçmişinden kaldır
+// TODO
 export const removeFromRecipeHistory = async (recipeId: string) => {
     try {
         const token = await getToken();
@@ -384,27 +368,7 @@ export const removeFromRecipeHistory = async (recipeId: string) => {
     }
 };
 
-// Tarif yapıldıktan sonra malzeme miktarlarını güncelle
-export const updatePantryAfterRecipe = async (ingredientIds: string[]) => {
-    try {
-        const token = await getToken();
-        const response = await api.put('/user/history/update', null, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            params: {
-                ingredientIds: ingredientIds
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error updating pantry after recipe:', error);
-        throw error;
-    }
-};
-
-// Son tarif geçmişini getir
-export const getLastRecipeHistory = async () => {
+export const getLastRecipeFromHistory = async () => {
     try {
         const token = await getToken();
         const response = await api.get('/user/history/last', {
@@ -426,20 +390,21 @@ interface RecipeReview {
     image?: File;
 }
 
-export const submitRecipeReview = async (review: RecipeReview) => {
+export const submitRecipeReview = async ({ recipeId, rating, comment, image }: RecipeReview) => {
     try {
         const token = await getToken();
         const formData = new FormData();
-        formData.append('rating', review.rating.toString());
-        formData.append('comment', review.comment);
-        if (review.image) {
-            formData.append('image', review.image);
+        formData.append('recipeId', recipeId);
+        formData.append('review', comment);
+        formData.append('rating', rating.toString());
+        if (image) {
+            formData.append('image', image);
         }
 
-        const response = await api.post(`/recipes/${review.recipeId}/review`, formData, {
+        const response = await api.post('/user/review', formData, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
             },
         });
         return response.data;
