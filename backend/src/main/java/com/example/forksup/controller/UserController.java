@@ -442,7 +442,6 @@ public class UserController {
             @RequestPart("rating") String rating,
             @RequestPart(value = "image", required = false) MultipartFile image
     ) {
-        System.out.println(review);
         try {
             byte ratingValue = Byte.parseByte(rating);
             if (ratingValue < 0 || ratingValue > 5) {
