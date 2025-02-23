@@ -21,6 +21,7 @@ import {ThemeProvider} from "./context/ThemeContext";
 import RecipeHistory from "./pages/RecipeHistory";
 import { PantryProvider } from './context/PantryContext';
 import ChatBot from './components/ChatBot/ChatBot';
+import InitialProfileSetup from './components/InitialProfileSetup';
 
 const App: React.FC = () => {
     const [user, setUser] = useState<any>(null);
@@ -57,6 +58,7 @@ const App: React.FC = () => {
                         />
                         <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
                         <Route path="/history" element={<ProtectedRoute><RecipeHistory/></ProtectedRoute>}/>
+                        <Route path="/setup-profile" element={<ProtectedRoute><InitialProfileSetup/></ProtectedRoute>}/>
 
                     </Route>
 

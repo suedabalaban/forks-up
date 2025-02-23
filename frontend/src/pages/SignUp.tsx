@@ -1,4 +1,4 @@
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import React, {useState} from "react";
 import GoogleLoginButton from "../components/GoogleLoginButton";
 import {ArrowRight, Lock, Mail} from "lucide-react";
@@ -11,6 +11,7 @@ const SignUp = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -26,12 +27,13 @@ const SignUp = () => {
                 sendEmailVerification(userCredential.user).then(
                     () => {
                         setMessage("Account created successfully. Please check your email to verify your account.");
+                        // Navigate to profile setup after successful registration
+                        navigate('/setup-profile');
                     }
                 ).catch((error) => {
                     console.error('Error during sign-up:', error);
                     setMessage(error.message);
                 })
-                setMessage("Account created successfully. Please check your email to verify your account.");
             })
             .catch((error) => {
                 console.error('Error during sign-up:', error);

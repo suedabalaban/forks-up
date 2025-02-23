@@ -11,8 +11,9 @@ import {
     deleteUser
 } from "firebase/auth";
 import DietaryPreferences from "./DietaryPreferences";
-import {KeyRound, ShieldAlert, Trash2, User as UserIcon, X} from 'lucide-react';
+import {KeyRound, ShieldAlert, Trash2, Upload, User as UserIcon, Wand2, X} from 'lucide-react';
 import { motion } from "framer-motion";
+import { uploadAvatar, generateAvatar, updateDescription, getAvatar, getMyUser } from "../api/ForksUpAPI";
 
 const GoogleIcon: React.FC = () => (
     <svg className="w-5 h-5 inline-block ml-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -33,6 +34,10 @@ const Profile: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [successMessage, setSuccessMessage] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [description, setDescription] = useState<string>("");
+    const [avatar, setAvatar] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [fetchedAvatar, setFetchedAvatar] = useState<string | null>(null);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -40,6 +45,32 @@ const Profile: React.FC = () => {
                 setUser(user);
                 setDisplayName(user.displayName || "");
                 setEmail(user.email || "");
+                
+                // Fetch user data including description and avatar
+                const fetchUserData = async () => {
+                    try {
+                        const [userResponse, avatarData] = await Promise.all([
+                            getMyUser(),
+                            getAvatar()
+                        ]);
+
+                        // Set description if exists
+                        if (userResponse.data.description) {
+                            setDescription(userResponse.data.description);
+                        }
+
+                        // Set avatar if exists
+                        if (avatarData) {
+                            const blob = new Blob([avatarData], { type: 'image/jpeg' });
+                            const imageUrl = URL.createObjectURL(blob);
+                            setFetchedAvatar(imageUrl);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching user data:', error);
+                    }
+                };
+
+                fetchUserData();
             }
         });
 
@@ -92,6 +123,16 @@ const Profile: React.FC = () => {
         setIsLoading(true);
 
         try {
+            // Handle avatar upload
+            if (avatar) {
+                await uploadAvatar(avatar);
+            }
+
+            // Handle description update
+            if (description) {
+                await updateDescription(description);
+            }
+
             // Handle display name update
             if (displayName !== user.displayName) {
                 await updateProfile(user, {
@@ -186,6 +227,32 @@ const Profile: React.FC = () => {
         }
     };
 
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            setAvatar(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
+    const handleGenerateAvatar = async () => {
+        setIsLoading(true);
+        try {
+            await updateDescription(description);
+            const response = await generateAvatar();
+            const blob = new Blob([response], { type: 'image/jpeg' });
+            const imageUrl = URL.createObjectURL(blob);
+            setPreviewUrl(imageUrl);
+            const avatarFile = new File([blob], 'generated-avatar.jpg', { type: 'image/jpeg' });
+            setAvatar(avatarFile);
+            setSuccessMessage("Avatar generated successfully!");
+        } catch (error) {
+            setErrorMessage('Failed to generate avatar');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     if (!user) {
         return <div className="flex justify-center items-center h-screen">Please log in</div>;
     }
@@ -220,17 +287,19 @@ const Profile: React.FC = () => {
             >
                 <div className="flex items-center gap-4 mb-6">
                     <div className="relative group">
-                        {user.photoURL ? (
-                            <img
-                                src={user.photoURL}
-                                alt="Profile"
-                                className="w-20 h-20 rounded-full object-cover border-4 border-purple-100 dark:border-purple-900/50"
-                            />
-                        ) : (
-                            <div className="w-20 h-20 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center border-4 border-purple-100 dark:border-purple-900/30">
-                                <UserIcon size={36} className="text-purple-600 dark:text-purple-400"/>
-                            </div>
-                        )}
+                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-purple-100 dark:border-purple-900/50">
+                            {(previewUrl || fetchedAvatar) ? (
+                                <img
+                                    src={previewUrl || fetchedAvatar || undefined}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
+                                    <UserIcon size={36} className="text-purple-600 dark:text-purple-400"/>
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -240,6 +309,51 @@ const Profile: React.FC = () => {
                             {user.email}
                             {!isEmailProvider() && <GoogleIcon />}
                         </p>
+                    </div>
+                </div>
+
+                {/* Avatar and Description Section */}
+                <div className="space-y-6 mb-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            About Me
+                        </label>
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 
+                                     dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            rows={4}
+                            placeholder="Tell us about yourself..."
+                        />
+                    </div>
+
+                    <div className="flex gap-3">
+                        <button
+                            onClick={handleGenerateAvatar}
+                            disabled={!description || isLoading}
+                            className="flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-gray-50 
+                                     dark:border-gray-600 dark:hover:bg-gray-700 transition-colors dark:text-white"
+                        >
+                            <Wand2 size={16} />
+                            Generate Avatar
+                        </button>
+
+                        <button
+                            className="flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-gray-50 
+                                     dark:border-gray-600 dark:hover:bg-gray-700 transition-colors dark:text-white"
+                        >
+                            <Upload size={16} />
+                            <label className="cursor-pointer">
+                                Upload Photo
+                                <input
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                />
+                            </label>
+                        </button>
                     </div>
                 </div>
 

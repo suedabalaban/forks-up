@@ -16,6 +16,20 @@ const getToken = async () => {
     return token
 };
 
+export const getMyUser = async () => {
+    try {
+        const token = await getToken();
+        return await api.get(`/user`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching ingredients:', error);
+        throw error;
+    }
+};
+
 export const checkFavoriteStatus = async (recipeId: string) => {
     try {
         const token = await getToken();
@@ -353,21 +367,6 @@ export const addToRecipeHistory = async (recipeId: string) => {
     }
 };
 
-// TODO
-export const removeFromRecipeHistory = async (recipeId: string) => {
-    try {
-        const token = await getToken();
-        await api.delete(`/user/history/${recipeId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-    } catch (error) {
-        console.error('Error removing from recipe history:', error);
-        throw error;
-    }
-};
-
 export const getLastRecipeFromHistory = async () => {
     try {
         const token = await getToken();
@@ -410,6 +409,75 @@ export const submitRecipeReview = async ({ recipeId, rating, comment, image }: R
         return response.data;
     } catch (error) {
         console.error('Error submitting recipe review:', error);
+        throw error;
+    }
+};
+
+export const uploadAvatar = async (avatar: File) => {
+    try {
+        const token = await getToken();
+        const formData = new FormData();
+        formData.append('avatar', avatar);
+
+        const response = await api.post('/user/avatar', formData, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error uploading avatar:', error);
+        throw error;
+    }
+};
+
+export const getAvatar = async () => {
+    try {
+        const token = await getToken();
+        const response = await api.get('/user/avatar', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            responseType: 'arraybuffer',
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error getting avatar:', error);
+        throw error;
+    }
+};
+
+export const generateAvatar = async () => {
+    try {
+        const token = await getToken();
+        const response = await api.post('/user/generate-avatar', null, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            responseType: 'arraybuffer'  
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error generating avatar:', error);
+        throw error;
+    }
+};
+
+export const updateDescription = async (description: string) => {
+    try {
+        const token = await getToken();
+        const response = await api.post('/user/description',
+            { description },
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error updating description:', error);
         throw error;
     }
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import tagsData from "../assets/tags.json";
 import { ChevronLeft, ChevronRight, Edit, ChevronDown, ChevronUp } from 'lucide-react';
 import { addUserPreferences, getUserPreferences } from "../api/ForksUpAPI";
@@ -15,6 +16,7 @@ interface RegionState {
 }
 
 const DietaryPreferences: React.FC = () => {
+  const navigate = useNavigate();
   const [preferences, setPreferences] = useState<DietaryPreferencesState>({
     health_conscious: [],
     allergies_intolerances: [],
@@ -117,7 +119,11 @@ const DietaryPreferences: React.FC = () => {
       setSuccessMessage("Preferences saved successfully");
       setHasExistingPreferences(true);
       setIsEditMode(false);
-      setTimeout(() => setSuccessMessage(""), 3000); 
+      
+      // Navigate to user profile page after a short delay
+      setTimeout(() => {
+        navigate('/user');
+      }, 1500);
     } catch (error) {
       console.error('Error saving preferences:', error);
     }

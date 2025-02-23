@@ -71,6 +71,13 @@ public class UserController {
         return new ResponseEntity<>(null, null, HttpStatus.OK);
     }
 
+    @GetMapping("")
+    public ResponseEntity<User> getMyUser(HttpServletRequest request) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        User u  = userService.getUserByFirebaseID(uid);
+        return ResponseEntity.ok(u);
+    }
+
     /**
      * Checks if a specific recipe is in the user's favorites list.
      * This is a utility endpoint that helps frontend determine if a recipe
@@ -381,11 +388,11 @@ public class UserController {
      * @throws ResourceNotFoundException If the user cannot be found.
      * @throws RuntimeException If an error occurs during the API request.
      */
-    @PostMapping(path = "/generate-avatar")
-    public ResponseEntity<User> generateAvatar(HttpServletRequest request) {
+    @PostMapping(path = "/generate-avatar", produces = "image/jpeg")
+    public ResponseEntity<byte[]> generateAvatar(HttpServletRequest request) {
         String uid = (String) request.getSession().getAttribute("uid");
         User updatedUser = userService.generateAvatar(uid);
-        return ResponseEntity.ok(updatedUser);
+        return ResponseEntity.ok(updatedUser.getAvatar());
     }
 
     /**
@@ -458,4 +465,5 @@ public class UserController {
                     .body("Error submitting review: " + e.getMessage());
         }
     }
+
 }
