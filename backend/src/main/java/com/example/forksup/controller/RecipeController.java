@@ -24,7 +24,6 @@ public class RecipeController {
     @Autowired
     private RecipeService recipeService;
 
-
     /**
      * Retrieves a specific recipe from the database using its MongoDB ObjectId.
      * This endpoint performs several validation steps:

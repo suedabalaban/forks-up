@@ -22,6 +22,8 @@ import RecipeHistory from "./pages/RecipeHistory";
 import { PantryProvider } from './context/PantryContext';
 import ChatBot from './components/ChatBot/ChatBot';
 import InitialProfileSetup from './components/InitialProfileSetup';
+import SharedRecipe from './pages/SharedRecipe';
+import { RecipeProvider } from './context/RecipeContext';
 
 const App: React.FC = () => {
     const [user, setUser] = useState<any>(null);
@@ -45,35 +47,35 @@ const App: React.FC = () => {
     return (
         <PantryProvider>
             <ThemeProvider>
-                <Routes>
+                <RecipeProvider>
+                    <Routes>
 
-                    <Route path="/" element={<Layout/>}>
-                        <Route path="/" element={<Home/>}/>
-                        <Route path="/user" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
-                        <Route path="/search" element={<ProtectedRoute><SearchRecipes/></ProtectedRoute>}/>
-                        <Route path="/favorites" element={<ProtectedRoute><UserFavorites/></ProtectedRoute>}/>
-                        <Route path="/pantry" element={<ProtectedRoute><UserIngredients/></ProtectedRoute>}/>
-                        <Route path="/dietary-preferences"
-                            element={<ProtectedRoute><DietaryPreferences/></ProtectedRoute>}
-                        />
-                        <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
-                        <Route path="/history" element={<ProtectedRoute><RecipeHistory/></ProtectedRoute>}/>
-                        <Route path="/setup-profile" element={<ProtectedRoute><InitialProfileSetup/></ProtectedRoute>}/>
+                        <Route path="/" element={<Layout/>}>
+                            <Route path="/" element={<Home/>}/>
+                            <Route path="/recipe/:id" element={<SharedRecipe/>}/>
+                            <Route path="/user" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
+                            <Route path="/search" element={<ProtectedRoute><SearchRecipes/></ProtectedRoute>}/>
+                            <Route path="/favorites" element={<ProtectedRoute><UserFavorites/></ProtectedRoute>}/>
+                            <Route path="/pantry" element={<ProtectedRoute><UserIngredients/></ProtectedRoute>}/>
+                            <Route path="/dietary-preferences"
+                                element={<ProtectedRoute><DietaryPreferences/></ProtectedRoute>}
+                            />
+                            <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
+                            <Route path="/history" element={<ProtectedRoute><RecipeHistory/></ProtectedRoute>}/>
+                            <Route path="/setup-profile" element={<ProtectedRoute><InitialProfileSetup/></ProtectedRoute>}/>
 
-                    </Route>
+                        </Route>
 
-                    <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>}>
-                        <Route path="/login" element={<Login/>}/>
-                        <Route path="/signup" element={<SignUp/>}/>
-                        <Route path="/forgot-password" element={<ForgotPassword/>}/>
-                        <Route path="/reset-password" element={<ResetPassword/>}/>
-                    </Route>
+                        <Route path="/" element={<PublicRoute><LoginLayout/></PublicRoute>}>
+                            <Route path="/login" element={<Login/>}/>
+                            <Route path="/signup" element={<SignUp/>}/>
+                            <Route path="/forgot-password" element={<ForgotPassword/>}/>
+                            <Route path="/reset-password" element={<ResetPassword/>}/>
+                        </Route>
 
-                    <Route path="/">
-                    </Route>
-
-                </Routes>
-                <ChatBot />
+                    </Routes>
+                    <ChatBot />
+                </RecipeProvider>
             </ThemeProvider>
         </PantryProvider>
     );
@@ -115,8 +117,6 @@ export const PublicRoute = ({children}: any) => {
     }, []);
 
     if (loading) return <Loading/>;
-
-    if (user) return <Navigate to="/" replace/>;
 
     return children;
 };

@@ -24,16 +24,13 @@ const InitialProfileSetup: React.FC = () => {
     const handleGenerateAvatar = async () => {
         setLoading(true);
         try {
-            // First update the description
             await updateDescription(description);
             
-            // Then generate the avatar
             const response = await generateAvatar();
             const blob = new Blob([response], { type: 'image/jpeg' });
             const imageUrl = URL.createObjectURL(blob);
             setPreviewUrl(imageUrl);
             
-            // After successful generation, store the blob as File for later upload
             const avatarFile = new File([blob], 'generated-avatar.jpg', { type: 'image/jpeg' });
             setAvatar(avatarFile);
         } catch (error) {

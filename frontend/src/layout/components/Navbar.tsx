@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'firebase/auth';
 import { Moon, Sun, Search, UserRound, Settings, ShoppingBag, Star, Heart, History } from 'lucide-react';
@@ -7,6 +7,7 @@ import RecipesIcon from '../../assets/RecipesIcon';
 import { useTheme } from '../../context/ThemeContext';
 import { Recipe } from '../../model/Recipe';
 import ActiveRecipeTimer from "../../components/ActiveRecipeTimer";
+import { getAvatar } from "../../api/ForksUpAPI";
 
 interface NavbarProps {
     user: User | null;
@@ -28,9 +29,29 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
     const [searchTerm, setSearchTerm] = useState('');
     const [isPersonalized, setIsPersonalized] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
+    const [avatar, setAvatar] = useState<string | null>(null);
     const tooltipTimer = React.useRef<NodeJS.Timeout>();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchAvatar = async () => {
+            if (user) {
+                try {
+                    const avatarData = await getAvatar();
+                    if (avatarData) {
+                        const blob = new Blob([avatarData], { type: 'image/jpeg' });
+                        const imageUrl = URL.createObjectURL(blob);
+                        setAvatar(imageUrl);
+                    }
+                } catch (error) {
+                    console.error('Error fetching avatar:', error);
+                }
+            }
+        };
+
+        fetchAvatar();
+    }, [user]);
 
     const handleMouseEnter = () => {
         tooltipTimer.current = setTimeout(() => {
@@ -148,10 +169,18 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                         {user ? (
                             <div className="relative group">
                                 <div className="flex items-center space-x-3 cursor-pointer">
-                                    <div className="w-11 h-11 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center shadow-md">
-                                        <span className="text-purple-600 dark:text-purple-300 font-medium text-lg">
-                                            {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
-                                        </span>
+                                    <div className="w-11 h-11 rounded-full overflow-hidden bg-purple-100 dark:bg-purple-900 flex items-center justify-center shadow-md">
+                                        {avatar ? (
+                                            <img
+                                                src={avatar}
+                                                alt="Profile"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-purple-600 dark:text-purple-300 font-medium text-lg">
+                                                {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
 

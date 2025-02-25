@@ -53,7 +53,6 @@ const SearchRecipes: React.FC = () => {
 
         if (searchTerm == null && searchTag == null) {return}
 
-        // Combine URL tag parameter with selected tags from the component state
         const allTags = [...selectedTags];
         if (searchTag && !selectedTags.includes(searchTag)) {
             allTags.push(searchTag);
@@ -108,7 +107,6 @@ const SearchRecipes: React.FC = () => {
         }
     };
 
-    // Add this new useEffect for scrolling
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [page]);
@@ -118,7 +116,6 @@ const SearchRecipes: React.FC = () => {
     const handlePreviousPage = () => handlePageChange(page - 1);
     const handleNextPage = () => handlePageChange(page + 1);
 
-    // Generate page numbers to display
     const getPageNumbers = () => {
         const delta = 2; // Number of pages to show on each side of current page
         const range: (number | string)[] = [];
@@ -145,7 +142,6 @@ const SearchRecipes: React.FC = () => {
 
     const handleTagsChange = (newTags: string[]) => {
         setSelectedTags(newTags);
-        // Reset to first page when tags change
         setPage(0);
     };
 
@@ -251,8 +247,7 @@ const SearchRecipes: React.FC = () => {
                             </div>
                         )}
 
-                        {recipes.length > 0 && (
-                            // Recipe List Section
+                        {!(error || (!searchParams.get('q')?.trim() && !searchParams.get('tag')?.trim() && selectedTags.length === 0)) && recipes.length > 0 && (
                             <>
                                 {recipes.length > 0 && (
                                     <>

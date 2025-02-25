@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Close } from "@mui/icons-material";
-import { Star, UserRound, Users, Printer, PlayCircle, Timer } from "lucide-react";
-import { auth } from "../config/firebaseconfig";
+import { Star, Users, Printer, Timer, Share2 } from "lucide-react";
 import axios from "axios";
 import { Recipe } from "../model/Recipe";
-import {addFavorite, checkFavoriteStatus, removeFavorite, getPantryItems} from "../api/ForksUpAPI";
+import {addFavorite, checkFavoriteStatus, removeFavorite} from "../api/ForksUpAPI";
 import { getIngredientEmoji } from "../utils/ingredientEmojis";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePantry } from '../context/PantryContext';
+import { useNavigate } from 'react-router-dom';
+import { useRecipe } from '../context/RecipeContext';
 
 type RecipeDetailsProps = {
     recipe: Recipe;
     onClose: () => void;
     onStartRecipe?: (recipe: Recipe) => void;
+    isFullScreen?: boolean;
 };
 
 type YouTubeVideo = {
@@ -21,12 +23,14 @@ type YouTubeVideo = {
     thumbnail: string;
 };
 
-const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRecipe}) => {
+const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRecipe, isFullScreen = false}) => {
     const { pantryIngredients } = usePantry();
+    const { setCurrentRecipe } = useRecipe();
     const [isFavorite, setIsFavorite] = useState(false);
     const [videos, setVideos] = useState<YouTubeVideo[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const YOUTUBE_API_KEY = 'AIzaSyAOJIp4JcDsW--0SKq5pDhgrPG19DdcO30';
 
@@ -77,6 +81,11 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
 
         fetchYouTubeVideos();
     }, [recipe.id, recipe.name]);
+
+    useEffect(() => {
+        setCurrentRecipe(recipe);
+        return () => setCurrentRecipe(null);
+    }, [recipe, setCurrentRecipe]);
 
     // Add helper function to check pantry ingredients
     const isIngredientInPantry = (ingredientName: string) => {
@@ -160,17 +169,38 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
         onStartRecipe?.(recipe);
     };
 
+    const handleShare = async () => {
+        const recipeUrl = `${window.location.origin}/recipe/${recipe.id}`;
+        
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: recipe.name,
+                    text: recipe.description,
+                    url: recipeUrl
+                });
+            } catch (err) {
+                console.log('Error sharing:', err);
+            }
+        } else {
+            // Fallback to copying to clipboard
+            navigator.clipboard.writeText(recipeUrl);
+            // You might want to show a toast notification here
+        }
+    };
+
     return (
         <AnimatePresence>
             <motion.div
-                className="fixed inset-0 bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-50 flex items-center justify-center p-4 z-50"
+                className={`${isFullScreen ? '' : 'fixed inset-0 bg-black bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-50'} flex items-center justify-center p-4 z-50`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={onClose}
+                onClick={isFullScreen ? undefined : onClose}
             >
                 <motion.div
-                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-6xl w-full mx-4 max-h-[85vh] flex flex-row overflow-hidden relative"
+                    className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full mx-4 overflow-hidden relative flex
+                        ${isFullScreen ? 'max-w-8xl' : 'max-w-7xl max-h-[85vh]'}`}
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.95, opacity: 0, y: 10 }}
@@ -230,6 +260,15 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                                             title="Print Recipe"
                                         >
                                             <Printer className="w-7 h-7 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300" />
+                                        </motion.button>
+                                        <motion.button
+                                            onClick={handleShare}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                                            title="Share Recipe"
+                                        >
+                                            <Share2 className="w-7 h-7 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300" />
                                         </motion.button>
                                     </div>
                                 </div>
@@ -365,6 +404,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                             ))}
                         </div>
                     </motion.div>
+
                 </motion.div>
             </motion.div>
         </AnimatePresence>
