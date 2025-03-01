@@ -30,7 +30,9 @@
     "shareRecipe": "Share Recipe",
     "favoriteError": "Error updating favorite status",
     "copySuccess": "Recipe link copied to clipboard",
-    "shareError": "Error sharing recipe"
+    "shareError": "Error sharing recipe",
+    "reviews": "Reviews",
+    "noReviews": "No reviews yet"
   },
   "home": {
     "greetings": {
@@ -84,11 +86,72 @@
       "settings": "Settings",
       "logout": "Logout",
       "lightMode": "Light Mode",
-      "darkMode": "Dark Mode"
+      "darkMode": "Dark Mode",
+      "reviews": "Reviews"
     },
     "auth": {
       "login": "Login",
       "signup": "Sign Up"
+    }
+  },
+  "search": {
+    "error": "No recipes found",
+    "discoverTitle": "Discover Amazing Recipes",
+    "discoverDescription": "Search for recipes or explore our popular categories below",
+    "popularCategories": "Popular Categories",
+    "browseByMealType": "Browse by Meal Type",
+    "categories": {
+      "quickEasy": "Quick & Easy",
+      "quickEasyDesc": "Ready in 30 minutes or less",
+      "healthy": "Healthy",
+      "healthyDesc": "Nutritious and balanced meals",
+      "comfort": "Comfort Food",
+      "comfortDesc": "Hearty and satisfying dishes",
+      "desserts": "Desserts",
+      "dessertsDesc": "Sweet treats and baked goods",
+      "vegetarian": "Vegetarian",
+      "vegetarianDesc": "Meat-free delicious options",
+      "international": "International",
+      "internationalDesc": "Cuisines from around the world"
+    },
+    "mealTypes": {
+      "breakfast": "Breakfast & Brunch 🍳",
+      "lunch": "Lunch Ideas 🥪",
+      "dinner": "Quick Dinners 🍝",
+      "snacks": "Healthy Snacks 🥕",
+      "baking": "Weekend Baking 🥖",
+      "party": "Party Food 🎉"
+    }
+  },
+  "tagFilters": {
+    "title": "Filters",
+    "categories": {
+      "dietary_restrictions": "Dietary Restrictions",
+      "cuisines": "Cuisines",
+      "courses": "Courses",
+      "occasions": "Occasions",
+      "cooking_methods": "Cooking Methods",
+      "preparation_time": "Preparation Time"
+    },
+    "subcategories": {
+      "health_conscious": "Health Conscious",
+      "allergies_intolerances": "Allergies & Intolerances",
+      "lifestyle": "Lifestyle",
+      "asian": "Asian",
+      "european": "European",
+      "middle_eastern": "Middle Eastern",
+      "american": "American",
+      "african": "African",
+      "latin_american": "Latin American",
+      "main_dishes": "Main Dishes",
+      "appetizers_sides": "Appetizers & Sides",
+      "breakfast_brunch": "Breakfast & Brunch",
+      "desserts": "Desserts",
+      "beverages": "Beverages",
+      "holidays": "Holidays",
+      "special_occasions": "Special Occasions",
+      "techniques": "Techniques",
+      "equipment": "Equipment"
     }
   }
 }

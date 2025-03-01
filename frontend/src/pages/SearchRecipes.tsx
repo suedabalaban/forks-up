@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {useSearchParams, useOutletContext} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import RecipeCard from '../components/RecipeCard';
 import RecipeDetails from "../components/RecipeDetails";
 import LoadingPage from "./Loading";
@@ -14,6 +15,7 @@ interface OutletContextType {
 }
 
 const SearchRecipes: React.FC = () => {
+    const {t} = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -40,21 +42,21 @@ const SearchRecipes: React.FC = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const popularCategories = [
-        {name: 'Quick & Easy', icon: '⚡', description: 'Ready in 30 minutes or less'},
-        {name: 'Healthy', icon: '🥗', description: 'Nutritious and balanced meals'},
-        {name: 'Comfort Food', icon: '🍲', description: 'Hearty and satisfying dishes'},
-        {name: 'Desserts', icon: '🍰', description: 'Sweet treats and baked goods'},
-        {name: 'Vegetarian', icon: '🥬', description: 'Meat-free delicious options'},
-        {name: 'International', icon: '🌎', description: 'Cuisines from around the world'}
+        {name: t('search.categories.quickEasy'), icon: '⚡', description: t('search.categories.quickEasyDesc')},
+        {name: t('search.categories.healthy'), icon: '🥗', description: t('search.categories.healthyDesc')},
+        {name: t('search.categories.comfort'), icon: '🍲', description: t('search.categories.comfortDesc')},
+        {name: t('search.categories.desserts'), icon: '🍰', description: t('search.categories.dessertsDesc')},
+        {name: t('search.categories.vegetarian'), icon: '🥬', description: t('search.categories.vegetarianDesc')},
+        {name: t('search.categories.international'), icon: '🌎', description: t('search.categories.internationalDesc')}
     ];
 
     const mealTypes = [
-        'Breakfast & Brunch 🍳',
-        'Lunch Ideas 🥪',
-        'Quick Dinners 🍝',
-        'Healthy Snacks 🥕',
-        'Weekend Baking 🥖',
-        'Party Food 🎉'
+        t('search.mealTypes.breakfast'),
+        t('search.mealTypes.lunch'),
+        t('search.mealTypes.dinner'),
+        t('search.mealTypes.snacks'),
+        t('search.mealTypes.baking'),
+        t('search.mealTypes.party')
     ];
 
     const fetchRecipes = async (pageNumber = page) => {
@@ -165,7 +167,7 @@ const SearchRecipes: React.FC = () => {
                         {error && (
                             <div className="text-center text-gray-600 dark:text-gray-400 flex items-center justify-center mb-8">
                                 <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4">
-                                    <p className="text-red-600 dark:text-red-400">{error}</p>
+                                    <p className="text-red-600 dark:text-red-400">{t('search.error')}</p>
                                 </div>
                             </div>
                         )}
@@ -175,16 +177,16 @@ const SearchRecipes: React.FC = () => {
                             <div className="max-w-4xl mx-auto">
                                 <div className="text-center mb-12">
                                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                                        Discover Amazing Recipes
+                                        {t('search.discoverTitle')}
                                     </h1>
                                     <p className="text-gray-600 dark:text-gray-400 text-lg">
-                                        Search for recipes or explore our popular categories below
+                                        {t('search.discoverDescription')}
                                     </p>
                                 </div>
 
                                 <div className="mb-12">
                                     <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">
-                                        Popular Categories
+                                        {t('search.popularCategories')}
                                     </h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {popularCategories.map((category) => (
@@ -215,7 +217,7 @@ const SearchRecipes: React.FC = () => {
 
                                 <div>
                                     <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">
-                                        Browse by Meal Type
+                                        {t('search.browseByMealType')}
                                     </h2>
                                     <div className="flex flex-wrap gap-3">
                                         {mealTypes.map((type) => (

@@ -3,9 +3,9 @@ package com.example.forksup.service;
 import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.*;
 import com.example.forksup.repository.RecipeRepository;
+import com.example.forksup.repository.ReviewRepository;
 import com.example.forksup.repository.UserRepository;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,14 +21,25 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private RecipeRepository recipeRepository;
+    private final RecipeRepository recipeRepository;
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    private final ReviewRepository reviewRepository;
+
+    UserService(
+            UserRepository userRepository,
+            RecipeRepository recipeRepository,
+            RestTemplate restTemplate,
+            ReviewRepository reviewRepository
+    ) {
+        this.userRepository = userRepository;
+        this.recipeRepository = recipeRepository;
+        this.restTemplate = restTemplate;
+        this.reviewRepository = reviewRepository;
+    }
 
     public User getUserById(String id) {
         return userRepository.findById(new ObjectId(id)).orElseThrow(() ->

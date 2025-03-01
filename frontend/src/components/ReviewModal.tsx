@@ -169,7 +169,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ recipe, onClose }) => {
                     <textarea
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
-                        className="w-full p-3 border rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        className="w-full p-3 border rounded-lg bg-white dark:text-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                         rows={4}
                         placeholder="How did it turn out? Any tips for others?"
                     />

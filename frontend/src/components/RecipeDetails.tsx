@@ -3,7 +3,7 @@ import { Close } from "@mui/icons-material";
 import { Star, Users, Printer, Timer, Share2 } from "lucide-react";
 import axios from "axios";
 import { Recipe } from "../model/Recipe";
-import {addFavorite, checkFavoriteStatus, removeFavorite} from "../api/RecipeAPI";
+import {addFavorite, checkFavoriteStatus, removeFavorite, getRecipeReviews} from "../api/RecipeAPI";
 import { getIngredientEmoji } from "../utils/ingredientEmojis";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePantry } from '../context/PantryContext';
@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { useRecipe } from '../context/RecipeContext';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../context/NotificationContext';
+import ReviewCard from './ReviewCard';
+import ReviewModal from "./ReviewModal";
 
 type RecipeDetailsProps = {
     recipe: Recipe;
@@ -32,6 +34,8 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
     const [videos, setVideos] = useState<YouTubeVideo[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [showReviewModal, setShowReviewModal] = useState(false);
     const navigate = useNavigate();
     const { t } = useTranslation();
     const { showSuccess, showError } = useNotification();
@@ -84,6 +88,17 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
         };
 
         fetchYouTubeVideos();
+
+        const fetchReviews = async () => {
+            try {
+                const reviewData = await getRecipeReviews(recipe.id);
+                setReviews(reviewData);
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+            }
+        };
+
+        fetchReviews();
     }, [recipe.id, recipe.name]);
 
     useEffect(() => {
@@ -365,6 +380,40 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                                     ))}
                                 </ol>
                             </motion.div>
+
+                            {/* Reviews Section */}
+                            <motion.div
+                                className="mt-12"
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.6 }}
+                            >
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                                        <span>💬</span>
+                                        <span>{t('recipeDetails.reviews')}</span>
+                                    </h3>
+                                    <button
+                                        onClick={() => setShowReviewModal(true)}
+                                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm"
+                                    >
+                                        <span>Write Review</span>
+                                        <Star className="w-4 h-4" />
+                                    </button>
+                                </div>
+
+                                {reviews.length > 0 ? (
+                                    <div className="space-y-6">
+                                        {reviews.map((review, index) => (
+                                            <ReviewCard key={index} review={review} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                                        {t('recipeDetails.noReviews')}
+                                    </p>
+                                )}
+                            </motion.div>
                         </div>
                     </motion.div>
 
@@ -415,6 +464,25 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
 
                 </motion.div>
             </motion.div>
+            
+            {showReviewModal && (
+                <ReviewModal
+                    recipe={recipe}
+                    onClose={() => {
+                        setShowReviewModal(false);
+                        // Refresh reviews after submission
+                        const fetchReviews = async () => {
+                            try {
+                                const reviewData = await getRecipeReviews(recipe.id);
+                                setReviews(reviewData);
+                            } catch (error) {
+                                console.error('Error fetching reviews:', error);
+                            }
+                        };
+                        fetchReviews();
+                    }}
+                />
+            )}
         </AnimatePresence>
     );
 };

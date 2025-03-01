@@ -203,6 +203,10 @@ export const ingredientMap: { [key: string]: string } = {
     'fondue': '🫕',
     'falafel': '🧆',
     'tamale': '🫔',
+    'ice': '🧊',
+    'marshmallow': '🍡',
+    'cotton candy': '🍭',
+
 };
 
 export const getIngredientEmoji = (ingredient: string): string => {

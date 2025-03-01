@@ -5,6 +5,7 @@ import com.example.forksup.model.Recipe;
 import com.example.forksup.model.Review;
 import com.example.forksup.model.User;
 import com.example.forksup.repository.ReviewRepository;
+import com.example.forksup.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,19 +18,20 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     private final RecipeService recipeService;
 
-    ReviewService(ReviewRepository reviewRepository) {
+    ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, RecipeService recipeService) {
         this.reviewRepository = reviewRepository;
-        this.userService = new UserService();
-        this.recipeService = new RecipeService();
+        this.userRepository = userRepository;
+        this.recipeService = recipeService;
     }
 
     public Review addUserReview(String firebaseId, String recipeId, String comment, int rating, MultipartFile image) {
-        User user = userService.getUserByFirebaseID(firebaseId);
-        Recipe recipe = recipeService.getByRecipeId(recipeId);
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );        Recipe recipe = recipeService.getByRecipeId(recipeId);
 
         Review review;
         try {
@@ -45,6 +47,20 @@ public class ReviewService {
         return reviewRepository.findByRecipe_Id(new ObjectId(recipe.getId())).orElseThrow(
                 () -> new ResourceNotFoundException("Reviews not found")
         );
+    }
+
+    public List<Review> getReviewsByUser(String firebaseId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        return reviewRepository.getReviewsByUser(user);
+    }
+
+    public void deleteReviewForUser(String firebaseId, String reviewId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        reviewRepository.deleteReviewByUserAndId(user, new ObjectId(reviewId));
     }
 
 }

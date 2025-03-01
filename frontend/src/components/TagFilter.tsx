@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-// Type definitions for the tag structure
 interface TagStructure {
     dietary_restrictions: {
         health_conscious: string[];
@@ -44,6 +44,7 @@ type CategoryKey = keyof TagStructure;
 type SubcategoryKey<T> = T extends object ? keyof T : never;
 
 const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
+    const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
     const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
@@ -107,7 +108,7 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
                         : 'hover:bg-purple-50 dark:hover:bg-purple-600 text-gray-700 dark:text-gray-300 hover:shadow-sm'
                 }`}
             >
-                {tag.replace(/-/g, ' ')}
+                {t(`tagFilters.tags.${tag}`, tag.replace(/-/g, ' '))}
             </div>
         ));
     };
@@ -117,7 +118,6 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
         tags: string[],
         parentExpanded: boolean = true
     ): React.ReactNode => {
-        const displayName = name.replace(/_/g, ' ');
         const isExpanded = expandedSubcategories.has(name);
 
         return (
@@ -132,7 +132,7 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
                         <ChevronRight size={16} className="text-gray-500 dark:text-gray-400" />
                     )}
                     <span>
-                        {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
+                        {t(`tagFilters.subcategories.${name}`, name.replace(/_/g, ' '))}
                     </span>
                 </div>
                 <div className={`mt-2 transition-all duration-300 ${!isExpanded ? 'hidden' : ''}`}>
@@ -147,7 +147,6 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
         data: TagStructure[CategoryKey]
     ): React.ReactNode => {
         const isExpanded = expandedCategories.has(category);
-        const displayName = category.replace(/_/g, ' ');
 
         return (
             <div key={category} className="mb-6">
@@ -160,8 +159,8 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
                     ) : (
                         <ChevronRight size={20} className="text-purple-700 dark:text-purple-400" />
                     )}
-                    <span className="font-semibold text-purple-700 dark:text-purple-400">
-                        {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
+                    <span className="font-semibold text-purple-700 dark:text-gray-200">
+                        {t(`tagFilters.categories.${category}`, category.replace(/_/g, ' '))}
                     </span>
                 </div>
 
@@ -187,7 +186,9 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
     return (
         <div className="p-4 overflow-y-auto h-auto max-h-[110vh]">
             <div className="mb-6">
-                <h2 className="text-xl font-bold text-purple-700 dark:text-purple-400 mb-4">Filters</h2>
+                <h2 className="text-xl font-bold text-purple-700 dark:text-purple-400 mb-4">
+                    {t('tagFilters.title')}
+                </h2>
                 {selectedTags.size > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4 p-3 rounded-lg">
                         {Array.from(selectedTags).map(tag => (
@@ -196,7 +197,7 @@ const TagFilters: React.FC<TagFiltersProps> = ({ onTagsChange, tags }) => {
                                 onClick={() => handleTagClick(tag)}
                                 className="inline-flex items-center bg-blue-600 dark:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-sm cursor-pointer hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 shadow-sm"
                             >
-                                {tag.replace(/-/g, ' ')}
+                                {t(`tagFilters.tags.${tag}`, tag.replace(/-/g, ' '))}
                                 <span className="ml-2 text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-500">×</span>
                             </span>
                         ))}

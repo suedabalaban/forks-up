@@ -138,3 +138,32 @@ export const addUserPreferences = async (preferences: any) => {
         throw error;
     }
 };
+
+export const getUserReviews = async () => {
+    try {
+        const token = await getToken();
+        const response = await api.get('/user/review', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error getting user reviews:', error);
+        throw error;
+    }
+};
+
+export const deleteUserReview = async (reviewId: string) => {
+    try {
+        const token = await getToken();
+        await api.delete(`/user/review/${reviewId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    } catch (error) {
+        console.error('Error deleting review:', error);
+        throw error;
+    }
+};

@@ -9,9 +9,19 @@ const api = axios.create({
 });
 
 const getToken = async () => {
-    const token = await auth.currentUser?.getIdToken();
+    let token = await auth.currentUser?.getIdToken();
+    let attempts = 0;
+    const maxAttempts = 10;
+    const delayMs = 1000;
+
+    while (!token && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        token = await auth.currentUser?.getIdToken();
+        attempts++;
+    }
+
     if (!token) {
-        throw new Error('No authentication token available');
+        throw new Error('No authentication token available after multiple attempts');
     }
     return token;
 };

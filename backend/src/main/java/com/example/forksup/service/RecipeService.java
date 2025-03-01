@@ -36,7 +36,7 @@ public class RecipeService {
         Pageable pageable = PageRequest.of(page, size);
 
         String combinedText = combineSearchParameters(keyword, tags, ingredients);
-        int minScore = (int) combinedText.chars().filter(ch -> ch == ' ').count() * 7 + 20;
+        int minScore = (int) combinedText.chars().filter(ch -> ch == ' ').count() * 7;
         return recipeRepository.searchRecipesAdvanced(combinedText, minScore, pageable);
     }
 
@@ -91,7 +91,7 @@ public class RecipeService {
         }
 
         String combinedText = combineSearchParameters(keyword, tags, ingredients);
-        int minScore = (int) combinedText.chars().filter(ch -> ch == ' ').count() * 7 + 20;
+        int minScore = (int) combinedText.chars().filter(ch -> ch == ' ').count() * 7 ;
         return recipeRepository.searchRecipesAdvanced(combinedText, minScore,pageable);
     }
 

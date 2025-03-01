@@ -86,14 +86,13 @@ export const submitRecipeReview = async ({ recipeId, rating, comment, image }: a
     try {
         const token = await getToken();
         const formData = new FormData();
-        formData.append('recipeId', recipeId);
         formData.append('review', comment);
         formData.append('rating', rating.toString());
         if (image) {
             formData.append('image', image);
         }
 
-        const response = await api.post('/user/review', formData, {
+        const response = await api.post(`/recipes/${recipeId}/review`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "multipart/form-data",
@@ -206,5 +205,20 @@ export const getLastRecipeFromHistory = async () => {
     } catch (error) {
         console.error('Error retrieving last recipe history:', error);
         return null;
+    }
+};
+
+export const getRecipeReviews = async (recipeId: string) => {
+    try {
+        const token = await getToken();
+        const response = await api.get(`/recipes/${recipeId}/review`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error getting recipe reviews:', error);
+        throw error;
     }
 };

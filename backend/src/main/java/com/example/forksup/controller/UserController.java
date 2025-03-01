@@ -3,6 +3,7 @@ package com.example.forksup.controller;
 import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.*;
 import com.example.forksup.repository.UserRepository;
+import com.example.forksup.service.ReviewService;
 import com.example.forksup.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ReviewService reviewService;
 
     /**
      * Retrieves a user by their unique identifier.
@@ -319,6 +322,19 @@ public class UserController {
 
         userService.addDescription(uid, description);
         return new ResponseEntity<>(description, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/review")
+    public ResponseEntity<List<Review>> getReviewsByUser(HttpServletRequest request) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        return ResponseEntity.ok(reviewService.getReviewsByUser(uid));
+    }
+
+    @DeleteMapping(path = "/review/{reviewId}")
+    public ResponseEntity<Void> deleteReview(HttpServletRequest request, @PathVariable("reviewId") String reviewId) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        reviewService.deleteReviewForUser(uid, reviewId);
+        return ResponseEntity.noContent().build();
     }
 
 }

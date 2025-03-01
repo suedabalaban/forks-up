@@ -30,7 +30,9 @@
     "shareRecipe": "Tarifi Paylaş",
     "favoriteError": "Favori durumu güncellenirken hata oluştu",
     "copySuccess": "Tarif bağlantısı panoya kopyalandı",
-    "shareError": "Tarif paylaşılırken hata oluştu"
+    "shareError": "Tarif paylaşılırken hata oluştu",
+    "reviews": "Yorumlar",
+    "noReviews": "Henüz yorum yok"
   },
   "home": {
     "greetings": {
@@ -84,11 +86,72 @@
       "settings": "Ayarlar",
       "logout": "Çıkış Yap",
       "lightMode": "Aydınlık Mod",
-      "darkMode": "Karanlık Mod"
+      "darkMode": "Karanlık Mod",
+      "reviews": "Yorumlar"
     },
     "auth": {
       "login": "Giriş Yap",
       "signup": "Kayıt Ol"
+    }
+  },
+  "search": {
+    "error": "Tarif bulunamadı",
+    "discoverTitle": "Harika Tarifleri Keşfedin",
+    "discoverDescription": "Tarifleri arayın veya popüler kategorilerimizi keşfedin",
+    "popularCategories": "Popüler Kategoriler",
+    "browseByMealType": "Öğün Türüne Göre Göz At",
+    "categories": {
+      "quickEasy": "Pratik & Kolay",
+      "quickEasyDesc": "30 dakika veya daha kısa sürede hazır",
+      "healthy": "Sağlıklı",
+      "healthyDesc": "Besleyici ve dengeli öğünler",
+      "comfort": "Lezzet Şöleni",
+      "comfortDesc": "Doyurucu ve tatmin edici yemekler",
+      "desserts": "Tatlılar",
+      "dessertsDesc": "Tatlı atıştırmalıklar ve hamur işleri",
+      "vegetarian": "Vejetaryen",
+      "vegetarianDesc": "Etsiz lezzetli seçenekler",
+      "international": "Dünya Mutfağı",
+      "internationalDesc": "Dünya mutfağından lezzetler"
+    },
+    "mealTypes": {
+      "breakfast": "Kahvaltı & Brunch 🍳",
+      "lunch": "Öğle Yemeği Fikirleri 🥪",
+      "dinner": "Pratik Akşam Yemekleri 🍝",
+      "snacks": "Sağlıklı Atıştırmalıklar 🥕",
+      "baking": "Hafta Sonu Hamur İşleri 🥖",
+      "party": "Parti Yemekleri 🎉"
+    }
+  },
+  "tagFilters": {
+    "title": "Filtreler",
+    "categories": {
+      "dietary_restrictions": "Diyet Kısıtlamaları",
+      "cuisines": "Mutfaklar",
+      "courses": "Yemek Türleri",
+      "occasions": "Özel Günler",
+      "cooking_methods": "Pişirme Yöntemleri",
+      "preparation_time": "Hazırlama Süresi"
+    },
+    "subcategories": {
+      "health_conscious": "Sağlıklı Beslenme",
+      "allergies_intolerances": "Alerjiler & Hassasiyetler",
+      "lifestyle": "Yaşam Tarzı",
+      "asian": "Asya",
+      "european": "Avrupa",
+      "middle_eastern": "Orta Doğu",
+      "american": "Amerika",
+      "african": "Afrika",
+      "latin_american": "Latin Amerika",
+      "main_dishes": "Ana Yemekler",
+      "appetizers_sides": "Başlangıçlar & Yan Yemekler",
+      "breakfast_brunch": "Kahvaltı & Brunch",
+      "desserts": "Tatlılar",
+      "beverages": "İçecekler",
+      "holidays": "Tatiller",
+      "special_occasions": "Özel Günler",
+      "techniques": "Teknikler",
+      "equipment": "Ekipmanlar"
     }
   }
 }

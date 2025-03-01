@@ -26,6 +26,7 @@ import SharedRecipe from './pages/SharedRecipe';
 import { RecipeProvider } from './context/RecipeContext';
 import './i18n';
 import { NotificationProvider } from './context/NotificationContext';
+import UserReviews from './pages/UserReviews';
 
 const App: React.FC = () => {
     const [user, setUser] = useState<any>(null);
@@ -66,6 +67,7 @@ const App: React.FC = () => {
                                     <Route path="/settings" element={<ProtectedRoute><Settings/></ProtectedRoute>}/>
                                     <Route path="/history" element={<ProtectedRoute><RecipeHistory/></ProtectedRoute>}/>
                                     <Route path="/setup-profile" element={<ProtectedRoute><InitialProfileSetup/></ProtectedRoute>}/>
+                                    <Route path="/reviews" element={<ProtectedRoute><UserReviews/></ProtectedRoute>}/>
 
                                 </Route>
 

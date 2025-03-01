@@ -140,7 +140,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipes);
     }
 
-    @PostMapping(path = "/{recipeId}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/{recipeId}/review", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> addReview(
             HttpServletRequest request,
             @PathVariable("recipeId") String recipeId,
@@ -158,7 +158,7 @@ public class RecipeController {
         return ResponseEntity.ok(reviewService.addUserReview(uid, recipeId, review, ratingValue, image));
     }
 
-    @GetMapping("/{recipeId}/comment")
+    @GetMapping("/{recipeId}/review")
     public ResponseEntity<List<Review>> getReviewsByRecipe(
             @PathVariable("recipeId") String recipeId
     ) {

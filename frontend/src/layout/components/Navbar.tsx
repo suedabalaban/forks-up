@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'firebase/auth';
-import { Moon, Sun, Search, UserRound, Settings, ShoppingBag, Star, Heart, History } from 'lucide-react';
+import { Moon, Sun, Search, UserRound, Settings, ShoppingBag, Star, Heart, History, MessageSquare } from 'lucide-react';
 import Button from '@mui/material/Button';
 import RecipesIcon from '../../assets/RecipesIcon';
 import { useTheme } from '../../context/ThemeContext';
@@ -77,6 +77,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
         { icon: ShoppingBag, text: t('navbar.menu.pantry'), path: '/pantry' },
         { icon: Star, text: t('navbar.menu.favorites'), path: '/favorites' },
         { icon: History, text: t('navbar.menu.history'), path: '/history' },
+        { icon: MessageSquare, text: t('navbar.menu.reviews'), path: '/reviews' },
         { icon: Settings, text: t('navbar.menu.settings'), path: '/settings' },
     ];
 
