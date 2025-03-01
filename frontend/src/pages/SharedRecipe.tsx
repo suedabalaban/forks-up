@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import RecipeDetails from '../components/RecipeDetails';
-import { getRecipeById } from '../api/ForksUpAPI';
 import Loading from './Loading';
 import {Recipe} from "../model/Recipe";
+import {getRecipeById} from "../api/RecipeAPI";
 
 const SharedRecipe: React.FC = () => {
     const { id } = useParams();

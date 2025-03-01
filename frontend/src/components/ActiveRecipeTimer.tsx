@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, AlertCircle, Play, Pause } from 'lucide-react';
 import { Recipe } from '../model/Recipe';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import RecipeDetails from "./RecipeDetails";
 import { createPortal } from 'react-dom';
 import { getPreparationTimeFromTags } from '../utils/preparationTime';
-import { addToRecipeHistory, getRecipeHistory } from '../api/ForksUpAPI';
+import { addToRecipeHistory, getRecipeHistory } from '../api/RecipeAPI';
 import { RecipeHistory } from '../model/RecipeHistory';
 import { auth } from '../config/firebaseconfig';
 import ReviewModal from './ReviewModal';

@@ -1,23 +1,15 @@
 package com.example.forksup.service;
 
+import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.*;
-import com.example.forksup.repository.IngredientRepository;
-import com.example.forksup.repository.recipe.RecipeRepository;
-import com.example.forksup.repository.UserRepository;
+import com.example.forksup.repository.RecipeRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
@@ -26,13 +18,15 @@ public class RecipeService {
     private RecipeRepository recipeRepository;
 
     @Autowired
-    private IngredientRepository ingredientRepository;
-    @Autowired
     private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
 
-    public Page<Recipe> searchRecipes(
+    public Recipe getByRecipeId(String id) {
+        return recipeRepository.findById(new ObjectId(id)).orElseThrow(() ->
+                new ResourceNotFoundException("Recipe not found")
+        );
+    }
+
+    public Slice<Recipe> searchRecipes(
             String keyword,
             List<String> tags,
             List<String> ingredients,
@@ -40,14 +34,12 @@ public class RecipeService {
             int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Ingredient> ingredientIds = null;
-        if (ingredients != null && !ingredients.isEmpty()) {
-            ingredientIds = ingredientRepository.findIngredientsByNameIn(ingredients);
-        }
-        return recipeRepository.searchRecipes(keyword, tags, ingredientIds, null, pageable);
+
+        String combinedText = combineSearchParameters(keyword, tags, ingredients);
+        return recipeRepository.searchRecipesAdvanced(combinedText, pageable);
     }
 
-    public Page<Recipe> searchRecipesByPreferences(
+    public Slice<Recipe> searchRecipesByPreferences(
             String uid,
             String keyword,
             List<String> tags,
@@ -57,25 +49,22 @@ public class RecipeService {
     ) {
         Pageable pageable = PageRequest.of(page, size);
 
-        List<Ingredient> ingredientIds = new ArrayList<>();
-        if (ingredients != null && !ingredients.isEmpty()) {
-            ingredientIds = ingredientRepository.findIngredientsByNameIn(ingredients);
+        if (ingredients == null) {
+            ingredients = new ArrayList<>();
+        }
+
+        if (tags == null) {
+            tags = new ArrayList<>();
         }
 
         List<PantryItem> pantryItems = userService.getUserPantryItems(uid);
         Preferences preferences = userService.getUserPreferences(uid);
 
         if (pantryItems != null && !pantryItems.isEmpty()) {
-            ingredientIds.addAll(pantryItems.stream()
+            ingredients.addAll(pantryItems.stream()
                     .map(PantryItem::getIngredient)
+                    .map(Ingredient::getName)
                     .toList());
-        }
-
-        List<String> otherTags = new ArrayList<>();
-        List<String> cuisineTags = new ArrayList<>();
-
-        if (tags != null) {
-            otherTags.addAll(tags);
         }
 
         if (preferences != null) {
@@ -83,93 +72,51 @@ public class RecipeService {
                 DietaryRestrictions restrictions = preferences.getDietaryRestrictions();
 
                 if (restrictions.getHealthConscious() != null) {
-                    otherTags.addAll(restrictions.getHealthConscious());
+                    tags.addAll(restrictions.getHealthConscious());
                 }
 
                 if (restrictions.getAllergiesIntolerances() != null) {
-                    otherTags.addAll(restrictions.getAllergiesIntolerances());
+                    tags.addAll(restrictions.getAllergiesIntolerances());
                 }
 
                 if (restrictions.getLifestyle() != null) {
-                    otherTags.addAll(restrictions.getLifestyle());
+                    tags.addAll(restrictions.getLifestyle());
                 }
             }
 
             if (preferences.getCuisines() != null) {
-                cuisineTags.addAll(preferences.getCuisines());
+                tags.addAll(preferences.getCuisines());
             }
         }
 
-        return recipeRepository.searchRecipesWithPreferences(
-                keyword,
-                cuisineTags,
-                otherTags,
-                ingredientIds,
-                null,
-                pageable
-        );
+        String combinedText = combineSearchParameters(keyword, tags, ingredients);
+        return recipeRepository.searchRecipesAdvanced(combinedText, pageable);
     }
 
-    public Page<Recipe> searchRecipesByIngredientsMatch(
-            String uid,
-            String keyword,
-            List<String> tags,
-            List<String> ingredients,
-            int page,
-            int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
+    private String combineSearchParameters(String keyword, List<String> tags, List<String> ingredients) {
+        StringBuilder combinedText = new StringBuilder();
 
-        List<Ingredient> ingredientIds = new ArrayList<>();
-        if (ingredients != null && !ingredients.isEmpty()) {
-            ingredientIds = ingredientRepository.findIngredientsByNameIn(ingredients);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            combinedText.append(keyword.trim()).append(" ");
         }
-
-        List<PantryItem> pantryItems = userService.getUserPantryItems(uid);
-        Preferences preferences = userService.getUserPreferences(uid);
-
-        if (pantryItems != null && !pantryItems.isEmpty()) {
-            ingredientIds.addAll(pantryItems.stream()
-                    .map(PantryItem::getIngredient)
-                    .toList());
-        }
-
-        List<String> otherTags = new ArrayList<>();
-        List<String> cuisineTags = new ArrayList<>();
 
         if (tags != null) {
-            otherTags.addAll(tags);
-        }
-
-        if (preferences != null) {
-            if (preferences.getDietaryRestrictions() != null) {
-                DietaryRestrictions restrictions = preferences.getDietaryRestrictions();
-
-                if (restrictions.getHealthConscious() != null) {
-                    otherTags.addAll(restrictions.getHealthConscious());
+            for (String tag : tags) {
+                if (tag != null && !tag.trim().isEmpty()) {
+                    combinedText.append(tag.trim()).append(" ");
                 }
-
-                if (restrictions.getAllergiesIntolerances() != null) {
-                    otherTags.addAll(restrictions.getAllergiesIntolerances());
-                }
-
-                if (restrictions.getLifestyle() != null) {
-                    otherTags.addAll(restrictions.getLifestyle());
-                }
-            }
-
-            if (preferences.getCuisines() != null) {
-                cuisineTags.addAll(preferences.getCuisines());
             }
         }
 
-        return recipeRepository.searchRecipesWithIngredientsMatch(
-                keyword,
-                cuisineTags,
-                otherTags,
-                ingredientIds,
-                null,
-                pageable
-        );
+        if (ingredients != null) {
+            for (String ingredient : ingredients) {
+                if (ingredient != null && !ingredient.trim().isEmpty()) {
+                    combinedText.append(ingredient.trim()).append(" ");
+                }
+            }
+        }
+
+        return combinedText.toString().trim();
     }
+
 }

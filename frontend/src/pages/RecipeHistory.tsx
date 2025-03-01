@@ -3,9 +3,9 @@ import RecipeCard from "../components/RecipeCard";
 import RecipeDetails from "../components/RecipeDetails";
 import {Recipe} from "../model/Recipe";
 import {History} from "lucide-react";
-import {getRecipeHistory} from "../api/ForksUpAPI";
 import {Link, useOutletContext} from "react-router-dom";
 import {RecipeHistory as RecipeHistoryType} from "../model/RecipeHistory";
+import {getRecipeHistory} from "../api/RecipeAPI";
 
 interface OutletContextType {
     onStartRecipe: (recipe: Recipe) => void;

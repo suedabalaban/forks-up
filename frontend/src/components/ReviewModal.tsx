@@ -3,10 +3,12 @@ import {Star, Image as ImageIcon, X, Plus, Minus, Search, Trash2} from 'lucide-r
 import { Recipe } from '../model/Recipe';
 import { PantryItem } from '../model/PantryItem';
 import { Ingredient } from '../model/Ingredient';
-import {getPantryItems, updateQuantity, getIngredients, addIngredient, removeIngredient, submitRecipeReview} from '../api/ForksUpAPI';
 import { getIngredientEmoji } from '../utils/ingredientEmojis';
 import { measurementUnits, MeasurementUnit } from '../utils/MeasurementUnit';
 import {AnimatePresence, motion} from "framer-motion";
+import {addIngredient, getPantryItems, removeIngredient, updateQuantity} from "../api/PantryAPI";
+import {getIngredients} from "../api/IngredientAPI";
+import {submitRecipeReview} from "../api/RecipeAPI";
 
 interface ReviewModalProps {
     recipe: Recipe;

@@ -50,6 +50,9 @@ public class Recipe {
     @Field("search_terms")
     private List<String> searchTerms;
 
+    @Field("totalScore")
+    private String totalScore;
+
     public Recipe() {}
 
     public Recipe(ObjectId id, Long recipeId, String name, String description, List<Ingredient> ingredients,
@@ -165,6 +168,14 @@ public class Recipe {
 
     public void setSearchTerms(List<String> searchTerms) {
         this.searchTerms = searchTerms;
+    }
+
+    public String getTotalScore() {
+        return totalScore;
+    }
+
+    public void setTotalScore(String totalScore) {
+        this.totalScore = totalScore;
     }
 
 }

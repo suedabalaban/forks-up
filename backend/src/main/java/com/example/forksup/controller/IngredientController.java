@@ -1,8 +1,7 @@
 package com.example.forksup.controller;
 
 import com.example.forksup.model.Ingredient;
-import com.example.forksup.repository.IngredientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.forksup.service.IngredientService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,24 +14,15 @@ import java.util.List;
 @RequestMapping("/api/ingredients")
 public class IngredientController {
 
-    @Autowired
-    private IngredientRepository ingredientRepository;
+    private final IngredientService ingredientService;
 
-    /**
-     * Performs an intelligent search for ingredients based on user input.
-     * This endpoint implements a relevance-based search that:
-     * - Matches ingredients by name, description, or common aliases
-     * - Returns results sorted by relevance to the search keyword
-     * - Helps users find ingredients even with partial or approximate matches
-     *
-     * @param keyword The search term to match against ingredients
-     * @return ResponseEntity containing:
-     *         - List of matching Ingredient objects sorted by relevance
-     *         - Empty list if no matches found
-     */
+    IngredientController(IngredientService ingredientService) {
+        this.ingredientService = ingredientService;
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<Ingredient>> searchIngredients(@RequestParam String keyword) {
-        List<Ingredient> ingredients = ingredientRepository.findByKeywordSortedByRelevance(keyword);
+        List<Ingredient> ingredients = ingredientService.findByIngredientName(keyword);
         return ResponseEntity.ok(ingredients);
     }
 

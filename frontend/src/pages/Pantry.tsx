@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import {Search, Plus, Minus, Trash2, X} from 'lucide-react';
 import {PantryItem} from "../model/PantryItem";
 import {Ingredient} from "../model/Ingredient";
-import {addIngredient, getIngredients, getPantryItems, removeIngredient} from "../api/ForksUpAPI";
 import { getIngredientEmoji } from '../utils/ingredientEmojis';
 import { measurementUnits, MeasurementUnit } from '../utils/MeasurementUnit';
 import {AnimatePresence, motion} from 'framer-motion';
+import {addIngredient, getPantryItems, removeIngredient} from "../api/PantryAPI";
+import {getIngredients} from "../api/IngredientAPI";
 
 const Pantry = () => {
     const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);

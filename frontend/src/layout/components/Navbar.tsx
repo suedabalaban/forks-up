@@ -7,7 +7,8 @@ import RecipesIcon from '../../assets/RecipesIcon';
 import { useTheme } from '../../context/ThemeContext';
 import { Recipe } from '../../model/Recipe';
 import ActiveRecipeTimer from "../../components/ActiveRecipeTimer";
-import { getAvatar } from "../../api/ForksUpAPI";
+import { useTranslation } from 'react-i18next';
+import {getAvatar} from "../../api/UserAPI";
 
 interface NavbarProps {
     user: User | null;
@@ -17,15 +18,8 @@ interface NavbarProps {
     onCloseTimer: () => void;
 }
 
-const menuItems = [
-    { icon: UserRound, text: 'Profile', path: '/user' },
-    { icon: ShoppingBag, text: 'Pantry', path: '/pantry' },
-    { icon: Star, text: 'Favorites', path: '/favorites' },
-    { icon: History, text: 'History', path: '/history' },
-    { icon: Settings, text: 'Settings', path: '/settings' },
-];
-
 const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTimerClick, onCloseTimer }) => {
+    const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
     const [isPersonalized, setIsPersonalized] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
@@ -78,6 +72,14 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
         }
     };
 
+    const menuItems = [
+        { icon: UserRound, text: t('navbar.menu.profile'), path: '/user' },
+        { icon: ShoppingBag, text: t('navbar.menu.pantry'), path: '/pantry' },
+        { icon: Star, text: t('navbar.menu.favorites'), path: '/favorites' },
+        { icon: History, text: t('navbar.menu.history'), path: '/history' },
+        { icon: Settings, text: t('navbar.menu.settings'), path: '/settings' },
+    ];
+
     return (
         <nav className="bg-white dark:bg-gray-900 shadow-lg">
             <div className="max-w-7xl mx-auto px-6">
@@ -101,7 +103,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                     type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="Search recipes..."
+                                    placeholder={t('navbar.search.placeholder')}
                                     className="w-full px-5 py-2.5 pr-14 rounded-full border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300"
                                 />
                                 <button
@@ -130,7 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                                 : 'fill-none stroke-current'
                                         }`}
                                     />
-                                    For You
+                                    {t('navbar.search.forYou')}
                                 </button>
 
                                 {showTooltip && (
@@ -140,15 +142,15 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                             <div className="space-y-2">
                                                 <p className="flex items-center gap-2">
                                                     <span>🎯</span>
-                                                    <span>Shows personalized recipe recommendations</span>
+                                                    <span>{t('navbar.search.personalizationTooltip.title1')}</span>
                                                 </p>
                                                 <p className="flex items-center gap-2">
                                                     <span>🥘</span>
-                                                    <span>Based on your dietary preferences</span>
+                                                    <span>{t('navbar.search.personalizationTooltip.title2')}</span>
                                                 </p>
                                                 <p className="flex items-center gap-2">
                                                     <span>🧺</span>
-                                                    <span>Uses ingredients from your pantry</span>
+                                                    <span>{t('navbar.search.personalizationTooltip.title3')}</span>
                                                 </p>
                                             </div>
                                         </div>
@@ -209,12 +211,12 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                         {theme === 'dark' ? (
                                             <>
                                                 <Sun className="w-5 h-5 mr-3 text-yellow-500" />
-                                                <span>Light Mode</span>
+                                                <span>{t('navbar.menu.lightMode')}</span>
                                             </>
                                         ) : (
                                             <>
                                                 <Moon className="w-5 h-5 mr-3 text-gray-500" />
-                                                <span>Dark Mode</span>
+                                                <span>{t('navbar.menu.darkMode')}</span>
                                             </>
                                         )}
                                     </button>
@@ -223,7 +225,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                             onClick={handleLogout}
                                             className="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                                         >
-                                            Logout
+                                            {t('navbar.menu.logout')}
                                         </button>
                                     </div>
                                 </div>
@@ -235,7 +237,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                         variant="outlined"
                                         className="!text-purple-600 dark:!text-purple-400 !border-purple-600 dark:!border-purple-400 hover:!bg-purple-50 dark:hover:!bg-purple-900/20 !px-6 !py-2 !rounded-full !transition-all !duration-300"
                                     >
-                                        Login
+                                        {t('navbar.auth.login')}
                                     </Button>
                                 </Link>
                                 <Link to="/signup">
@@ -243,7 +245,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, handleLogout, activeRecipe, onTim
                                         variant="contained"
                                         className="!bg-purple-600 dark:!bg-purple-500 hover:!bg-purple-700 dark:hover:!bg-purple-600 !text-white !px-6 !py-2.5 !rounded-full !transition-all !duration-300"
                                     >
-                                        Sign Up
+                                        {t('navbar.auth.signup')}
                                     </Button>
                                 </Link>
                             </div>

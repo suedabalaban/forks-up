@@ -6,8 +6,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LogoutModal from './components/LogoutModal';
 import { Recipe } from '../model/Recipe';
-import { getRecipeHistory, getLastRecipeFromHistory } from '../api/ForksUpAPI';
 import { getPreparationTimeFromTags } from '../utils/preparationTime';
+import {getLastRecipeFromHistory} from "../api/RecipeAPI";
 
 const Layout: React.FC = () => {
     const [user, setUser] = useState<User | null>(() => {

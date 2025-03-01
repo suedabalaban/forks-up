@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import tagsData from "../assets/tags.json";
 import { ChevronLeft, ChevronRight, Edit, ChevronDown, ChevronUp } from 'lucide-react';
-import { addUserPreferences, getUserPreferences } from "../api/ForksUpAPI";
+import {addUserPreferences, getUserPreferences} from "../api/UserAPI";
 
 export interface DietaryPreferencesState {
   health_conscious: string[];

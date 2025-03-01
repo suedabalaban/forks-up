@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getPantryItems } from '../api/ForksUpAPI';
 import { auth } from '../config/firebaseconfig';
+import {getPantryItems} from "../api/PantryAPI";
 
 interface PantryContextType {
     pantryIngredients: string[];
@@ -36,7 +36,6 @@ export const PantryProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
 
     useEffect(() => {
-        // Listen for auth state changes
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
                 refreshPantry();

@@ -1,0 +1,94 @@
+{
+  "chatbot": {
+    "welcome": "Welcome! Please select a recipe first to ask questions about it.",
+    "initialMessage": "Current Recipe: {{recipeName}}\n\nI can help you with:\n- Ingredient substitutions\n- Cooking techniques\n- Step explanations\n\nWhat would you like to know?",
+    "selectRecipe": "Please select a recipe first to ask questions about it.",
+    "error": "I apologize, but I encountered an error. Please try again later.",
+    "title": "AI Assistant",
+    "suggestedQuestions": "Suggested Questions",
+    "typePlaceholder": "Type a message...",
+    "selectRecipePlaceholder": "Select a recipe to start chatting"
+  },
+  "profile": {
+    "languageSettings": "Language Settings",
+    "selectLanguage": "Select Language",
+    "english": "English",
+    "turkish": "Turkish",
+    "languageChangeSuccess": "Language changed successfully"
+  },
+  "recipeDetails": {
+    "ingredients": "Ingredients",
+    "instructions": "Instructions",
+    "serves": "Serves",
+    "relatedVideos": "Related Videos",
+    "loadingVideos": "Loading videos...",
+    "videoError": "Failed to load related videos",
+    "startCooking": "Start Cooking",
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites",
+    "printRecipe": "Print Recipe",
+    "shareRecipe": "Share Recipe",
+    "favoriteError": "Error updating favorite status",
+    "copySuccess": "Recipe link copied to clipboard",
+    "shareError": "Error sharing recipe"
+  },
+  "home": {
+    "greetings": {
+      "morning": "Good Morning! 🌟",
+      "afternoon": "Good Afternoon! 🌟",
+      "evening": "Good Evening! 🌟",
+      "night": "Good Night! 🌟"
+    },
+    "descriptions": {
+      "morning": "Rise and shine! Discover perfect breakfast ideas",
+      "afternoon": "Fuel your day with delicious creations",
+      "evening": "Craft memorable dinners with our recipes",
+      "night": "Late-night culinary inspiration awaits"
+    },
+    "exploreButton": "Explore Recipes →",
+    "categories": "Categories",
+    "categoryNames": {
+      "breakfast": "Breakfast",
+      "main-dish": "Main Courses",
+      "salads": "Salads",
+      "desserts": "Desserts",
+      "beverages": "Beverages",
+      "snacks": "Snacks"
+    },
+    "featuredRecipes": "Featured Recipes",
+    "recipeInfo": {
+      "serves": "Serves",
+      "time": "Time",
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      }
+    }
+  },
+  "navbar": {
+    "search": {
+      "placeholder": "Search recipes...",
+      "forYou": "For You",
+      "personalizationTooltip": {
+        "title1": "Shows personalized recipe recommendations",
+        "title2": "Based on your dietary preferences",
+        "title3": "Uses ingredients from your pantry"
+      }
+    },
+    "menu": {
+      "profile": "Profile",
+      "pantry": "Pantry",
+      "favorites": "Favorites",
+      "history": "History",
+      "settings": "Settings",
+      "logout": "Logout",
+      "lightMode": "Light Mode",
+      "darkMode": "Dark Mode"
+    },
+    "auth": {
+      "login": "Login",
+      "signup": "Sign Up"
+    }
+  }
+}

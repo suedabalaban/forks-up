@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChefHat, Clock, Users, Sun, Moon, Cloud, Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Home: React.FC = () => {
+    const { t } = useTranslation();
     const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
 
     useEffect(() => {
@@ -46,7 +48,7 @@ const Home: React.FC = () => {
             title: "Homemade Pizza",
             image: "https://images.unsplash.com/photo-1513104890138-7c749659a591",
             time: "45 min",
-            difficulty: "Medium",
+            difficulty: t('home.recipeInfo.difficulty.medium'),
             servings: 4
         },
         {
@@ -68,12 +70,12 @@ const Home: React.FC = () => {
     ];
 
     const tags = [
-        { name: "breakfast", displayName: "Breakfast", icon: "🍳" },
-        { name: "main-dish", displayName: "Main Courses", icon: "🍖" },
-        { name: "salads", displayName: "Salads", icon: "🥗" },
-        { name: "desserts", displayName: "Desserts", icon: "🍰" },
-        { name: "beverages", displayName: "Beverages", icon: "🥤" },
-        { name: "snacks", displayName: "Snacks", icon: "🥨" }
+        { name: "breakfast", displayName: t('home.categoryNames.breakfast'), icon: "🍳" },
+        { name: "main-dish", displayName: t('home.categoryNames.main-dish'), icon: "🍖" },
+        { name: "salads", displayName: t('home.categoryNames.salads'), icon: "🥗" },
+        { name: "desserts", displayName: t('home.categoryNames.desserts'), icon: "🍰" },
+        { name: "beverages", displayName: t('home.categoryNames.beverages'), icon: "🥤" },
+        { name: "snacks", displayName: t('home.categoryNames.snacks'), icon: "🥨" }
     ];
 
     return (
@@ -88,17 +90,14 @@ const Home: React.FC = () => {
                             ? 'text-gray-800 dark:text-white/90'
                             : 'text-white dark:text-white/90'
                     }`}>
-                        Good {timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1)}! 🌟
+                        {t(`home.greetings.${timeOfDay}`)}
                     </h1>
                     <p className={`text-xl mb-8 ${
                         ['morning', 'afternoon'].includes(timeOfDay)
                             ? 'text-gray-700/95 dark:text-gray-300/90'
                             : 'text-white/90 dark:text-gray-300/90'
                     }`}>
-                        {timeOfDay === 'morning' && 'Rise and shine! Discover perfect breakfast ideas'}
-                        {timeOfDay === 'afternoon' && 'Fuel your day with delicious creations'}
-                        {timeOfDay === 'evening' && 'Craft memorable dinners with our recipes'}
-                        {timeOfDay === 'night' && 'Late-night culinary inspiration awaits'}
+                        {t(`home.descriptions.${timeOfDay}`)}
                     </p>
                     <Link to="/search" className={`inline-block px-8 py-4 rounded-xl transition-all
                                     duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-lg
@@ -107,7 +106,7 @@ const Home: React.FC = () => {
                             ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white/95 hover:from-purple-700 hover:to-blue-600'
                             : 'bg-gradient-to-r from-purple-400 to-blue-300 text-gray-800 hover:from-purple-300 hover:to-blue-200'
                     }`}>
-                        Explore Recipes →
+                        {t('home.exploreButton')}
                     </Link>
                 </div>
 
@@ -122,7 +121,9 @@ const Home: React.FC = () => {
 
             {/* Enhanced Categories */}
             <section className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-800 dark:text-white/90 mb-8">Categories</h2>
+                <h2 className="text-3xl font-bold text-gray-800 dark:text-white/90 mb-8">
+                    {t('home.categories')}
+                </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
                     {tags.map((tag) => (
                         <Link to={`/search?tag=${tag.name}`} key={tag.name}
@@ -144,7 +145,9 @@ const Home: React.FC = () => {
 
             {/* Enhanced Featured Recipes */}
             <section>
-                <h2 className="text-3xl font-bold text-gray-800 dark:text-white/90 mb-8">Featured Recipes</h2>
+                <h2 className="text-3xl font-bold text-gray-800 dark:text-white/90 mb-8">
+                    {t('home.featuredRecipes')}
+                </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {featuredRecipes.map((recipe) => (
                         <div key={recipe.id}
@@ -163,7 +166,7 @@ const Home: React.FC = () => {
                                 <div className="flex items-center justify-between text-sm text-gray-700/90 dark:text-gray-400/90">
                                     <div className="flex items-center space-x-1.5">
                                         <Clock size={18} className="text-purple-600 dark:text-purple-400"/>
-                                        <span>{recipe.time}</span>
+                                        <span>{t('home.recipeInfo.time')}: {recipe.time}</span>
                                     </div>
                                     <div className="flex items-center space-x-1.5">
                                         <ChefHat size={18} className="text-emerald-600 dark:text-emerald-400"/>
@@ -171,7 +174,7 @@ const Home: React.FC = () => {
                                     </div>
                                     <div className="flex items-center space-x-1.5">
                                         <Users size={18} className="text-amber-600 dark:text-amber-400"/>
-                                        <span>{recipe.servings}</span>
+                                        <span>{t('home.recipeInfo.serves')} {recipe.servings}</span>
                                     </div>
                                 </div>
                             </div>

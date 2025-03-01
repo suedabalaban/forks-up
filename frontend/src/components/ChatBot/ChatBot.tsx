@@ -1,29 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { MessageSquare, X, Send } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { MessageSquare, X, Send, ChevronDown, ChevronUp } from 'lucide-react';
 import { useRecipe } from '../../context/RecipeContext';
-import { getPredefinedQuestions, analyzeRecipe } from '../../api/ForksUpAPI';
+import { getPredefinedQuestions, analyzeRecipe } from '../../api/GeminiAPI';
+import { useTranslation } from 'react-i18next';
 
 const ChatBot: React.FC = () => {
+    const { t } = useTranslation();
     const { currentRecipe, chatHistory, addChatMessage } = useRecipe();
     const [isOpen, setIsOpen] = useState(false);
     const [inputMessage, setInputMessage] = useState('');
     const [predefinedQuestions, setPredefinedQuestions] = useState<string[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Load predefined questions when chat opens
+    const currentMessages = currentRecipe 
+        ? chatHistory[currentRecipe.id] || []
+        : chatHistory['no-recipe'] || [];
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [currentMessages]);
+
     useEffect(() => {
         if (isOpen) {
             loadPredefinedQuestions();
         }
     }, [isOpen]);
 
-    // Set initial message when recipe changes
     useEffect(() => {
-        if (currentRecipe && isOpen && (!chatHistory[currentRecipe.id] || chatHistory[currentRecipe.id].length === 0)) {
-            const initialMessage = {
-                text: `Current Recipe: ${currentRecipe.name}\n\nI can help you with:\n- Ingredient substitutions\n- Cooking techniques\n- Step explanations\n\nWhat would you like to know?`,
-                isUser: false
-            };
-            addChatMessage(currentRecipe.id, initialMessage);
+        if (isOpen) {
+            if (!currentRecipe) {
+                addChatMessage('no-recipe', {
+                    text: t('chatbot.welcome'),
+                    isUser: false
+                });
+            } else if (!chatHistory[currentRecipe.id] || chatHistory[currentRecipe.id].length === 0) {
+                const initialMessage = {
+                    text: t('chatbot.initialMessage', { recipeName: currentRecipe.name }),
+                    isUser: false
+                };
+                addChatMessage(currentRecipe.id, initialMessage);
+            }
         }
     }, [currentRecipe, isOpen]);
 
@@ -38,10 +59,20 @@ const ChatBot: React.FC = () => {
 
     const handleQuestionClick = (question: string) => {
         handleSubmit(question);
+        setShowSuggestions(false);
     };
 
     const handleSubmit = async (text: string) => {
-        if (!text.trim() || !currentRecipe) return;
+        if (!currentRecipe) {
+            addChatMessage('no-recipe', {
+                text: t('chatbot.selectRecipe'),
+                isUser: false
+            });
+            setInputMessage('');
+            return;
+        }
+        
+        if (!text.trim()) return;
 
         const userMessage = { text, isUser: true };
         addChatMessage(currentRecipe.id, userMessage);
@@ -56,14 +87,13 @@ const ChatBot: React.FC = () => {
             addChatMessage(currentRecipe.id, botMessage);
         } catch (error) {
             const errorMessage = {
-                text: "I apologize, but I encountered an error. Please try again later.",
+                text: t('chatbot.error'),
                 isUser: false
             };
             addChatMessage(currentRecipe.id, errorMessage);
         }
     };
 
-    const currentMessages = currentRecipe ? chatHistory[currentRecipe.id] || [] : [];
 
     return (
         <div className="fixed bottom-6 right-6 z-50">
@@ -72,7 +102,7 @@ const ChatBot: React.FC = () => {
                     <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-4 flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white">
                             <MessageSquare size={20} />
-                            <span className="font-semibold">AI Assistant</span>
+                            <span className="font-semibold">{t('chatbot.title')}</span>
                         </div>
                         <button 
                             onClick={() => setIsOpen(false)}
@@ -82,7 +112,7 @@ const ChatBot: React.FC = () => {
                         </button>
                     </div>
                     
-                    <div className="h-80 overflow-y-auto p-4 space-y-4">
+                    <div className="h-80 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                         {currentMessages.map((message, index) => (
                             <div key={index} 
                                 className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
@@ -95,25 +125,38 @@ const ChatBot: React.FC = () => {
                                 </div>
                             </div>
                         ))}
+                        <div ref={messagesEndRef} /> {/* Scroll anchor */}
                     </div>
 
-                    {/* Predefined Questions Section */}
-                    {predefinedQuestions.length > 0 && (
-                        <div className="p-2 border-t dark:border-gray-700">
-                            <div className="flex flex-wrap gap-2">
-                                {predefinedQuestions.map((question, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleQuestionClick(question)}
-                                        className="text-sm bg-gray-100 dark:bg-gray-700 
-                                                text-gray-800 dark:text-gray-200 px-3 py-1 
-                                                rounded-full hover:bg-gray-200 
-                                                dark:hover:bg-gray-600 transition-colors"
-                                    >
-                                        {question}
-                                    </button>
-                                ))}
-                            </div>
+                    {/* Only show predefined questions if a recipe is selected */}
+                    {currentRecipe && predefinedQuestions.length > 0 && (
+                        <div className="border-t dark:border-gray-700">
+                            <button
+                                onClick={() => setShowSuggestions(!showSuggestions)}
+                                className="w-full p-2 flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                            >
+                                <span>{t('chatbot.suggestedQuestions')}</span>
+                                {showSuggestions ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                            </button>
+                            
+                            {showSuggestions && (
+                                <div className="p-2 max-h-40 overflow-y-auto">
+                                    <div className="flex flex-col gap-2">
+                                        {predefinedQuestions.map((question, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => handleQuestionClick(question)}
+                                                className="text-left text-sm bg-gray-100 dark:bg-gray-700 
+                                                        text-gray-800 dark:text-gray-200 px-3 py-2 
+                                                        rounded-lg hover:bg-gray-200 
+                                                        dark:hover:bg-gray-600 transition-colors"
+                                            >
+                                                {question}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -126,15 +169,19 @@ const ChatBot: React.FC = () => {
                                 type="text"
                                 value={inputMessage}
                                 onChange={(e) => setInputMessage(e.target.value)}
-                                placeholder="Type a message..."
+                                placeholder={currentRecipe ? t('chatbot.typePlaceholder') : t('chatbot.selectRecipePlaceholder')}
+                                disabled={!currentRecipe}
                                 className="flex-1 rounded-lg px-4 py-2 bg-gray-100 dark:bg-gray-700 
                                         text-gray-800 dark:text-gray-200 focus:outline-none
-                                        focus:ring-2 focus:ring-purple-500"
+                                        focus:ring-2 focus:ring-purple-500 disabled:opacity-50
+                                        disabled:cursor-not-allowed"
                             />
                             <button 
                                 type="submit"
+                                disabled={!currentRecipe}
                                 className="bg-gradient-to-r from-purple-600 to-blue-500 text-white 
-                                        p-2 rounded-lg hover:opacity-90 transition-opacity"
+                                        p-2 rounded-lg hover:opacity-90 transition-opacity
+                                        disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Send size={20} />
                             </button>

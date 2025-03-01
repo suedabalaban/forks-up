@@ -7,7 +7,6 @@ import com.example.forksup.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,22 +78,6 @@ public class UserController {
     }
 
     /**
-     * Checks if a specific recipe is in the user's favorites list.
-     * This is a utility endpoint that helps frontend determine if a recipe
-     * should be displayed as favorited or not.
-     *
-     * @param request HTTP request containing user session
-     * @param recipeId The unique identifier of the recipe to check
-     * @return ResponseEntity with boolean indicating if recipe is favorited
-     */
-    @GetMapping("/favorite/{recipeId}")
-    public ResponseEntity<Boolean> isRecipeInFavorites(HttpServletRequest request, @PathVariable String recipeId) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        boolean isFavorite = userService.isRecipeInFavorites(uid, recipeId);
-        return ResponseEntity.ok(isFavorite);
-    }
-
-    /**
      * Adds a recipe to the user's favorites collection.
      * This endpoint manages the many-to-many relationship between users and their
      * favorite recipes.
@@ -127,6 +110,22 @@ public class UserController {
     }
 
     /**
+     * Checks if a specific recipe is in the user's favorites list.
+     * This is a utility endpoint that helps frontend determine if a recipe
+     * should be displayed as favorited or not.
+     *
+     * @param request HTTP request containing user session
+     * @param recipeId The unique identifier of the recipe to check
+     * @return ResponseEntity with boolean indicating if recipe is favorited
+     */
+    @GetMapping("/favorite/{recipeId}")
+    public ResponseEntity<Boolean> isRecipeInFavorites(HttpServletRequest request, @PathVariable String recipeId) {
+        String uid = (String) request.getSession().getAttribute("uid");
+        boolean isFavorite = userService.isRecipeInFavorites(uid, recipeId);
+        return ResponseEntity.ok(isFavorite);
+    }
+
+    /**
      * Retrieves all recipes that the user has marked as favorites.
      * This endpoint performs a join operation between user favorites and recipe data
      * to return complete recipe information for each favorite.
@@ -139,82 +138,6 @@ public class UserController {
         String uid = (String) request.getSession().getAttribute("uid");
         List<Recipe> recipes = userService.getFavoriteRecipes(uid);
         return new ResponseEntity<>(recipes, null, HttpStatus.OK);
-    }
-
-    /**
-     * Retrieves the user's virtual pantry containing all stored ingredients.
-     * The pantry is a persistent storage of ingredients that the user has available
-     * for cooking, including their quantities.
-     *
-     * @param request HTTP request containing user session
-     * @return ResponseEntity with List of PantryItem objects
-     */
-    @GetMapping(path = "/pantry")
-    public ResponseEntity<List<PantryItem>> getUserPantry(HttpServletRequest request) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        List<PantryItem> pantryItems = userService.getUserPantryItems(uid);
-        return ResponseEntity.ok(pantryItems);
-    }
-
-    /**
-     * Adds a new ingredient to the user's pantry with specified quantity.
-     * This endpoint creates a new pantry entry if the ingredient doesn't exist,
-     * managing the relationship between users and their available ingredients.
-     *
-     * @param request HTTP request containing user session
-     * @param ingredientId Unique identifier of the ingredient
-     * @param quantity Amount of the ingredient to add
-     * @return ResponseEntity with HTTP 201 (CREATED) on successful addition
-     */
-    @PostMapping(path = "/pantry")
-    public ResponseEntity<Void> addIngredientToPantry(
-            HttpServletRequest request,
-            @RequestParam String ingredientId,
-            @RequestParam Integer quantity,
-            @RequestParam String unit
-    ) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        userService.addIngredientToPantry(uid, ingredientId, quantity, unit);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    /**
-     * Updates the quantity of an existing ingredient in the user's pantry.
-     * This endpoint modifies the amount of an ingredient without changing other
-     * properties or relationships.
-     *
-     * @param request HTTP request containing user session
-     * @param ingredientId Unique identifier of the ingredient
-     * @param quantity New quantity to set
-     * @return ResponseEntity with updated PantryItem
-     */
-    @PutMapping(path = "/pantry/{ingredientId}")
-    public ResponseEntity<PantryItem> updateIngredientQuantity(
-            HttpServletRequest request,
-            @PathVariable String ingredientId,
-            @RequestParam Integer quantity,
-            @RequestParam String unit) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        PantryItem updatedItem = userService.updateIngredientQuantity(uid, ingredientId, quantity, unit);
-        return ResponseEntity.ok(updatedItem);
-    }
-
-    /**
-     * Removes an ingredient entirely from the user's pantry.
-     * This endpoint deletes the association between user and ingredient in the pantry,
-     * typically used when an ingredient is depleted or no longer needed.
-     *
-     * @param request HTTP request containing user session
-     * @param ingredientId Unique identifier of the ingredient to remove
-     * @return ResponseEntity with HTTP 204 (NO_CONTENT) on successful removal
-     */
-    @DeleteMapping(path = "/pantry/{ingredientId}")
-    public ResponseEntity<Void> removeIngredientFromPantry(
-            HttpServletRequest request,
-            @PathVariable String ingredientId) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        userService.removeIngredientFromPantry(uid, ingredientId);
-        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -232,12 +155,7 @@ public class UserController {
             HttpServletRequest request,
             @RequestBody Preferences preferences) {
         String uid = (String) request.getSession().getAttribute("uid");
-        User user = userRepository.findUserByFirebaseId(uid).orElseThrow(() ->
-                new ResourceNotFoundException("User not found")
-        );
-        user.setPreferences(preferences);
-        userRepository.save(user);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.addUserPreferences(uid, preferences));
     }
 
     /**
@@ -303,24 +221,6 @@ public class UserController {
         String uid = (String) request.getSession().getAttribute("uid");
         userService.removeItemFromRecipeHistory(uid, recipeId);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Updates the pantry quantities after a recipe has been cooked.
-     * This endpoint automatically adjusts ingredient quantities in the user's pantry
-     * based on the ingredients used in the cooked recipe.
-     *
-     * @param request HTTP request containing user session
-     * @param ingredientIds List of ingredients used in the recipe
-     * @return ResponseEntity with list of updated ingredient IDs
-     */
-    @PutMapping(path = "/history/update")
-    public ResponseEntity<List<String>> updatePantryAfterRecipe(
-            HttpServletRequest request,
-            @RequestParam List<String> ingredientIds) {
-        String uid = (String) request.getSession().getAttribute("uid");
-        userService.updatePantryAfterRecipe(uid, ingredientIds);
-        return ResponseEntity.ok(ingredientIds);
     }
 
     /**
@@ -419,50 +319,6 @@ public class UserController {
 
         userService.addDescription(uid, description);
         return new ResponseEntity<>(description, HttpStatus.OK);
-    }
-
-    /**
-     * This endpoint allows users to submit a review for a recipe.
-     * The review includes the recipe's ID, a text review, a rating (0-5),
-     * and optionally an image related to the review.
-     *
-     * @param request The HttpServletRequest object containing the session info, especially the user ID.
-     * @param recipeId The ID of the recipe being reviewed.
-     * @param review The text content of the review.
-     * @param rating The rating for the recipe, a byte value between 0 and 5.
-     * @param image An optional image related to the review. Can be null.
-     * @return A ResponseEntity containing a success message when the review is successfully added.
-     * @throws ResourceNotFoundException if the recipe or user is not found.
-     */
-    @PostMapping(path = "/review", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> addReview(
-            HttpServletRequest request,
-            @RequestPart("recipeId") String recipeId,
-            @RequestPart("review") String review,
-            @RequestPart("rating") String rating,
-            @RequestPart(value = "image", required = false) MultipartFile image
-    ) {
-        try {
-            byte ratingValue = Byte.parseByte(rating);
-            if (ratingValue < 0 || ratingValue > 5) {
-                return ResponseEntity.badRequest().body("Rating must be between 0 and 5");
-            }
-            
-            String uid = (String) request.getSession().getAttribute("uid");
-            if (uid == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
-            }
-            
-            userService.addUserReview(uid, recipeId, review, ratingValue, image);
-            return ResponseEntity.ok("Review added successfully.");
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body("Invalid rating format");
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error submitting review: " + e.getMessage());
-        }
     }
 
 }

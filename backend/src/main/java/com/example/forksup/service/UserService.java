@@ -2,8 +2,7 @@ package com.example.forksup.service;
 
 import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.*;
-import com.example.forksup.repository.IngredientRepository;
-import com.example.forksup.repository.recipe.RecipeRepository;
+import com.example.forksup.repository.RecipeRepository;
 import com.example.forksup.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,24 +28,22 @@ public class UserService {
     private RecipeRepository recipeRepository;
 
     @Autowired
-    private IngredientRepository ingredientRepository;
-
-    @Autowired
     private RestTemplate restTemplate;
 
     public User getUserById(String id) {
-        ObjectId idObj = new ObjectId(id);
-        User u = userRepository.findById(idObj).orElseThrow(() ->
+        return userRepository.findById(new ObjectId(id)).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
-        return u;
     }
 
     public User getUserByFirebaseID(String firebaseId) {
-        User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+        return userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
-        return u;
+    }
+
+    public User updateUser(User user) {
+        return userRepository.save(user);
     }
 
     public User insertUser(User user) {
@@ -110,73 +107,6 @@ public class UserService {
         return u.getPantryItems();
     }
 
-    public void addIngredientToPantry(String firebaseId, String ingredientId, Integer quantity, String unit) {
-        User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
-                new ResourceNotFoundException("User not found")
-        );
-        Ingredient i = ingredientRepository.findById(new ObjectId(ingredientId)).orElseThrow(() ->
-                new ResourceNotFoundException("Ingredient not found")
-        );
-        if (u.getPantryItems() == null) {
-            u.setPantryItems(new ArrayList<>());
-        }
-        List<PantryItem> pantryItems = u.getPantryItems();
-        PantryItem existingPantryItem = pantryItems.stream()
-                .filter(item -> item.getIngredient().getId().equals(i.getId()))
-                .findFirst()
-                .orElse(null);
-
-        if (existingPantryItem == null) {
-            PantryItem newPantryItem = new PantryItem();
-            newPantryItem.setIngredient(i);
-            newPantryItem.setQuantity(quantity);
-            newPantryItem.setMeasurementUnit(unit);
-            pantryItems.add(newPantryItem);
-        } else {
-            existingPantryItem.setQuantity(quantity);
-        }
-        u.setPantryItems(pantryItems);
-        userRepository.save(u);
-    }
-
-    public PantryItem updateIngredientQuantity(String firebaseId, String ingredientId, Integer quantity, String unit) {
-        User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
-                new ResourceNotFoundException("User not found")
-        );
-        Ingredient i = ingredientRepository.findById(new ObjectId(ingredientId)).orElseThrow(() ->
-                new ResourceNotFoundException("Ingredient not found")
-        );
-        if (u.getPantryItems() == null) {
-            throw new ResourceNotFoundException("Pantry is empty");
-        }
-        PantryItem pantryItem = u.getPantryItems().stream()
-                .filter(item -> item.getIngredient().getId().equals(i.getId()))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found in pantry"));
-        pantryItem.setQuantity(quantity);
-        pantryItem.setMeasurementUnit(unit);
-
-        userRepository.save(u);
-        return pantryItem;
-    }
-
-    public void removeIngredientFromPantry(String firebaseId, String ingredientId) {
-        User u = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
-                new ResourceNotFoundException("User not found")
-        );
-        Ingredient i = ingredientRepository.findById(new ObjectId(ingredientId)).orElseThrow(() ->
-                new ResourceNotFoundException("Ingredient not found")
-        );
-        if (u.getPantryItems() == null || u.getPantryItems().isEmpty()) {
-            throw new ResourceNotFoundException("Pantry is empty");
-        }
-        boolean removed = u.getPantryItems().removeIf(item -> item.getIngredient().getId().equals(i.getId()));
-        if (!removed) {
-            throw new ResourceNotFoundException("Ingredient not found in pantry");
-        }
-        userRepository.save(u);
-    }
-
     public List<RecipeHistory> getRecipeHistory(String firebaseId) {
         User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
@@ -216,16 +146,13 @@ public class UserService {
         }
     }
 
-    public boolean isItemInRecipeHistory(String firebaseId, String recipeId) {
+    public User addUserPreferences(String firebaseId, Preferences preferences) {
         User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );
-        if(user.getRecipeHistory() == null) {return false;}
-        Recipe recipe = recipeRepository.findById(new ObjectId(recipeId)).orElseThrow(() ->
-                new ResourceNotFoundException("Recipe not found")
-        );
-        return user.getRecipeHistory().stream()
-                .anyMatch(historyItem -> historyItem.getRecipe().getId().equals(recipe.getId()));
+        user.setPreferences(preferences);
+        userRepository.save(user);
+        return user;
     }
 
     public Preferences getUserPreferences(String firebaseId) {
@@ -233,19 +160,6 @@ public class UserService {
                 new ResourceNotFoundException("User not found")
         );
         return user.getPreferences();
-    }
-
-    public void updatePantryAfterRecipe(String firebaseId, List<String> ingredientIds) {
-        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
-                new ResourceNotFoundException("User not found")
-        );
-
-        if(ingredientIds != null && !ingredientIds.isEmpty()) {
-            for(String ingredientId : ingredientIds) {
-                removeIngredientFromPantry(firebaseId, ingredientId);
-            }
-            userRepository.save(user);
-        }
     }
 
     public RecipeHistory getLastRecipeHistory(String firebaseId) {
@@ -257,8 +171,14 @@ public class UserService {
             return null;
         }
         
-        // En son eklenen tarifi döndür - tmm
-        return user.getRecipeHistory().get(user.getRecipeHistory().size() - 1);
+        return user.getRecipeHistory().getLast();
+    }
+
+    public byte[] getAvatar(String firebaseId) {
+        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
+                new ResourceNotFoundException("User not found")
+        );
+        return user.getAvatar();
     }
 
     public void uploadAvatar(String firebaseId, MultipartFile avatar) {
@@ -275,13 +195,6 @@ public class UserService {
         } else {
             throw new IllegalArgumentException("Avatar file is empty or null.");
         }
-    }
-
-    public byte[] getAvatar(String firebaseId){
-        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
-                new ResourceNotFoundException("User not found")
-        );
-        return user.getAvatar();
     }
 
     public void addDescription(String firebaseId, String description) {
@@ -318,46 +231,6 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException("Error generating avatar: " + e.getMessage(), e);
         }
-    }
-
-    public void addUserReview(String firebaseId, String recipeId, String review, Byte rating, MultipartFile image) {
-        User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
-                new ResourceNotFoundException("User not found")
-        );
-        Recipe recipe = recipeRepository.findById(new ObjectId(recipeId)).orElseThrow(() ->
-                new ResourceNotFoundException("Recipe not found")
-        );
-
-        // Check if recipe history exists, if not create it
-        if (user.getRecipeHistory() == null) {
-            user.setRecipeHistory(new ArrayList<>());
-        }
-
-        // Find the history item or create a new one
-        RecipeHistory historyItem = user.getRecipeHistory().stream()
-                .filter(item -> item.getRecipe().getId().equals(recipe.getId()))
-                .findFirst()
-                .orElseGet(() -> {
-                    RecipeHistory newItem = new RecipeHistory(recipe);
-                    user.getRecipeHistory().add(newItem);
-                    return newItem;
-                });
-
-        // Update the history item
-        historyItem.setReview(review);
-        historyItem.setRating(rating);
-
-        // Process image if provided
-        if (image != null && !image.isEmpty()) {
-            try {
-                historyItem.setRecipeImage(image.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException("Error processing the upload file", e);
-            }
-        }
-
-        // Save the updated user document
-        userRepository.save(user);
     }
 
 }

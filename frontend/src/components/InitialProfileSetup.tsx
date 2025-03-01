@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { uploadAvatar, generateAvatar, updateDescription } from '../api/ForksUpAPI';
+import { uploadAvatar, generateAvatar, updateDescription } from '../api/UserAPI';
 import { Button, TextField } from '@mui/material';
 import { Upload, Wand2, User, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';

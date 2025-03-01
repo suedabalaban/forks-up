@@ -1,16 +1,20 @@
 package com.example.forksup.controller;
 
 import com.example.forksup.model.Recipe;
-import com.example.forksup.repository.recipe.RecipeRepository;
+import com.example.forksup.model.Review;
+import com.example.forksup.repository.RecipeRepository;
 import com.example.forksup.service.RecipeService;
 
+import com.example.forksup.service.ReviewService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,13 +28,15 @@ public class RecipeController {
     @Autowired
     private RecipeService recipeService;
 
+    @Autowired
+    private ReviewService reviewService;
+
     /**
      * Retrieves a specific recipe from the database using its MongoDB ObjectId.
      * This endpoint performs several validation steps:
      * 1. Validates the ID format (must be 24 characters long)
      * 2. Attempts to convert the string ID to a MongoDB ObjectId
      * 3. Searches the database for a matching recipe
-     *
      * Error Handling:
      * - Returns BAD_REQUEST (400) if:
      *   * ID is null
@@ -69,7 +75,6 @@ public class RecipeController {
      * - Keyword search (searches recipe names and descriptions)
      * - Tag filtering (cuisine types, dietary restrictions, etc.)
      * - Ingredient-based filtering
-     *
      * The search is implemented using regex pattern matching for flexible text search.
      * Results are paginated to optimize performance and data transfer.
      *
@@ -84,7 +89,7 @@ public class RecipeController {
      *         - Default page size is 9 recipes
      */
     @GetMapping("/search")
-    public ResponseEntity<Page<Recipe>> searchRecipesRegex(
+    public ResponseEntity<Slice<Recipe>> searchRecipesRegex(
             HttpServletRequest request,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
@@ -93,8 +98,7 @@ public class RecipeController {
             @RequestParam(defaultValue = "9") int size
     ) {
         String uid = (String) request.getSession().getAttribute("uid");
-
-        Page<Recipe> recipes = recipeService.searchRecipes(keyword, tags, ingredients, page, size);
+        Slice<Recipe> recipes = recipeService.searchRecipes(keyword, tags, ingredients, page, size);
         return ResponseEntity.ok(recipes);
     }
 
@@ -120,7 +124,7 @@ public class RecipeController {
      *         - Default page size is 9 recipes
      */
     @GetMapping("/preferences")
-    public ResponseEntity<Page<Recipe>> searchRecipesByPreferences(
+    public ResponseEntity<Slice<Recipe>> searchRecipesByPreferences(
             HttpServletRequest request,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) List<String> tags,
@@ -132,25 +136,33 @@ public class RecipeController {
         if (uid == null) {
             return new ResponseEntity<>(null, null, HttpStatus.UNAUTHORIZED);
         }
-        Page<Recipe> recipes = recipeService.searchRecipesByPreferences(uid, keyword, tags, ingredients, page, size);
+        Slice<Recipe> recipes = recipeService.searchRecipesByPreferences(uid, keyword, tags, ingredients, page, size);
         return ResponseEntity.ok(recipes);
     }
 
-    @GetMapping(value = "/preferences/ingredients-match")
-    public ResponseEntity<Page<Recipe>> searchRecipesByIngredientsMatch(
+    @PostMapping(path = "/{recipeId}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Object> addReview(
             HttpServletRequest request,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) List<String> tags,
-            @RequestParam(required = false) List<String> ingredients,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "9") int size) {
-
+            @PathVariable("recipeId") String recipeId,
+            @RequestPart("review") String review,
+            @RequestPart("rating") String rating,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
         String uid = (String) request.getSession().getAttribute("uid");
-        if (uid == null) {
-            return new ResponseEntity<>(null, null, HttpStatus.UNAUTHORIZED);
+
+        int ratingValue = Integer.parseInt(rating);
+        if (ratingValue < 0 || ratingValue > 5) {
+            return ResponseEntity.badRequest().body("Rating must be between 0 and 5");
         }
-        Page<Recipe> recipes = recipeService.searchRecipesByIngredientsMatch(uid, keyword, tags, ingredients, page, size);
-        return ResponseEntity.ok(recipes);
+
+        return ResponseEntity.ok(reviewService.addUserReview(uid, recipeId, review, ratingValue, image));
+    }
+
+    @GetMapping("/{recipeId}/comment")
+    public ResponseEntity<List<Review>> getReviewsByRecipe(
+            @PathVariable("recipeId") String recipeId
+    ) {
+        return ResponseEntity.ok(reviewService.getReviewsByRecipeId(recipeId));
     }
 
 }

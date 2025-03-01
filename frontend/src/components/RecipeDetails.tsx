@@ -3,12 +3,14 @@ import { Close } from "@mui/icons-material";
 import { Star, Users, Printer, Timer, Share2 } from "lucide-react";
 import axios from "axios";
 import { Recipe } from "../model/Recipe";
-import {addFavorite, checkFavoriteStatus, removeFavorite} from "../api/ForksUpAPI";
+import {addFavorite, checkFavoriteStatus, removeFavorite} from "../api/RecipeAPI";
 import { getIngredientEmoji } from "../utils/ingredientEmojis";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePantry } from '../context/PantryContext';
 import { useNavigate } from 'react-router-dom';
 import { useRecipe } from '../context/RecipeContext';
+import { useTranslation } from 'react-i18next';
+import { useNotification } from '../context/NotificationContext';
 
 type RecipeDetailsProps = {
     recipe: Recipe;
@@ -31,6 +33,8 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { t } = useTranslation();
+    const { showSuccess, showError } = useNotification();
 
     const YOUTUBE_API_KEY = 'AIzaSyAOJIp4JcDsW--0SKq5pDhgrPG19DdcO30';
 
@@ -103,7 +107,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
             }
             setIsFavorite(!isFavorite);
         } catch (error) {
-            console.error('Error toggling favorite status:', error);
+            showError(t('recipeDetails.favoriteError'));
         }
     };
 
@@ -180,12 +184,11 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                     url: recipeUrl
                 });
             } catch (err) {
-                console.log('Error sharing:', err);
+                showError(t('recipeDetails.shareError'));
             }
         } else {
-            // Fallback to copying to clipboard
             navigator.clipboard.writeText(recipeUrl);
-            // You might want to show a toast notification here
+            showSuccess(t('recipeDetails.copySuccess'));
         }
     };
 
@@ -246,6 +249,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                                             whileTap={{ scale: 0.9 }}
                                             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
                                             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                                            title={t(isFavorite ? 'recipeDetails.removeFromFavorites' : 'recipeDetails.addToFavorites')}
                                         >
                                             <Star
                                                 className={`w-7 h-7 transition-colors duration-200
@@ -257,7 +261,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-                                            title="Print Recipe"
+                                            title={t('recipeDetails.printRecipe')}
                                         >
                                             <Printer className="w-7 h-7 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300" />
                                         </motion.button>
@@ -266,7 +270,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.9 }}
                                             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-                                            title="Share Recipe"
+                                            title={t('recipeDetails.shareRecipe')}
                                         >
                                             <Share2 className="w-7 h-7 text-gray-400 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300" />
                                         </motion.button>
@@ -278,7 +282,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                                 
                                 {/* Search Terms */}
                                 <div className="flex flex-wrap gap-2 mb-4">
-                                    {recipe.searchTerms.map((term, index) => (
+                                    {recipe.tags.map((term, index) => (
                                         <span
                                             key={index}
                                             className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm"
@@ -292,7 +296,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                                 <div className="flex items-center gap-6 text-gray-600 dark:text-gray-300">
                                     <div className="flex items-center gap-2">
                                         <Users className="w-5 h-5" />
-                                        <span>Serves {recipe.servings}</span>
+                                        <span>{t('recipeDetails.serves')} {recipe.servings}</span>
                                     </div>
                                 </div>
                             </div>
@@ -306,7 +310,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                             >
                                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                     <span>🥘</span>
-                                    <span>Ingredients</span>
+                                    <span>{t('recipeDetails.ingredients')}</span>
                                 </h3>
                                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {recipe.ingredientsRawStr?.map((ingredient, index) => {
@@ -342,7 +346,7 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                             >
                                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                                     <span>📝</span>
-                                    <span>Instructions</span>
+                                    <span>{t('recipeDetails.instructions')}</span>
                                 </h3>
                                 <ol className="space-y-4">
                                     {recipe.steps?.map((step, index) => (
@@ -371,13 +375,17 @@ const RecipeDetails: React.FC<RecipeDetailsProps> = ({recipe, onClose, onStartRe
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.5 }}
                     >
-                        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Related Videos</h3>
+                        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
+                            {t('recipeDetails.relatedVideos')}
+                        </h3>
                         {loading && (
-                            <div className="text-gray-500 dark:text-gray-300 animate-pulse">Loading videos...</div>
+                            <div className="text-gray-500 dark:text-gray-300 animate-pulse">
+                                {t('recipeDetails.loadingVideos')}
+                            </div>
                         )}
                         {error && (
                             <div className="text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/10 p-3 rounded-lg">
-                                {error}
+                                {t('recipeDetails.videoError')}
                             </div>
                         )}
                         <div className="space-y-6">

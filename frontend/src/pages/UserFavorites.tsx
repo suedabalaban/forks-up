@@ -1,11 +1,10 @@
 import React, {useState, useEffect} from "react";
 import RecipeCard from "../components/RecipeCard";
 import RecipeDetails from "../components/RecipeDetails";
-import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
 import {Star} from "lucide-react";
-import {getFavoriteRecipes} from "../api/ForksUpAPI";
 import {Link, useOutletContext} from "react-router-dom";
+import { getFavoriteRecipes } from "../api/RecipeAPI";
 
 interface OutletContextType {
     onStartRecipe: (recipe: Recipe) => void;

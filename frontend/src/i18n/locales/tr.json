@@ -1,0 +1,94 @@
+{
+  "chatbot": {
+    "welcome": "Hoş geldiniz! Lütfen sorularınızı sormak için önce bir tarif seçin.",
+    "initialMessage": "Mevcut Tarif: {{recipeName}}\n\nSize şu konularda yardımcı olabilirim:\n- Malzeme değişimleri\n- Pişirme teknikleri\n- Adım açıklamaları\n\nNeyi öğrenmek istersiniz?",
+    "selectRecipe": "Lütfen sorularınızı sormak için önce bir tarif seçin.",
+    "error": "Özür dilerim, bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+    "title": "Yapay Zeka Asistanı",
+    "suggestedQuestions": "Önerilen Sorular",
+    "typePlaceholder": "Bir mesaj yazın...",
+    "selectRecipePlaceholder": "Sohbete başlamak için bir tarif seçin"
+  },
+  "profile": {
+    "languageSettings": "Dil Ayarları",
+    "selectLanguage": "Dil Seçin",
+    "english": "İngilizce",
+    "turkish": "Türkçe",
+    "languageChangeSuccess": "Dil başarıyla değiştirildi"
+  },
+  "recipeDetails": {
+    "ingredients": "Malzemeler",
+    "instructions": "Hazırlanışı",
+    "serves": "Porsiyon",
+    "relatedVideos": "İlgili Videolar",
+    "loadingVideos": "Videolar yükleniyor...",
+    "videoError": "İlgili videolar yüklenemedi",
+    "startCooking": "Pişirmeye Başla",
+    "addToFavorites": "Favorilere ekle",
+    "removeFromFavorites": "Favorilerden çıkar",
+    "printRecipe": "Tarifi Yazdır",
+    "shareRecipe": "Tarifi Paylaş",
+    "favoriteError": "Favori durumu güncellenirken hata oluştu",
+    "copySuccess": "Tarif bağlantısı panoya kopyalandı",
+    "shareError": "Tarif paylaşılırken hata oluştu"
+  },
+  "home": {
+    "greetings": {
+      "morning": "Günaydın! 🌟",
+      "afternoon": "Tünaydın! 🌟",
+      "evening": "İyi Akşamlar! 🌟",
+      "night": "İyi Geceler! 🌟"
+    },
+    "descriptions": {
+      "morning": "Güne muhteşem kahvaltı fikirleriyle başlayın",
+      "afternoon": "Gününüzü lezzetli tariflerle güçlendirin",
+      "evening": "Unutulmaz akşam yemekleri hazırlayın",
+      "night": "Gece için ilham verici tarifler sizi bekliyor"
+    },
+    "exploreButton": "Tarifleri Keşfet →",
+    "categories": "Kategoriler",
+    "categoryNames": {
+      "breakfast": "Kahvaltılık",
+      "main-dish": "Ana Yemekler",
+      "salads": "Salatalar",
+      "desserts": "Tatlılar",
+      "beverages": "İçecekler",
+      "snacks": "Atıştırmalıklar"
+    },
+    "featuredRecipes": "Öne Çıkan Tarifler",
+    "recipeInfo": {
+      "serves": "Porsiyon",
+      "time": "Süre",
+      "difficulty": {
+        "easy": "Kolay",
+        "medium": "Orta",
+        "hard": "Zor"
+      }
+    }
+  },
+  "navbar": {
+    "search": {
+      "placeholder": "Tariflerde ara...",
+      "forYou": "Size Özel",
+      "personalizationTooltip": {
+        "title1": "Kişiselleştirilmiş tarif önerileri gösterir",
+        "title2": "Diyet tercihlerinize göre özelleştirilir",
+        "title3": "Mutfağınızdaki malzemeleri kullanır"
+      }
+    },
+    "menu": {
+      "profile": "Profil",
+      "pantry": "Mutfak",
+      "favorites": "Favoriler",
+      "history": "Geçmiş",
+      "settings": "Ayarlar",
+      "logout": "Çıkış Yap",
+      "lightMode": "Aydınlık Mod",
+      "darkMode": "Karanlık Mod"
+    },
+    "auth": {
+      "login": "Giriş Yap",
+      "signup": "Kayıt Ol"
+    }
+  }
+}

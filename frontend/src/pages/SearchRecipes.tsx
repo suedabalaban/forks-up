@@ -7,7 +7,7 @@ import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
 import TagFilters from "../components/TagFilter";
 import tags from "../assets/tags.json"
-import {getPersonalizedRecipes, getRecipes} from "../api/ForksUpAPI";
+import {getPersonalizedRecipes, getRecipes} from "../api/RecipeAPI";
 
 interface OutletContextType {
     onStartRecipe: (recipe: Recipe) => void;

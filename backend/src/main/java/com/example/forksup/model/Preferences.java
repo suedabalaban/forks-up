@@ -1,10 +1,10 @@
 package com.example.forksup.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
+
 public class Preferences {
 
     @Field("dietary_restrictions")
