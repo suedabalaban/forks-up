@@ -15,8 +15,8 @@ public interface RecipeRepository extends MongoRepository<Recipe, ObjectId> {
     @Aggregation(pipeline = {
             "{$match: { $text: { $search: ?0 } } }",
             "{ $addFields: { totalScore: { $add: [{ $meta: \"textScore\" }] } } }",
+            "{ $match: { totalScore: { $gte: ?1 } } }",
             "{ $sort: { totalScore: -1 } }"
     })
-    Slice<Recipe> searchRecipesAdvanced(String text, Pageable pageable);
-
+    Slice<Recipe> searchRecipesAdvanced(String text, int minScore, Pageable pageable);
 }

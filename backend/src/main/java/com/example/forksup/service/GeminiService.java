@@ -119,12 +119,12 @@ public class GeminiService {
 
     public List<String> getPredefinedQuestions() {
         return List.of(
-                "Bu tarif vegan beslenmeye uygun mu?",
-                "Bu tarif vejetaryen beslenmeye uygun mu?",
-                "Bu tarif diyet beslenmeye uygun mu?",
-                "Bu tarif kaç kalori içeriyor?",
-                "Bu tarifin pişirme süresi ne kadar?",
-                "Bu tarif için alternatif malzemeler nelerdir?"
+                "Is this recipe suitable for a vegan diet?",
+                "Is this recipe suitable for a vegetarian diet?",
+                "Is this recipe suitable for a diet?",
+                "How many calories does this recipe contain?",
+                "What is the cooking time for this recipe?",
+                "What are the alternative ingredients for this recipe?"
         );
     }
 

@@ -1,7 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {useSearchParams, useOutletContext} from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
-import {ChevronLeft, ChevronRight, ChevronsRight, ChevronsLeft} from 'lucide-react';
 import RecipeDetails from "../components/RecipeDetails";
 import LoadingPage from "./Loading";
 import {Recipe} from "../model/Recipe";
@@ -24,7 +23,19 @@ const SearchRecipes: React.FC = () => {
 
     const [page, setPage] = useState(0);
     const [pageSize] = useState(9);
-    const [totalPages, setTotalPages] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const observer = useRef<IntersectionObserver>();
+    const lastRecipeElementRef = useCallback((node: HTMLDivElement) => {
+        if (isLoading || isLoadingMore) return;
+        if (observer.current) observer.current.disconnect();
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                setPage(prevPage => prevPage + 1);
+            }
+        });
+        if (node) observer.current.observe(node);
+    }, [isLoading, hasMore, isLoadingMore]);
 
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -58,13 +69,17 @@ const SearchRecipes: React.FC = () => {
             allTags.push(searchTag);
         }
 
-        setIsLoading(true);
+        if (pageNumber === 0) {
+            setIsLoading(true);
+        } else {
+            setIsLoadingMore(true);
+        }
         setError(null);
 
         try {
-            let data
+            let data;
             if (isPersonalized) {
-                 data = await getPersonalizedRecipes(
+                data = await getPersonalizedRecipes(
                     searchTerm || undefined,
                     pageNumber,
                     pageSize
@@ -73,68 +88,40 @@ const SearchRecipes: React.FC = () => {
                 data = await getRecipes(
                     searchTerm || undefined,
                     allTags.length > 0 ? allTags : undefined,
-                    undefined, // pantryItems parameter
+                    undefined,
                     pageNumber,
                     pageSize
                 );
             }
 
-
+            setHasMore(!data.last);
             if (data.content.length > 0) {
-                setRecipes(data.content);
-            } else {
+                setRecipes(prev => pageNumber === 0 ? data.content : [...prev, ...data.content]);
+            } else if (pageNumber === 0) {
                 setError('No recipes found');
             }
 
-            setTotalPages(data.totalPages);
-            setPage(pageNumber);
-            setPage(pageNumber);
         } catch (err) {
-            setRecipes([]);
+            if (pageNumber === 0) {
+                setRecipes([]);
+            }
             setError(err instanceof Error ? err.message : 'An error occurred while fetching recipes');
         } finally {
             setIsLoading(false);
+            setIsLoadingMore(false);
         }
     };
 
     useEffect(() => {
+        setPage(0);
         fetchRecipes(0);
     }, [searchParams, selectedTags]);
 
-    const handlePageChange = (newPage: number) => {
-        if (newPage >= 0 && newPage < totalPages) {
-            fetchRecipes(newPage);
-        }
-    };
-
     useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, [page]);
-
-    const handleFirstPage = () => handlePageChange(0);
-    const handleLastPage = () => handlePageChange(totalPages - 1);
-    const handlePreviousPage = () => handlePageChange(page - 1);
-    const handleNextPage = () => handlePageChange(page + 1);
-
-    const getPageNumbers = () => {
-        const delta = 2; // Number of pages to show on each side of current page
-        const range: (number | string)[] = [];
-        const rangeWithDots: (number | string)[] = [];
-
-        for (let i = 0; i < totalPages; i++) {
-            if (
-                i === 0 || // First page
-                i === totalPages - 1 || // Last page
-                (i >= page - delta && i <= page + delta) // Pages around current page
-            ) {
-                range.push(i);
-            } else if (range[range.length - 1] !== '...') {
-                range.push('...');
-            }
+        if (page > 0) {
+            fetchRecipes(page);
         }
-
-        return range;
-    };
+    }, [page]);
 
     const handleClosePopup = () => {
         setSelectedRecipe(null);
@@ -252,63 +239,21 @@ const SearchRecipes: React.FC = () => {
                                 {recipes.length > 0 && (
                                     <>
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                            {recipes.map((recipe) => (
-                                                <RecipeCard
+                                            {recipes.map((recipe, index) => (
+                                                <div
                                                     key={recipe.id}
-                                                    recipe={recipe}
-                                                    onClick={() => setSelectedRecipe(recipe)}
-                                                />
+                                                    ref={index === recipes.length - 1 ? lastRecipeElementRef : undefined}
+                                                >
+                                                    <RecipeCard
+                                                        recipe={recipe}
+                                                        onClick={() => setSelectedRecipe(recipe)}
+                                                    />
+                                                </div>
                                             ))}
                                         </div>
-
-                                        {totalPages > 1 && (
-                                            <div className="flex justify-center items-center space-x-2 mt-8">
-                                                <button
-                                                    onClick={handleFirstPage}
-                                                    disabled={page === 0}
-                                                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    <ChevronsLeft className="w-5 h-5"/>
-                                                </button>
-                                                <button
-                                                    onClick={handlePreviousPage}
-                                                    disabled={page === 0}
-                                                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    <ChevronLeft className="w-5 h-5"/>
-                                                </button>
-
-                                                {getPageNumbers().map((pageNum, index) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() =>
-                                                            typeof pageNum === 'number' ? handlePageChange(pageNum) : null
-                                                        }
-                                                        disabled={pageNum === '...'}
-                                                        className={`w-10 h-10 rounded-lg ${
-                                                            pageNum === page
-                                                                ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400'
-                                                                : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                                                        } ${pageNum === '...' ? 'cursor-default' : ''}`}
-                                                    >
-                                                        {pageNum}
-                                                    </button>
-                                                ))}
-
-                                                <button
-                                                    onClick={handleNextPage}
-                                                    disabled={page === totalPages - 1}
-                                                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    <ChevronRight className="w-5 h-5"/>
-                                                </button>
-                                                <button
-                                                    onClick={handleLastPage}
-                                                    disabled={page === totalPages - 1}
-                                                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    <ChevronsRight className="w-5 h-5"/>
-                                                </button>
+                                        {isLoadingMore && (
+                                            <div className="flex justify-center mt-4">
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
                                             </div>
                                         )}
                                     </>
