@@ -14,13 +14,6 @@ services:
     volumes:
       - mongodb_data:/data/db
       - ./db:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: mongosh --eval "try { db.getSiblingDB('admin').auth('sodabatuhan', 'S0DABaTuHaN'); print('OK'); } catch (e) { print(e); exit(1); }"
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 40s
-    restart: unless-stopped
 
   backend:
     build:

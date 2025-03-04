@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Send, ChevronDown, ChevronUp } from 'lucide-react';
+// Import Gemini icon
+import { Sparkle } from 'lucide-react';
 import { useRecipe } from '../../context/RecipeContext';
 import { getPredefinedQuestions, analyzeRecipe } from '../../api/GeminiAPI';
 import { useTranslation } from 'react-i18next';
@@ -81,7 +83,7 @@ const ChatBot: React.FC = () => {
         try {
             const response = await analyzeRecipe(currentRecipe.id, text);
             const botMessage = {
-                text: response.result || "I'm sorry, I couldn't analyze that. Please try asking something else.",
+                text: response.response || "I'm sorry, I couldn't analyze that. Please try asking something else.",
                 isUser: false
             };
             addChatMessage(currentRecipe.id, botMessage);
@@ -94,35 +96,54 @@ const ChatBot: React.FC = () => {
         }
     };
 
+    const formatMessage = (text: string) => {
+        // Replace **text** with extra bold text and colored highlight
+        const doubleStarred = text.replace(
+            /\*\*(.*?)\*\*/g, 
+            '<span class="font-extrabold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-1.5 rounded-md">$1</span>'
+        );
+        // Replace *text* with just bold text, no color
+        return doubleStarred.replace(
+            /\*(.*?)\*/g, 
+            '<span class="font-bold">$1</span>'
+        );
+    };
 
     return (
         <div className="fixed bottom-6 right-6 z-50">
             {isOpen ? (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-80 transition-all duration-300 overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-96 md:w-[450px] transition-all duration-300 overflow-hidden max-h-[70vh] flex flex-col">
                     <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-4 flex items-center justify-between">
                         <div className="flex items-center gap-2 text-white">
                             <MessageSquare size={20} />
                             <span className="font-semibold">{t('chatbot.title')}</span>
+                            <div className="flex items-center gap-1 text-xs opacity-75 border-l border-white/30 pl-2 ml-2">
+                                <Sparkle size={14} className="shrink-0" />
+                                <span className="whitespace-nowrap">{t('chatbot.poweredByGemini')}</span>
+                            </div>
                         </div>
                         <button 
                             onClick={() => setIsOpen(false)}
-                            className="text-white hover:text-gray-200 transition-colors"
+                            className="text-white p-1.5 rounded-full hover:bg-white/10 
+                                     transition-all duration-200 hover:shadow-lg 
+                                     hover:shadow-white/20"
                         >
                             <X size={20} />
                         </button>
                     </div>
                     
-                    <div className="h-80 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+                    <div className="min-h-[280px] max-h-[calc(70vh-120px)] overflow-y-auto p-3 space-y-3 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 flex-grow">
                         {currentMessages.map((message, index) => (
                             <div key={index} 
                                 className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                                    message.isUser 
-                                    ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white'
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-                                }`}>
-                                    {message.text}
-                                </div>
+                                <div 
+                                    className={`rounded-lg px-4 py-2 max-w-[85%] ${
+                                        message.isUser 
+                                        ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                                    }`}
+                                    dangerouslySetInnerHTML={{ __html: formatMessage(message.text) }}
+                                />
                             </div>
                         ))}
                         <div ref={messagesEndRef} /> {/* Scroll anchor */}
@@ -140,7 +161,7 @@ const ChatBot: React.FC = () => {
                             </button>
                             
                             {showSuggestions && (
-                                <div className="p-2 max-h-40 overflow-y-auto">
+                                <div className="p-2 max-h-32 overflow-y-auto">
                                     <div className="flex flex-col gap-2">
                                         {predefinedQuestions.map((question, index) => (
                                             <button
@@ -163,7 +184,7 @@ const ChatBot: React.FC = () => {
                     <form onSubmit={(e) => {
                         e.preventDefault();
                         handleSubmit(inputMessage);
-                    }} className="p-4 border-t dark:border-gray-700">
+                    }} className="p-3 border-t dark:border-gray-700">
                         <div className="flex gap-2">
                             <input
                                 type="text"

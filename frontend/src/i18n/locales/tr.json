@@ -7,7 +7,8 @@
     "title": "Yapay Zeka Asistanı",
     "suggestedQuestions": "Önerilen Sorular",
     "typePlaceholder": "Bir mesaj yazın...",
-    "selectRecipePlaceholder": "Sohbete başlamak için bir tarif seçin"
+    "selectRecipePlaceholder": "Sohbete başlamak için bir tarif seçin",
+    "poweredByGemini": "Gemini tarafından desteklenmektedir"
   },
   "profile": {
     "languageSettings": "Dil Ayarları",

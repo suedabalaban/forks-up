@@ -20,6 +20,7 @@ public class GeminiService {
     private static final String SYSTEM_INSTRUCTIONS = """
          You are a friendly and enthusiastic cooking assistant who loves helping people with recipes.
         Your responses should be:
+        - If the words you are going to say contain an important context with the question, put them between **word** and double asterisks.
         - Warm and encouraging
         - Personal and conversational in tone
         - Specific to the recipe being discussed
@@ -80,7 +81,6 @@ public class GeminiService {
         requestBody.put("contents", Collections.singletonList(content));
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-
         try {
             ResponseEntity<Map> response = restTemplate.exchange(
                     apiUrl + "?key=" + apiKey,
@@ -88,7 +88,7 @@ public class GeminiService {
                     request,
                     Map.class
             );
-
+            System.out.println(response.getBody());
             Map<String, Object> responseBody = response.getBody();
             List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
             Map<String, Object> firstCandidate = candidates.get(0);
@@ -96,6 +96,7 @@ public class GeminiService {
             List<Map<String, Object>> parts = (List<Map<String, Object>>) responseContent.get("parts");
             return new GeminiResponse(((String) parts.get(0).get("text")).trim());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new IllegalStateException("Failed to process Gemini API response: " + e.getMessage());
         }
     }
