@@ -50,7 +50,7 @@ const SearchRecipes: React.FC = () => {
         {name: t('search.categories.international'), icon: '🌎', description: t('search.categories.internationalDesc')}
     ];
 
-    const mealTypes = [
+    const mealTypes: string[] = [
         t('search.mealTypes.breakfast'),
         t('search.mealTypes.lunch'),
         t('search.mealTypes.dinner'),
