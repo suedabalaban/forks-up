@@ -3,6 +3,7 @@ package com.example.forksup.controller;
 import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.*;
 import com.example.forksup.repository.UserRepository;
+import com.example.forksup.service.FirebaseUserService;
 import com.example.forksup.service.ReviewService;
 import com.example.forksup.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,8 +25,12 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private ReviewService reviewService;
+
+    @Autowired
+    private FirebaseUserService firebaseUserService;
 
     /**
      * Retrieves a user by their unique identifier.
@@ -65,7 +70,8 @@ public class UserController {
                 null,
                 null,
                 null,
-                null)
+                null,
+                firebaseUserService.getDisplayName(uid))
         );
         if (u == null) {
             return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);

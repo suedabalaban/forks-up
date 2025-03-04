@@ -9,6 +9,7 @@ interface ReviewCardProps {
             avatar: string | null;
             firebaseId: string;
             description: string;
+            displayName: string;
         };
         rating: number;
         review: string;
@@ -39,12 +40,12 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
                                 />
                             ) : (
                                 <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-400 to-purple-600 dark:from-purple-600 dark:to-purple-800 text-white text-lg font-semibold">
-                                    {review.user.firebaseId.charAt(0).toUpperCase()}
+                                    {review.user.displayName.charAt(0).toUpperCase()}
                                 </div>
                             )}
                             <div className="flex flex-col">
                                 <span className="font-medium text-gray-900 dark:text-gray-100">
-                                    {review.user.description || `User${review.user.firebaseId.slice(0, 4)}`}
+                                    {review.user.displayName}
                                 </span>
                                 <div className="flex items-center mt-1 space-x-1">
                                     {[...Array(5)].map((_, i) => (

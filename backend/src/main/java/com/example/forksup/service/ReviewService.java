@@ -17,15 +17,16 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-
     private final UserRepository userRepository;
-
     private final RecipeService recipeService;
+    private final FirebaseUserService firebaseUserService;
 
-    ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, RecipeService recipeService) {
+    ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, 
+                 RecipeService recipeService, FirebaseUserService firebaseUserService) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.recipeService = recipeService;
+        this.firebaseUserService = firebaseUserService;
     }
 
     public Review addUserReview(String firebaseId, String recipeId, String comment, int rating, MultipartFile image) {
@@ -35,7 +36,12 @@ public class ReviewService {
 
         Review review;
         try {
-            review = new Review(user, recipe, comment, rating, image.getBytes());
+            if (image != null) {
+                review = new Review(user, recipe, comment, rating, image.getBytes());
+
+            } else {
+                review = new Review(user, recipe, comment, rating, null);
+            }
             return reviewRepository.save(review);
         } catch (IOException e) {
             throw new RuntimeException("Error processing the upload file", e);
@@ -44,9 +50,17 @@ public class ReviewService {
 
     public List<Review> getReviewsByRecipeId(String recipeId) {
         Recipe recipe = recipeService.getByRecipeId(recipeId);
-        return reviewRepository.findByRecipe_Id(new ObjectId(recipe.getId())).orElseThrow(
-                () -> new ResourceNotFoundException("Reviews not found")
-        );
+        List<Review> reviews = reviewRepository.findByRecipe_Id(new ObjectId(recipe.getId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Reviews not found"));
+
+        reviews.forEach(review -> {
+            String latestDisplayName = firebaseUserService.getDisplayName(review.getUser().getFirebaseId());
+            if (latestDisplayName != null) {
+                review.getUser().setDisplayName(latestDisplayName);
+            }
+        });
+        
+        return reviews;
     }
 
     public List<Review> getReviewsByUser(String firebaseId) {

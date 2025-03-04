@@ -10,6 +10,7 @@ export interface Review {
         avatar: string | null;
         firebaseId: string;
         description: string;
+        displayName: string;
     };
     recipeImage: string | null;
 }

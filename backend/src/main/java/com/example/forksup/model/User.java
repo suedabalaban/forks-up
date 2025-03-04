@@ -38,6 +38,9 @@ public class User {
     @Field("description")
     private String description;
 
+    @Field("display_name")
+    private String displayName;
+
     public User() {}
 
     public User (
@@ -47,7 +50,8 @@ public class User {
             List<PantryItem> pantryItems,
             List<Recipe> favorites,
             byte[] avatar,
-            String description
+            String description,
+            String displayName
     )
     {
         this.id = id;
@@ -57,7 +61,7 @@ public class User {
         this.favorites = favorites;
         this.avatar = avatar;
         this.description = description;
-
+        this.displayName = displayName;
     }
 
     public String getId() {return id != null ? id.toHexString() : null;}
@@ -104,5 +108,15 @@ public class User {
         if(description != null && description.length() > 200 ){
             throw new IllegalArgumentException("Description must be at most 200 characters long.");
         }
-        this.description = description;}
+        this.description = description;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
 }
