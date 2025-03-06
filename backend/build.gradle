@@ -26,6 +26,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'com.google.firebase:firebase-admin:9.3.0'
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+	implementation 'com.microsoft.onnxruntime:onnxruntime:1.16.1'
 }
 
 tasks.named('test') {
