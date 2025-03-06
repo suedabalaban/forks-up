@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**", "/api/recipes/**").permitAll()
+                        .requestMatchers("/auth/**", "/api/food-detection/**").permitAll()
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/ingredients/**").hasRole("USER")
                         .requestMatchers("/api/gemini/**").hasRole("USER")
