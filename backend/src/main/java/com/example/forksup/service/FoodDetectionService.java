@@ -11,15 +11,16 @@ import java.io.ByteArrayInputStream;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
 @Service
 public class FoodDetectionService {
 
-    private static final String MODEL_PATH = "src/main/resources/version2.onnx";
+    private static final String MODEL_PATH = "src/main/resources/food_detector2.onnx";
     private static final int IMG_SIZE = 224;
-    private static final float THRESHOLD = 0.5f;
+    private static final float THRESHOLD = 0.99996776f;
 
     private OrtEnvironment env;
     private OrtSession session;
@@ -34,26 +35,23 @@ public class FoodDetectionService {
             BufferedImage img = preprocessImage(file);
             float[] imgData = imageToFloatArray(img);
 
-            // ONNX model girişini oluştur
             OnnxTensor inputTensor = OnnxTensor.createTensor(env, FloatBuffer.wrap(imgData), new long[]{1, 3, IMG_SIZE, IMG_SIZE});
             Map<String, OnnxTensor> inputs = Collections.singletonMap("input", inputTensor);
 
-            // Modeli çalıştır
             OrtSession.Result result = session.run(inputs);
-            float[][] output = (float[][]) result.get(0).getValue();
+            Object output = result.get(0).getValue();
 
-            // Food sınıfı için olasılığı al
-            float foodProbability = output[0][1]; // Modelin food class için tahmini
-
-            // Eğer olasılık threshold'u geçerse "Food", yoksa "Non-Food" döndür
-            return foodProbability >= THRESHOLD ? "Food" : "Non-Food";
-
+            if (output instanceof float[][]) {
+                float[][] outputData = (float[][]) output;
+                float foodProbability = outputData[0][0];
+                return foodProbability >= THRESHOLD ? "Food" : "Non-Food";
+            }
+            return "Unexpected model output format";
         } catch (Exception e) {
             e.printStackTrace();
             return "Error processing image";
         }
     }
-
     private BufferedImage preprocessImage(MultipartFile file) throws Exception {
         byte[] bytes = file.getBytes();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
