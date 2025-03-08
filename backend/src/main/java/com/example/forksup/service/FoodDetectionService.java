@@ -36,7 +36,7 @@ public class FoodDetectionService {
         this.reviewRepository = reviewRepository;
     }
 
-    @Scheduled(fixedRate = 86400000)
+    @Scheduled(cron = "0 0 0 */1 * ?") // For every day
     public void validateUnverifiedReviews(){
         List<Review> unProcessedReviews = reviewRepository.findByIsProcessedFalse();
 
