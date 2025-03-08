@@ -14,4 +14,6 @@ public interface ReviewRepository extends MongoRepository<Review, ObjectId> {
     List<Review> getReviewsByUser(User user);
 
     void deleteReviewByUserAndId(User user, ObjectId id);
+
+    List<Review> findByIsProcessedFalse();
 }

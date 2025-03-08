@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,7 +30,8 @@ public class ReviewService {
         this.firebaseUserService = firebaseUserService;
     }
 
-    public Review addUserReview(String firebaseId, String recipeId, String comment, int rating, MultipartFile image) {
+    public Review addUserReview(String firebaseId, String recipeId, String comment, int rating, MultipartFile image,
+                                Date timeStamp) {
         User user = userRepository.findUserByFirebaseId(firebaseId).orElseThrow(() ->
                 new ResourceNotFoundException("User not found")
         );        Recipe recipe = recipeService.getByRecipeId(recipeId);
@@ -37,11 +39,11 @@ public class ReviewService {
         Review review;
         try {
             if (image != null) {
-                review = new Review(user, recipe, comment, rating, image.getBytes());
-
+                review = new Review(user, recipe, comment, rating, image.getBytes(), false, timeStamp);
             } else {
-                review = new Review(user, recipe, comment, rating, null);
+                review = new Review(user, recipe, comment, rating, null,true, timeStamp);
             }
+            review.setIsProcessed(false);
             return reviewRepository.save(review);
         } catch (IOException e) {
             throw new RuntimeException("Error processing the upload file", e);

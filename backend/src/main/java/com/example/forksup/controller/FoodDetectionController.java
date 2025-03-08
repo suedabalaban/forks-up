@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -17,7 +18,12 @@ public class FoodDetectionController {
 
     @PostMapping("/classify")
     public ResponseEntity<?> classifyImage(@RequestParam("file") MultipartFile file) {
-        String result = foodDetectionService.classifyImage(file);
-        return ResponseEntity.ok().body(Map.of("result", result));
+        try {
+            byte[] imageBytes = file.getBytes();
+            String result = foodDetectionService.classifyImage(imageBytes);
+            return ResponseEntity.ok().body(Map.of("result", result));
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Failed to process the image"));
+        }
     }
 }

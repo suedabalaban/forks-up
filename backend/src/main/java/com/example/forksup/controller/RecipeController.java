@@ -1,5 +1,6 @@
 package com.example.forksup.controller;
 
+import com.example.forksup.exception.ResourceNotFoundException;
 import com.example.forksup.model.Recipe;
 import com.example.forksup.model.Review;
 import com.example.forksup.repository.RecipeRepository;
@@ -16,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -154,8 +157,16 @@ public class RecipeController {
         if (ratingValue < 0 || ratingValue > 5) {
             return ResponseEntity.badRequest().body("Rating must be between 0 and 5");
         }
+        Date timeStamp = new Date();
 
-        return ResponseEntity.ok(reviewService.addUserReview(uid, recipeId, review, ratingValue, image));
+        try {
+            Review addedReview = reviewService.addUserReview(uid, recipeId, review, ratingValue, image, timeStamp);
+            return ResponseEntity.ok(addedReview);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
+        }
     }
 
     @GetMapping("/{recipeId}/review")

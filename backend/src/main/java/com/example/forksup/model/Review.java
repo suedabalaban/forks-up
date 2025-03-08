@@ -1,10 +1,13 @@
 package com.example.forksup.model;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.Date;
 
 @Document(collection = "reviews")
 public class Review {
@@ -27,12 +30,25 @@ public class Review {
     @Field
     private byte[] recipeImage;
 
-    public Review(User user, Recipe recipe, String review, int rating, byte[] recipeImage) {
+    @Field
+    private boolean isVerified;
+
+    @Field
+    private boolean isProcessed;
+
+    @Field
+    @CreatedDate
+    private Date timeStamp;
+
+    public Review(User user, Recipe recipe, String review, int rating, byte[] recipeImage, boolean isVerified,
+                  Date timeStamp) {
         this.user = user;
         this.recipe = recipe;
         this.review = review;
         this.rating = rating;
         this.recipeImage = recipeImage;
+        this.isVerified = isVerified;
+        this.timeStamp = timeStamp;
     }
 
     public User getUser() {
@@ -80,5 +96,17 @@ public class Review {
     public void setId(ObjectId id) {
         this.id = id;
     }
+
+    public boolean isVerified() {return isVerified;}
+
+    public void setIsVerified(boolean verified) {isVerified = verified;}
+
+    public boolean isProcessed() {return isProcessed;}
+
+    public void setIsProcessed(boolean processed) {isProcessed = processed;}
+
+    public Date getTimeStamp() {return timeStamp;}
+
+    public void setTimeStamp(Date timeStamp){this.timeStamp = timeStamp;}
 
 }
