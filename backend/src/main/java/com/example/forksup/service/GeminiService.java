@@ -67,18 +67,28 @@ public class GeminiService {
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + recipeId));
     }
 
-    private GeminiResponse sendGeminiRequest(String prompt) {
+    private GeminiResponse sendGeminiRequest(String prompt, String systemInstructions) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, Object> part = new HashMap<>();
-        part.put("text", prompt);
-
-        Map<String, Object> content = new HashMap<>();
-        content.put("parts", Collections.singletonList(part));
-
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("contents", Collections.singletonList(content));
+
+        Map<String, Object> systemInstruction = new HashMap<>();
+        systemInstruction.put("role", "system");
+        systemInstruction.put("parts", Collections.singletonList(Map.of("text", systemInstructions)));
+        requestBody.put("systemInstruction", systemInstruction);
+
+        //user prompt
+        Map<String, Object> userContent = new HashMap<>();
+        userContent.put("role", "user");
+        userContent.put("parts", Collections.singletonList(Map.of("text", prompt)));
+        requestBody.put("contents", Collections.singletonList(userContent));
+
+        Map<String, Object> generationConfig = new HashMap<>();
+        generationConfig.put("temperature", 0.9); // Adjust creativity
+        generationConfig.put("topP", 0.9); // Adjust diversity
+        generationConfig.put("maxOutputTokens", 1024); // Limit response length
+        requestBody.put("generationConfig", generationConfig);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
         try {
@@ -88,13 +98,16 @@ public class GeminiService {
                     request,
                     Map.class
             );
-            System.out.println(response.getBody());
+            //Parse the response
             Map<String, Object> responseBody = response.getBody();
             List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
             Map<String, Object> firstCandidate = candidates.get(0);
-            Map<String, Object> responseContent = (Map<String, Object>) firstCandidate.get("content");
-            List<Map<String, Object>> parts = (List<Map<String, Object>>) responseContent.get("parts");
-            return new GeminiResponse(((String) parts.get(0).get("text")).trim());
+            Map<String, Object> content = (Map<String, Object>) firstCandidate.get("content");
+            List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
+
+            // Extract the text response
+            String responseText = (String) parts.get(0).get("text");
+            return new GeminiResponse(responseText.trim());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException("Failed to process Gemini API response: " + e.getMessage());
@@ -110,10 +123,9 @@ public class GeminiService {
         }
 
         Recipe recipe = getRecipe(recipeId);
-        String prompt = SYSTEM_INSTRUCTIONS + "\n" + new RecipePromptBuilder(recipe, question)
-                .build();
+        String prompt = new RecipePromptBuilder(recipe, question).build();
 
-        GeminiResponse response = sendGeminiRequest(prompt);
+        GeminiResponse response = sendGeminiRequest(prompt, SYSTEM_INSTRUCTIONS);
         responseCache.put(cacheKey, response.getResponse());
         return response;
     }
@@ -129,4 +141,35 @@ public class GeminiService {
         );
     }
 
+    public List<String> generateRecipeQuestions(String recipeId){
+        String cacheKey = "questions-" + recipeId;
+        if (responseCache.containsKey(cacheKey)) {
+            return Arrays.asList(responseCache.get(cacheKey).split("\\|"));
+        }
+        Recipe recipe = getRecipe(recipeId);
+        String prompt = new RecipePromptBuilder(recipe, "Generate three specific questions users might ask about" +
+                "this recipe. Seperate questions by '|.'").build();
+
+        String systemInstructions = """
+        You are a recipe analysis assistant. Generate three concise and specific questions about the given recipe. Follow these rules:
+    - Each question should be short and to the point (maximum 15 words).
+    - Focus on key aspects of the recipe:
+      - Dietary suitability
+      - Cooking techniques
+      - Ingredient substitutions
+      - Nutritional information
+      - Preparation time
+      - Serving suggestions
+    - Avoid unnecessary details or explanations.
+    - Format: question1|question2|question3""";
+
+        GeminiResponse response = sendGeminiRequest(prompt, systemInstructions);
+        List<String> questions = Arrays.stream(response.getResponse().split("\\|"))
+                .map(String::trim)
+                .limit(3)
+                .toList();
+
+        responseCache.put(cacheKey, String.join("|", questions));
+        return questions;
+    }
 }
