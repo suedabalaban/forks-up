@@ -1,9 +1,11 @@
 package com.example.forksup.controller;
 
+import com.example.forksup.model.Recipe;
 import com.example.forksup.model.request.GeminiRequest;
 import com.example.forksup.model.response.GeminiResponse;
 import com.example.forksup.service.GeminiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,5 +77,21 @@ public class GeminiController {
        }
 
    }
+    @PostMapping("/search/natural")
+    public ResponseEntity<Slice<Recipe>> naturalLanguageSearch(
+            @RequestBody GeminiRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size) {
+        if (request.getInputText() == null || request.getInputText().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            Slice<Recipe> recipes = geminiService.naturalLanguageSearch(request.getInputText(), page, size);
+            return ResponseEntity.ok(recipes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
 }
