@@ -141,11 +141,7 @@ public class GeminiService {
         );
     }
 
-    public List<String> generateRecipeQuestions(String recipeId){
-        String cacheKey = "questions-" + recipeId;
-        if (responseCache.containsKey(cacheKey)) {
-            return Arrays.asList(responseCache.get(cacheKey).split("\\|"));
-        }
+    public String generateRecipeQuestions(String recipeId){
         Recipe recipe = getRecipe(recipeId);
         String prompt = new RecipePromptBuilder(recipe, "Generate three specific questions users might ask about" +
                 "this recipe. Seperate questions by '|.'").build();
@@ -168,8 +164,13 @@ public class GeminiService {
                 .map(String::trim)
                 .limit(3)
                 .toList();
-
-        responseCache.put(cacheKey, String.join("|", questions));
-        return questions;
+        // Format the response with questions in double quotes
+        return String.format(
+                "Current Recipe: %s\nI can help you with your questions:\n- \"%s\"\n- \"%s\"\n- \"%s\"\nWhat would you like to know?",
+                recipe.getName(),
+                questions.get(0),
+                questions.get(1),
+                questions.get(2)
+        );
     }
 }

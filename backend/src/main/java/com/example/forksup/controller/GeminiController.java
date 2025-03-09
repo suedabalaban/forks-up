@@ -65,10 +65,10 @@ public class GeminiController {
     }
 
    @PostMapping("/questions/{recipeId}")
-    public ResponseEntity<List<String>> generateRecipeQuestions(
+    public ResponseEntity<String> generateRecipeQuestions(
             @PathVariable String recipeId){
        try{
-           List<String> response = geminiService.generateRecipeQuestions(recipeId);
+           String response = geminiService.generateRecipeQuestions(recipeId);
            return ResponseEntity.ok(response);
        }catch (Exception e){
            return ResponseEntity.badRequest().build();
