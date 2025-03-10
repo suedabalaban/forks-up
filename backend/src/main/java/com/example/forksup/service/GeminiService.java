@@ -13,6 +13,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -71,10 +74,7 @@ public class GeminiService {
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + recipeId));
     }
 
-    private GeminiResponse sendGeminiRequest(String prompt, String systemInstructions, Map<String, Object> functionDeclaration) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
+    private Map<String, Object> createGeminiRequest(String prompt, String systemInstructions, Map<String, Object> functionDeclaration) {
         Map<String, Object> requestBody = new HashMap<>();
 
         // Add system instructions
@@ -102,6 +102,15 @@ public class GeminiService {
         generationConfig.put("topP", 0.9);
         generationConfig.put("maxOutputTokens", 1024);
         requestBody.put("generationConfig", generationConfig);
+
+        return requestBody;
+    }
+
+    private GeminiResponse sendGeminiRequest(String prompt, String systemInstructions, Map<String, Object> functionDeclaration) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> requestBody = createGeminiRequest(prompt, systemInstructions, functionDeclaration);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
         try {
@@ -133,42 +142,9 @@ public class GeminiService {
             throw new IllegalStateException("Failed to process Gemini API response: " + e.getMessage());
         }
     }
-    //overload sendGeminiRequests for non-function-call purposes
+    //overload sendGeminiRequest for non-function-call purposes
     private GeminiResponse sendGeminiRequest(String prompt, String systemInstructions) {
         return sendGeminiRequest(prompt, systemInstructions, null); // Call the three-parameter version
-    }
-
-    public Slice<Recipe> naturalLanguageSearch(String userQuery, int page, int size) {
-        // Define the function declaration
-        Map<String, Object> functionDeclaration = getSearchFunctionDeclaration();
-
-        // Send the user query to Gemini with function calling
-        GeminiResponse response = sendGeminiRequest(
-                userQuery,
-                "Analyze the user's query and extract search parameters for recipes.",
-                functionDeclaration
-        );
-
-        // Check if the response contains a function call
-        if (response.isFunctionCall()) {
-            Map<String, Object> functionCall = response.getFunctionCall();
-            if ("searchRecipes".equals(functionCall.get("name"))) {
-                // Extract the arguments from the function call
-                Map<String, Object> args = (Map<String, Object>) functionCall.get("args");
-
-                // Call the searchRecipes method with the parsed arguments
-                return recipeService.searchRecipes(
-                        (String) args.getOrDefault("keyword", ""),
-                        (List<String>) args.getOrDefault("tags", Collections.emptyList()),
-                        (List<String>) args.getOrDefault("ingredients", Collections.emptyList()),
-                        page,
-                        size
-                );
-            }
-        }
-
-        // If no function call is returned, throw an exception
-        throw new IllegalStateException("Gemini API did not return a valid function call.");
     }
 
     public GeminiResponse analyzeRecipe(String recipeId, String question) {
@@ -185,17 +161,6 @@ public class GeminiService {
         GeminiResponse response = sendGeminiRequest(prompt, SYSTEM_INSTRUCTIONS);
         responseCache.put(cacheKey, response.getResponse());
         return response;
-    }
-
-    public List<String> getPredefinedQuestions() {
-        return List.of(
-                "Is this recipe suitable for a vegan diet?",
-                "Is this recipe suitable for a vegetarian diet?",
-                "Is this recipe suitable for a diet?",
-                "How many calories does this recipe contain?",
-                "What is the cooking time for this recipe?",
-                "What are the alternative ingredients for this recipe?"
-        );
     }
 
     public String generateRecipeQuestions(String recipeId){
@@ -240,13 +205,13 @@ public class GeminiService {
                 questions.get(2)
         );
     }
-    //function calling implementation
+    //function declaration for function calling
     public Map<String, Object> getSearchFunctionDeclaration() {
         Map<String, Object> functionDeclaration = new HashMap<>();
         functionDeclaration.put("name", "searchRecipes");
         functionDeclaration.put("description", "Search recipes using keywords, tags, and ingredients.");
 
-        // Define the parameters schema
+        // Define the parameters schema of search method in RecipeService
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("type", "object");
         parameters.put("properties", Map.of(
@@ -259,4 +224,62 @@ public class GeminiService {
         functionDeclaration.put("parameters", parameters);
         return functionDeclaration;
     }
+
+    //function calling implementation
+    public Slice<Recipe> naturalLanguageSearch(String userQuery, int page, int size) {
+        // Define the function declaration
+        Map<String, Object> functionDeclaration = getSearchFunctionDeclaration();
+
+        // Send the user query to Gemini with function calling
+        GeminiResponse response = sendGeminiRequest(
+                userQuery,
+                "Analyze the user's query and extract search parameters for recipes.",
+                functionDeclaration
+        );
+
+        // Check if the response contains a function call
+        if (response.isFunctionCall()) {
+            Map<String, Object> functionCall = response.getFunctionCall();
+            if ("searchRecipes".equals(functionCall.get("name"))) {
+                // Extract the arguments from the function call
+                Map<String, Object> args = (Map<String, Object>) functionCall.get("args");
+
+                // Call the searchRecipes method with the parsed arguments
+                return recipeService.searchRecipes(
+                        (String) args.getOrDefault("keyword", ""),
+                        (List<String>) args.getOrDefault("tags", Collections.emptyList()),
+                        (List<String>) args.getOrDefault("ingredients", Collections.emptyList()),
+                        page,
+                        size
+                );
+            }
+        }
+
+        // If no function call is returned, throw an exception
+        throw new IllegalStateException("Gemini API did not return a valid function call.");
+    }
+
+    public Flux<String> streamTextCompletion(String userInput) {
+        String systemInstructions = """
+    You are a helpful assistant that provides real-time text completion. 
+    Your task is to complete the user's input in a meaningful and concise way.
+    - Keep the response short and relevant to the input.
+    - Do not repeat the user's input verbatim.
+    - Maintain a friendly and conversational tone.""";
+
+        Map<String, Object> requestBody = createGeminiRequest(userInput, systemInstructions, null);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+        return WebClient.create()
+                .post()
+                .uri(apiUrl + "?key=" + apiKey)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToFlux(String.class); // Stream the response
+    }
+
 }

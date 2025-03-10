@@ -6,8 +6,10 @@ import com.example.forksup.model.response.GeminiResponse;
 import com.example.forksup.service.GeminiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -61,11 +63,6 @@ public class GeminiController {
         }
     }
 
-    @GetMapping("/questions")
-    public List<String> getPredefinedQuestions(){
-        return geminiService.getPredefinedQuestions();
-    }
-
    @PostMapping("/questions/{recipeId}")
     public ResponseEntity<String> generateRecipeQuestions(
             @PathVariable String recipeId){
@@ -92,6 +89,11 @@ public class GeminiController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping(value = "/stream-complete", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> streamTextCompletion(@RequestParam String input) {
+        return geminiService.streamTextCompletion(input);
     }
 
 }
