@@ -30,9 +30,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**", "/api/recipes/**").permitAll()
                         .requestMatchers("/auth/**", "/api/food-detection/**").permitAll()
+                        .requestMatchers("/auth/**", "/api/gemini/**").permitAll()
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/ingredients/**").hasRole("USER")
-                        .requestMatchers("/api/gemini/**").hasRole("USER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
