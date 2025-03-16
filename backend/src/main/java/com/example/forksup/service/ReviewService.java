@@ -54,17 +54,18 @@ public class ReviewService {
 
     public List<Review> getReviewsByRecipeId(String recipeId) {
         Recipe recipe = recipeService.getByRecipeId(recipeId);
-        List<Review> reviews = reviewRepository.findByRecipe_Id(new ObjectId(recipe.getId()))
+        List<Review> allReviews = reviewRepository.findByRecipe_Id(new ObjectId(recipe.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Reviews not found"));
 
-        reviews.forEach(review -> {
-            String latestDisplayName = firebaseUserService.getDisplayName(review.getUser().getFirebaseId());
-            if (latestDisplayName != null) {
-                review.getUser().setDisplayName(latestDisplayName);
-            }
-        });
-        
-        return reviews;
+        return allReviews.stream()
+                .filter(Review::isVerified)
+                .peek(review -> {
+                    String latestDisplayName = firebaseUserService.getDisplayName(review.getUser().getFirebaseId());
+                    if (latestDisplayName != null) {
+                        review.getUser().setDisplayName(latestDisplayName);
+                    }
+                })
+                .toList();
     }
 
     public List<Review> getReviewsByUser(String firebaseId) {

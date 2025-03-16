@@ -1,6 +1,6 @@
 {
   "chatbot": {
-    "welcome": "Hoş geldiniz! Ben sizin yapay zeka yemek asistanınızım. Yemek ve tariflerle ilgili her şeyi sorabilirsiniz.\nİpucu: Yazarken önerileri kabul etmek için Tab ⇥ tuşunu kullanın.",
+    "welcome": "Hoş geldiniz! Ben sizin yapay zeka yemek asistanınızım. Yemek ve tariflerle ilgili her şeyi sorabilirsiniz.",
     "initialMessage": "Mevcut Tarif: {{recipeName}}\n\nSize şu konularda yardımcı olabilirim:\n- Malzeme değişimleri\n- Pişirme teknikleri\n- Adım açıklamaları\n\nNeyi öğrenmek istersiniz?",
     "selectRecipe": "Lütfen sorularınızı sormak için önce bir tarif seçin.",
     "error": "Özür dilerim, bir hata oluştu. Lütfen daha sonra tekrar deneyin.",

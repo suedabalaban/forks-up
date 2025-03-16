@@ -17,6 +17,7 @@ const ChatBot: React.FC = () => {
     const [isStreaming, setIsStreaming] = useState(false);
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number>(0);
+    const inputRef = useRef<HTMLDivElement>(null);
 
     const currentMessages = currentRecipe 
         ? chatHistory[currentRecipe.id] || []
@@ -144,6 +145,20 @@ const ChatBot: React.FC = () => {
         return () => clearTimeout(delayTimer);
     }, [inputMessage]);
 
+    // Add click outside handler
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+                setSuggestions([]);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     const handleSubmit = async (text: string) => {
         if (!text.trim()) return;
 
@@ -236,7 +251,7 @@ const ChatBot: React.FC = () => {
                         </button>
                     </div>
                     
-                    <div className="flex border-b dark:border-gray-700">
+                    <div className="flex border-b dark:text-white dark:border-gray-700">
                         <button
                             onClick={() => handleModeSwitch('chat')}
                             className={`flex-1 p-2 ${mode === 'chat' ? 'bg-purple-100 dark:bg-purple-900/40' : ''}`}
@@ -275,7 +290,7 @@ const ChatBot: React.FC = () => {
                         handleSubmit(inputMessage);
                     }} className="p-3 border-t dark:border-gray-700">
                         <div className="flex gap-2 relative">
-                            <div className="flex-1 relative">
+                            <div className="flex-1 relative" ref={inputRef}>
                                 {suggestions.length > 0 && (
                                     <div className="absolute bottom-full left-0 right-0 mb-1 bg-gray-100 dark:bg-gray-700 
                                                 rounded-lg border border-gray-200 dark:border-gray-600
