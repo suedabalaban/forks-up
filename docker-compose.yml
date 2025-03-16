@@ -10,7 +10,6 @@ services:
       - MONGO_INITDB_DATABASE=forksupdb
       - MONGO_INITDB_ROOT_USERNAME=sodabatuhan
       - MONGO_INITDB_ROOT_PASSWORD=S0DABaTuHaN
-    command: mongod --auth
     volumes:
       - mongodb_data:/data/db
       - ./db:/docker-entrypoint-initdb.d

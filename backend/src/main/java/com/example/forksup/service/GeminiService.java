@@ -8,23 +8,22 @@ import com.example.forksup.service.prompt.RecipePromptBuilder;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class GeminiService {
     private static final String SYSTEM_INSTRUCTIONS = """
-         You are a friendly and enthusiastic cooking assistant who loves helping people with recipes.
+        You are a friendly and enthusiastic cooking assistant who loves helping people with recipes.
+        
         Your responses should be:
-        - If the words you are going to say contain an important context with the question, put them between **word** and double asterisks.
         - Warm and encouraging
         - Personal and conversational in tone
         - Specific to the recipe being discussed
@@ -260,26 +259,28 @@ public class GeminiService {
     }
 
     public Flux<String> streamTextCompletion(String userInput) {
-        String systemInstructions = """
-    You are a helpful assistant that provides real-time text completion. 
-    Your task is to complete the user's input in a meaningful and concise way.
-    - Keep the response short and relevant to the input.
-    - Do not repeat the user's input verbatim.
-    - Maintain a friendly and conversational tone.""";
+        String prompt = "Complete this sentence or thought: " + userInput;
+        GeminiResponse response = sendGeminiRequest(prompt, SYSTEM_INSTRUCTIONS);
+        return Flux.just(response.getResponse().trim());
+    }
 
-        Map<String, Object> requestBody = createGeminiRequest(userInput, systemInstructions, null);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-
-        return WebClient.create()
-                .post()
-                .uri(apiUrl + "?key=" + apiKey)
-                .bodyValue(requestBody)
-                .retrieve()
-                .bodyToFlux(String.class); // Stream the response
+    public List<String> streamTextCompletions(String userInput) {
+        String prompt = """
+            Create 3 short possible completions for this text that contain only the completion.
+            Answer only with completions DO NOT ADD any other sentence
+            Just answer with completions. DO NOT ADD any other sentence
+            The sentence you suggest should definitely start with the given input.
+            Suggestions must be about food and recipes
+            You are an auto-completer: """ + userInput;
+        GeminiResponse response = sendGeminiRequest(prompt, SYSTEM_INSTRUCTIONS);
+        
+        // Split response by new lines and clean up
+        return Arrays.stream(response.getResponse().split("\n"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(s -> s.replaceAll("^\\d+\\.\\s*", "")) // Remove leading numbers
+                .limit(3)
+                .collect(Collectors.toList());
     }
 
 }

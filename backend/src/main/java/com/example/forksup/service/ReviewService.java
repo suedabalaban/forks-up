@@ -22,8 +22,10 @@ public class ReviewService {
     private final RecipeService recipeService;
     private final FirebaseUserService firebaseUserService;
 
-    ReviewService(ReviewRepository reviewRepository, UserRepository userRepository, 
-                 RecipeService recipeService, FirebaseUserService firebaseUserService) {
+    ReviewService(
+        ReviewRepository reviewRepository,UserRepository userRepository, 
+        RecipeService recipeService, 
+        FirebaseUserService firebaseUserService) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
         this.recipeService = recipeService;

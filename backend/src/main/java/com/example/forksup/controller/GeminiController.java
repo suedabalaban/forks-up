@@ -9,7 +9,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -74,6 +73,7 @@ public class GeminiController {
        }
 
    }
+
     @PostMapping("/search/natural")
     public ResponseEntity<Slice<Recipe>> naturalLanguageSearch(
             @RequestBody GeminiRequest request,
@@ -91,9 +91,14 @@ public class GeminiController {
         }
     }
 
-    @GetMapping(value = "/stream-complete", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> streamTextCompletion(@RequestParam String input) {
-        return geminiService.streamTextCompletion(input);
+    @GetMapping(value = "/stream-complete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<String>> streamTextCompletion(@RequestParam String input) {
+        try {
+            List<String> completions = geminiService.streamTextCompletions(input);
+            return ResponseEntity.ok(completions);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
 }

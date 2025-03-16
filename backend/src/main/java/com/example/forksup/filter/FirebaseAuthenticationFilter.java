@@ -1,6 +1,5 @@
 package com.example.forksup.filter;
 
-import com.example.forksup.config.DevAdminToken;
 import com.example.forksup.config.DevConfig;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -42,7 +41,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
             List<GrantedAuthority> authorities = new ArrayList<>();
 
             if (devConfig.isDevAdminToken(token)) {
-                DevAdminToken devToken = new DevAdminToken("admin-uid", "admin@forksup.dev");
+                DevConfig.DevAdminToken devToken = new DevConfig.DevAdminToken("admin-uid", "admin@forksup.dev");
                 session.setAttribute("uid", devToken.getUid());
                 session.setAttribute("isAdmin", true);
 

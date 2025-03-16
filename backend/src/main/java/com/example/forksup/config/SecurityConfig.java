@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -28,7 +27,7 @@ public class SecurityConfig {
                 .cors(c -> c.configurationSource(customCorsConfiguration))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**", "/api/recipes/**").permitAll()
+                        .requestMatchers("/auth/**", "/api/recipes/**", "/api/chatbot").permitAll()
                         .requestMatchers("/auth/**", "/api/food-detection/**").permitAll()
                         .requestMatchers("/auth/**", "/api/gemini/**").permitAll()
                         .requestMatchers("/api/user/**").hasRole("USER")

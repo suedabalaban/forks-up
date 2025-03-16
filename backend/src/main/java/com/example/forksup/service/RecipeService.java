@@ -91,7 +91,7 @@ public class RecipeService {
         }
 
         String combinedText = combineSearchParameters(keyword, tags, ingredients);
-        int minScore = (int) combinedText.chars().filter(ch -> ch == ' ').count() * 7 ;
+        int minScore = (int) combinedText.chars().filter(ch -> ch == ' ').count() ;
         return recipeRepository.searchRecipesAdvanced(combinedText, minScore, pageable);
     }
 

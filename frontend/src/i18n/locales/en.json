@@ -1,6 +1,6 @@
 {
   "chatbot": {
-    "welcome": "Welcome! Please select a recipe first to ask questions about it.",
+    "welcome": "Welcome! I'm your AI cooking assistant. Ask me anything about cooking and recipes.",
     "initialMessage": "Current Recipe: {{recipeName}}\n\nI can help you with:\n- Ingredient substitutions\n- Cooking techniques\n- Step explanations\n\nWhat would you like to know?",
     "selectRecipe": "Please select a recipe first to ask questions about it.",
     "error": "I apologize, but I encountered an error. Please try again later.",
@@ -8,7 +8,9 @@
     "suggestedQuestions": "Suggested Questions",
     "typePlaceholder": "Type a message...",
     "selectRecipePlaceholder": "Select a recipe to start chatting",
-    "poweredByGemini": "Powered by Gemini"
+    "poweredByGemini": "Powered by Gemini",
+    "chat": "Chat",
+    "search": "Search"
   },
   "profile": {
     "languageSettings": "Language Settings",

@@ -1,6 +1,6 @@
 {
   "chatbot": {
-    "welcome": "Hoş geldiniz! Lütfen sorularınızı sormak için önce bir tarif seçin.",
+    "welcome": "Hoş geldiniz! Ben sizin yapay zeka yemek asistanınızım. Yemek ve tariflerle ilgili her şeyi sorabilirsiniz.\nİpucu: Yazarken önerileri kabul etmek için Tab ⇥ tuşunu kullanın.",
     "initialMessage": "Mevcut Tarif: {{recipeName}}\n\nSize şu konularda yardımcı olabilirim:\n- Malzeme değişimleri\n- Pişirme teknikleri\n- Adım açıklamaları\n\nNeyi öğrenmek istersiniz?",
     "selectRecipe": "Lütfen sorularınızı sormak için önce bir tarif seçin.",
     "error": "Özür dilerim, bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
@@ -8,7 +8,9 @@
     "suggestedQuestions": "Önerilen Sorular",
     "typePlaceholder": "Bir mesaj yazın...",
     "selectRecipePlaceholder": "Sohbete başlamak için bir tarif seçin",
-    "poweredByGemini": "Gemini tarafından desteklenmektedir"
+    "poweredByGemini": "Gemini tarafından desteklenmektedir",
+    "chat": "Sohbet",
+    "search": "Arama"
   },
   "profile": {
     "languageSettings": "Dil Ayarları",
