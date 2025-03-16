@@ -266,19 +266,22 @@ public class GeminiService {
 
     public List<String> streamTextCompletions(String userInput) {
         String prompt = """
-            Create 3 short possible completions for this text that contain only the completion.
-            Answer only with completions DO NOT ADD any other sentence
-            Just answer with completions. DO NOT ADD any other sentence
-            The sentence you suggest should definitely start with the given input.
-            Suggestions must be about food and recipes
-            You are an auto-completer: """ + userInput;
+            Act as an autocomplete system. Return exactly 3 recipe-related completions for: %s
+            Rules:
+            - Each completion must start with the given input text exactly
+            - Return ONLY the completions, one per line
+            - No explanations or additional text
+            - Keep completions under 50 characters
+            - Must be about food, cooking, or recipes
+            - No numbering or bullet points""".formatted(userInput);
+
         GeminiResponse response = sendGeminiRequest(prompt, SYSTEM_INSTRUCTIONS);
         
-        // Split response by new lines and clean up
         return Arrays.stream(response.getResponse().split("\n"))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .map(s -> s.replaceAll("^\\d+\\.\\s*", "")) // Remove leading numbers
+                .filter(s -> s.toLowerCase().startsWith(userInput.toLowerCase()))
+                .distinct()
                 .limit(3)
                 .collect(Collectors.toList());
     }
