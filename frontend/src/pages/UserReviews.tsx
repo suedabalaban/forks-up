@@ -46,12 +46,20 @@ const ReviewItem: React.FC<{
 
                 {/* Recipe Details */}
                 <div className="flex-1 py-2">
-                    <button
-                        onClick={() => window.location.href = `/recipe/${review.recipe.id}`}
-                        className="text-xl font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors mb-2"
-                    >
-                        {review.recipe.name}
-                    </button>
+                    <div className="flex justify-between items-start">
+                        <button
+                            onClick={() => window.location.href = `/recipe/${review.recipe.id}`}
+                            className="text-xl font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors mb-2"
+                        >
+                            {review.recipe.name}
+                        </button>
+                        <button
+                            onClick={() => onDelete(review.id)}
+                            className="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                        >
+                            Delete Review
+                        </button>
+                    </div>
 
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
                         {review.recipe.description}
@@ -94,14 +102,6 @@ const ReviewItem: React.FC<{
             <div className="border-t border-gray-200 dark:border-gray-700">
                 <div className="p-4">
                     <ReviewCard review={{...review, review: review.review}} />
-                </div>
-                <div className="flex justify-end px-4 pb-4">
-                    <button
-                        onClick={() => onDelete(review.id)}
-                        className="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                    >
-                        Delete Review
-                    </button>
                 </div>
             </div>
         </motion.div>
@@ -183,7 +183,9 @@ const UserReviews: React.FC = () => {
                     <div className="mb-6 text-6xl">
                         ✍️
                     </div>
+                    <p className="mb-6 text-gray-600 dark:text-gray-400">
                         Share your thoughts about recipes you've tried! Your reviews help others discover great recipes.
+                    </p>
                     <Link
                         to="/search" 
                         className="inline-flex items-center px-6 py-3 rounded-lg bg-purple-600 dark:bg-purple-500 text-white hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors duration-300"

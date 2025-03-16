@@ -13,4 +13,5 @@ export interface Review {
         displayName: string;
     };
     recipeImage: string | null;
+    verified: boolean;
 }

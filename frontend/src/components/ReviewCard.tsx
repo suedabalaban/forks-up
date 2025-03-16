@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star } from 'lucide-react';
+import { Star, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ImageModal from './ImageModal';
 
@@ -15,6 +15,7 @@ interface ReviewCardProps {
         review: string;
         recipeImage: string | null;
         createdAt?: string;
+        verified: boolean;
     };
 }
 
@@ -28,6 +29,20 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
             >
+                {/* Verification Badge */}
+                {review.verified && (
+                    <div className="absolute top-4 right-4 flex items-center gap-1 px-2.5 py-1 rounded-full 
+                                  bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800">
+                        <CheckCircle2 
+                            size={18} 
+                            className="text-green-600 dark:text-green-400"
+                        />
+                        <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                            Verified
+                        </span>
+                    </div>
+                )}
+
                 {/* Header with user info and rating */}
                 <div className="p-6 pb-4">
                     <div className="flex items-start justify-between">

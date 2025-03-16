@@ -11,7 +11,7 @@ import {
     deleteUser
 } from "firebase/auth";
 import DietaryPreferences from "./DietaryPreferences";
-import {KeyRound, ShieldAlert, Trash2, Upload, User as UserIcon, Wand2} from 'lucide-react';
+import {KeyRound, ShieldAlert, Trash2, Upload, User as UserIcon, Wand2, X} from 'lucide-react';
 import { motion } from "framer-motion";
 import { useTranslation } from 'react-i18next';
 import { Languages } from 'lucide-react';
@@ -33,6 +33,7 @@ const Profile: React.FC = () => {
     const [avatar, setAvatar] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [fetchedAvatar, setFetchedAvatar] = useState<string | null>(null);
+    const [showAvatarModal, setShowAvatarModal] = useState<boolean>(false);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -249,7 +250,10 @@ const Profile: React.FC = () => {
             >
                 <div className="flex items-center gap-4 mb-6">
                     <div className="relative group">
-                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-purple-100 dark:border-purple-900/50">
+                        <div 
+                            onClick={() => (previewUrl || fetchedAvatar) && setShowAvatarModal(true)}
+                            className="w-20 h-20 rounded-full overflow-hidden border-4 border-purple-100 dark:border-purple-900/50 cursor-pointer hover:opacity-90 transition-opacity"
+                        >
                             {(previewUrl || fetchedAvatar) ? (
                                 <img
                                     src={previewUrl || fetchedAvatar || undefined}
@@ -274,6 +278,33 @@ const Profile: React.FC = () => {
                     </div>
                 </div>
 
+                {/* Avatar Modal */}
+                {showAvatarModal && (previewUrl || fetchedAvatar) && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+                        onClick={() => setShowAvatarModal(false)}
+                    >
+                        <div className="relative max-w-2xl w-full">
+                            <button
+                                onClick={() => setShowAvatarModal(false)}
+                                className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+                            >
+                                <X size={24} />
+                            </button>
+                            <motion.img
+                                initial={{ scale: 0.9 }}
+                                animate={{ scale: 1 }}
+                                src={previewUrl || fetchedAvatar || undefined}
+                                alt="Profile"
+                                className="w-full h-auto rounded-2xl"
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                        </div>
+                    </motion.div>
+                )}
+
                 {/* Avatar and Description Section */}
                 <div className="space-y-6 mb-6">
                     <div>
@@ -294,11 +325,15 @@ const Profile: React.FC = () => {
                         <button
                             onClick={handleGenerateAvatar}
                             disabled={!description || isLoading}
-                            className="flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-gray-50 
+                            className="group relative flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-gray-50 
                                      dark:border-gray-600 dark:hover:bg-gray-700 transition-colors dark:text-white"
                         >
                             <Wand2 size={16} />
                             Generate Avatar
+                            <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 
+                                          group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                Avatar will be generated based on your "About Me" description
+                            </div>
                         </button>
 
                         <button
