@@ -9,6 +9,8 @@ import com.example.forksup.service.RecipeService;
 import com.example.forksup.service.ReviewService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,9 @@ public class RecipeController {
 
     @Autowired
     private ReviewService reviewService;
+
+    private static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
+    private static final Logger reviewLogger = LoggerFactory.getLogger("reviewLogger");
 
     /**
      * Retrieves a specific recipe from the database using its MongoDB ObjectId.
@@ -152,6 +157,9 @@ public class RecipeController {
             @RequestPart(value = "image", required = false) MultipartFile image
     ) {
         String uid = (String) request.getSession().getAttribute("uid");
+        String ipAddress = request.getRemoteAddr();
+        String sessionId = request.getSession().getId();
+        String userAgent = request.getHeader("User-Agent");
 
         int ratingValue = Integer.parseInt(rating);
         if (ratingValue < 0 || ratingValue > 5) {
@@ -161,6 +169,11 @@ public class RecipeController {
 
         try {
             Review addedReview = reviewService.addUserReview(uid, recipeId, review, ratingValue, image, timeStamp);
+            logger.info("User {} added review for recipe {}: rating={}, comment='{}'",
+                    addedReview.getUser().getId(),addedReview.getRecipe().getRecipeId(), addedReview.getRating(),addedReview.getReview());
+            reviewLogger.info(String.format("Review added - Recipe: %s, Rating: %d, IP: %s, Session: %s, UserAgent: %s",
+                    recipeId, addedReview.getRating(), ipAddress, sessionId, userAgent));
+
             return ResponseEntity.ok(addedReview);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
