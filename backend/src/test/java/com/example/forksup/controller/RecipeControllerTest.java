@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 SecurityConfig.class
         })
 })
-@AutoConfigureMockMvc(addFilters = false)  // Security filtrelerini devre dışı bırak
+@AutoConfigureMockMvc(addFilters = true)
 public class RecipeControllerTest {
 
     @Autowired
@@ -91,7 +91,6 @@ public class RecipeControllerTest {
             };
         }
 
-        // Test için güvenlik konfigürasyonunu iptal eden bir Bean
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
             http
@@ -105,7 +104,6 @@ public class RecipeControllerTest {
 
     @BeforeEach
     public void setup() {
-        // Test verileri oluştur
         testRecipe1 = new Recipe();
         testRecipe1.setId(new ObjectId("6553a72a9a5b5f7a6fc03e11"));
         testRecipe1.setName("Spagetti Bolognese");
@@ -123,18 +121,16 @@ public class RecipeControllerTest {
 
     @Test
     public void testGetRecipeByIdNotFound() throws Exception {
-        // Service'in davranışını mock'la - ResourceNotFoundException fırlat
         when(recipeService.getByRecipeId(eq("6553a72a9a5b5f7a6fc03e99")))
                 .thenThrow(new ResourceNotFoundException("Recipe with id 6553a72a9a5b5f7a6fc03e99 not found"));
 
-        // API çağrısı ve 404 yanıtını test et
-        mockMvc.perform(get("/api/recipes/6553a72a9a5b5f7a6fc03e99"))
+        mockMvc.perform(get("/api/recipes/6553a72a9a5b5f7a6fc03e99")
+                .header("Authorization", "Bearer test-admin-token"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void testSearchRecipesWithKeyword() throws Exception {
-        // Arama sonuçlarını simüle et
         Slice<Recipe> slice = new SliceImpl<>(testRecipes, PageRequest.of(0, 10), false);
         when(recipeService.searchRecipes(
                 eq("pasta"),
@@ -144,11 +140,11 @@ public class RecipeControllerTest {
                 eq(10)))
                 .thenReturn(slice);
 
-        // API çağrısını ve sonuçlarını test et
         mockMvc.perform(get("/api/recipes/search")
                         .param("keyword", "pasta")
                         .param("page", "0")
-                        .param("size", "10"))
+                        .param("size", "10")
+                        .header("Authorization", "Bearer test-admin-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
                 .andExpect(jsonPath("$.content[0].name", is("Spagetti Bolognese")))
@@ -157,7 +153,6 @@ public class RecipeControllerTest {
 
     @Test
     public void testSearchRecipesWithTagsAndIngredients() throws Exception {
-        // Arama sonuçlarını simüle et - sadece bir tarif içeren sonuç
         Slice<Recipe> slice = new SliceImpl<>(Collections.singletonList(testRecipe1),
                 PageRequest.of(0, 10), false);
 
@@ -172,12 +167,12 @@ public class RecipeControllerTest {
                 eq(10)))
                 .thenReturn(slice);
 
-        // API çağrısını ve sonuçlarını test et
         mockMvc.perform(get("/api/recipes/search")
                         .param("tags", "İtalyan")
                         .param("ingredients", "domates")
                         .param("page", "0")
-                        .param("size", "10"))
+                        .param("size", "10")
+                        .header("Authorization", "Bearer test-admin-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].name", is("Spagetti Bolognese")));
@@ -185,7 +180,6 @@ public class RecipeControllerTest {
 
     @Test
     public void testSearchRecipesEmptyResult() throws Exception {
-        // Boş sonuç dön
         Slice<Recipe> emptySlice = new SliceImpl<>(new ArrayList<>(),
                 PageRequest.of(0, 10), false);
 
@@ -197,7 +191,6 @@ public class RecipeControllerTest {
                 eq(10)))
                 .thenReturn(emptySlice);
 
-        // API çağrısını ve boş sonuçları test et
         mockMvc.perform(get("/api/recipes/search")
                         .param("keyword", "bulunamayacak")
                         .param("page", "0")
