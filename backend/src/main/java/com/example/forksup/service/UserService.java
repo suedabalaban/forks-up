@@ -228,7 +228,7 @@ public class UserService {
         String encodedPrompt = UriUtils.encode(prompt, StandardCharsets.UTF_8);
         
         String url = "https://image.pollinations.ai/prompt/" + encodedPrompt +
-                     "?model=flux-pro&safe=true&private=true&width=216&height=216&nologo=true";
+                     "?model=flux-pro&safe=true&private=true&width=512&height=512&nologo=true";
 
         try {
             ResponseEntity<byte[]> response = restTemplate.getForEntity(url, byte[].class);

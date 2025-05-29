@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, KeyboardEvent } from 'react';
-import { MessageSquare, X, Send, Search, Sparkles } from 'lucide-react';
-import { Sparkle } from 'lucide-react';
+import {Send, Search, Sparkle, MessageSquare} from 'lucide-react';
 import { useRecipe } from '../../context/RecipeContext';
 import { getPredefinedQuestions, analyzeRecipe, naturalLanguageSearch, streamTextCompletion } from '../../api/GeminiAPI';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +12,7 @@ const LoadingDots = () => (
     </div>
 );
 
-const ChatBot: React.FC = () => {
+const GeminiChatBot: React.FC = () => {
     const { t } = useTranslation();
     const { currentRecipe, chatHistory, addChatMessage } = useRecipe();
     const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +27,7 @@ const ChatBot: React.FC = () => {
     const inputRef = useRef<HTMLDivElement>(null);
     const [isTyping, setIsTyping] = useState(false);
 
-    const currentMessages = currentRecipe 
+    const currentMessages = currentRecipe
         ? chatHistory[currentRecipe.id] || []
         : chatHistory['no-recipe'] || [];
 
@@ -119,12 +118,12 @@ const ChatBot: React.FC = () => {
                 break;
             case 'ArrowUp':
                 e.preventDefault();
-                setSelectedSuggestionIndex(prev => 
+                setSelectedSuggestionIndex(prev =>
                     prev > 0 ? prev - 1 : suggestions.length - 1);
                 break;
             case 'ArrowDown':
                 e.preventDefault();
-                setSelectedSuggestionIndex(prev => 
+                setSelectedSuggestionIndex(prev =>
                     prev < suggestions.length - 1 ? prev + 1 : 0);
                 break;
             case 'Escape':
@@ -183,7 +182,7 @@ const ChatBot: React.FC = () => {
                 const searchResponse = await naturalLanguageSearch(text);
                 const searchMessage = {
                     text: `Found ${searchResponse.content.length} recipes:\n${
-                        searchResponse.content.map((recipe: any) => 
+                        searchResponse.content.map((recipe: any) =>
                             `- ${recipe.name}`).join('\n')
                     }`,
                     isUser: false
@@ -230,144 +229,112 @@ const ChatBot: React.FC = () => {
 
         // Then handle the markdown formatting
         const doubleStarred = withQuestions.replace(
-            /\*\*(.*?)\*\*/g, 
+            /\*\*(.*?)\*\*/g,
             '<span class="font-extrabold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-1.5 rounded-md">$1</span>'
         );
 
         return doubleStarred.replace(
-            /\*(.*?)\*/g, 
+            /\*(.*?)\*/g,
             '<span class="font-bold">$1</span>'
         );
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-50">
-            {isOpen ? (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-96 md:w-[450px] transition-all duration-300 overflow-hidden max-h-[70vh] flex flex-col">
-                    <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-4 flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-white">
-                            <MessageSquare size={20} />
-                            <span className="font-semibold">{t('chatbot.title')}</span>
-                            <div className="flex items-center gap-1 text-xs opacity-75 border-l border-white/30 pl-2 ml-2">
-                                <Sparkle size={14} className="shrink-0" />
-                                <span className="whitespace-nowrap">{t('chatbot.poweredByGemini')}</span>
-                            </div>
-                        </div>
-                        <button 
-                            onClick={() => setIsOpen(false)}
-                            className="text-white p-1.5 rounded-full hover:bg-white/10 
-                                     transition-all duration-200 hover:shadow-lg 
-                                     hover:shadow-white/20"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
-                    
-                    <div className="flex border-b dark:text-white dark:border-gray-700">
-                        <button
-                            onClick={() => handleModeSwitch('chat')}
-                            className={`flex-1 p-2 ${mode === 'chat' ? 'bg-purple-100 dark:bg-purple-900/40' : ''}`}
-                        >
-                            <MessageSquare size={16} className="inline mr-2" />
-                            {t('chatbot.chat')}
-                        </button>
-                        <button
-                            onClick={() => handleModeSwitch('search')}
-                            className={`flex-1 p-2 ${mode === 'search' ? 'bg-purple-100 dark:bg-purple-900/40' : ''}`}
-                        >
-                            <Search size={16} className="inline mr-2" />
-                            {t('chatbot.search')}
-                        </button>
-                    </div>
+        <>
+            <div className="flex border-b dark:text-white dark:border-gray-700">
+                <button
+                    onClick={() => handleModeSwitch('chat')}
+                    className={`flex-1 p-2 ${mode === 'chat' ? 'bg-purple-100 dark:bg-purple-900/40' : ''}`}
+                >
+                    <MessageSquare size={16} className="inline mr-2" />
+                    {t('chatbot.chat')}
+                </button>
+                <button
+                    onClick={() => handleModeSwitch('search')}
+                    className={`flex-1 p-2 ${mode === 'search' ? 'bg-purple-100 dark:bg-purple-900/40' : ''}`}
+                >
+                    <Search size={16} className="inline mr-2" />
+                    {t('chatbot.search')}
+                </button>
+            </div>
 
-                    <div className="min-h-[280px] max-h-[calc(70vh-120px)] overflow-y-auto p-3 space-y-3 flex-grow">
-                        {currentMessages.map((message, index) => (
-                            <div key={index} 
-                                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                                <div 
-                                    className={`rounded-lg px-4 py-2 max-w-[85%] whitespace-pre-wrap break-words ${
-                                        message.isUser 
-                                        ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white'
-                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-                                    }`}
-                                    dangerouslySetInnerHTML={{ __html: formatMessage(message.text) }}
-                                />
-                            </div>
-                        ))}
-                        {isTyping && (
-                            <div className="flex justify-start">
-                                <div className="rounded-lg px-4 py-2 bg-gray-100 dark:bg-gray-700">
-                                    <LoadingDots />
+            <div className="min-h-[280px] max-h-[calc(70vh-180px)] overflow-y-auto p-3 space-y-3 flex-grow">
+                {currentMessages.map((message, index) => (
+                    <div key={index} 
+                        className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
+                        <div 
+                            className={`rounded-lg px-4 py-2 max-w-[85%] whitespace-pre-wrap break-words ${
+                                message.isUser 
+                                ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                            }`}
+                            dangerouslySetInnerHTML={{ __html: formatMessage(message.text) }}
+                        />
+                    </div>
+                ))}
+                {isTyping && (
+                    <div className="flex justify-start">
+                        <div className="rounded-lg px-4 py-2 bg-gray-100 dark:bg-gray-700">
+                            <LoadingDots />
+                        </div>
+                    </div>
+                )}
+                <div ref={messagesEndRef} />
+            </div>
+
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit(inputMessage);
+            }} className="p-3 border-t dark:border-gray-700 relative">
+                <div className="flex gap-2 relative">
+                    <div className="flex-1 relative" ref={inputRef}>
+                        {suggestions.length > 0 && (
+                            <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 
+                                        rounded-lg border border-gray-200 dark:border-gray-600
+                                        overflow-hidden shadow-lg z-[60] max-h-[200px] overflow-y-auto">
+                                {suggestions.map((suggestion, index) => (
+                                    <div
+                                        key={index}
+                                        className={`px-4 py-2 text-sm cursor-pointer
+                                            ${index === selectedSuggestionIndex 
+                                                ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'
+                                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                            }`}
+                                        onClick={() => {
+                                            setInputMessage(suggestion);
+                                            setSuggestions([]);
+                                        }}
+                                    >
+                                        {suggestion}
+                                    </div>
+                                ))}
+                                <div className="text-xs text-center p-1 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">
+                                    Use ↑↓ to navigate, Tab to select
                                 </div>
                             </div>
                         )}
-                        <div ref={messagesEndRef} /> {/* Scroll anchor */}
+                        <input
+                            type="text"
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder={t('chatbot.typePlaceholder')}
+                            className="w-full rounded-lg px-4 py-2 bg-gray-100 dark:bg-gray-700 
+                                    text-gray-800 dark:text-gray-200 focus:outline-none
+                                    focus:ring-2 focus:ring-purple-500"
+                        />
                     </div>
-
-                    <form onSubmit={(e) => {
-                        e.preventDefault();
-                        handleSubmit(inputMessage);
-                    }} className="p-3 border-t dark:border-gray-700">
-                        <div className="flex gap-2 relative">
-                            <div className="flex-1 relative" ref={inputRef}>
-                                {suggestions.length > 0 && (
-                                    <div className="absolute bottom-full left-0 right-0 mb-1 bg-gray-100 dark:bg-gray-700 
-                                                rounded-lg border border-gray-200 dark:border-gray-600
-                                                overflow-hidden shadow-lg z-50">
-                                        {suggestions.map((suggestion, index) => (
-                                            <div
-                                                key={index}
-                                                className={`px-4 py-2 text-sm cursor-pointer
-                                                    ${index === selectedSuggestionIndex 
-                                                        ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300'
-                                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                                                    }`}
-                                                onClick={() => {
-                                                    setInputMessage(suggestion);
-                                                    setSuggestions([]);
-                                                }}
-                                            >
-                                                {suggestion}
-                                            </div>
-                                        ))}
-                                        <div className="text-xs text-center p-1 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800">
-                                            Use ↑↓ to navigate, Tab to select
-                                        </div>
-                                    </div>
-                                )}
-                                <input
-                                    type="text"
-                                    value={inputMessage}
-                                    onChange={(e) => setInputMessage(e.target.value)}
-                                    onKeyDown={handleKeyDown}
-                                    placeholder={t('chatbot.typePlaceholder')}
-                                    className="w-full rounded-lg px-4 py-2 bg-gray-100 dark:bg-gray-700 
-                                            text-gray-800 dark:text-gray-200 focus:outline-none
-                                            focus:ring-2 focus:ring-purple-500"
-                                />
-                            </div>
-                            <button 
-                                type="submit"
-                                className="bg-gradient-to-r from-purple-600 to-blue-500 text-white 
-                                        p-2 rounded-lg hover:opacity-90 transition-opacity"
-                            >
-                                <Send size={20} />
-                            </button>
-                        </div>
-                    </form>
+                    <button 
+                        type="submit"
+                        className="bg-gradient-to-r from-purple-600 to-blue-500 text-white 
+                                p-2 rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                        <Send size={20} />
+                    </button>
                 </div>
-            ) : (
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className="bg-gradient-to-r from-purple-600 to-blue-500 text-white p-4 
-                            rounded-full shadow-lg hover:shadow-xl transition-all duration-300
-                            hover:scale-110"
-                >
-                    <MessageSquare size={24} />
-                </button>
-            )}
-        </div>
+            </form>
+        </>
     );
 };
 
-export default ChatBot;
+export default GeminiChatBot;

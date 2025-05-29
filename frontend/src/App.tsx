@@ -20,13 +20,13 @@ import Settings from "./pages/Settings";
 import {ThemeProvider} from "./context/ThemeContext";
 import RecipeHistory from "./pages/RecipeHistory";
 import { PantryProvider } from './context/PantryContext';
-import ChatBot from './components/ChatBot/ChatBot';
 import InitialProfileSetup from './components/InitialProfileSetup';
 import SharedRecipe from './pages/SharedRecipe';
 import { RecipeProvider } from './context/RecipeContext';
 import './i18n';
 import { NotificationProvider } from './context/NotificationContext';
 import UserReviews from './pages/UserReviews';
+import ChatBotContainer from "./components/ChatBot/ChatBotContainer";
 
 const App: React.FC = () => {
     const [user, setUser] = useState<any>(null);
@@ -79,7 +79,7 @@ const App: React.FC = () => {
                                 </Route>
 
                             </Routes>
-                            <ChatBot />
+                            <ChatBotContainer />
                         </RecipeProvider>
                 </PantryProvider>
             </NotificationProvider>

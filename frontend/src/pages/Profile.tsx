@@ -10,6 +10,7 @@ import {
     sendPasswordResetEmail,
     deleteUser
 } from "firebase/auth";
+
 import DietaryPreferences from "./DietaryPreferences";
 import {KeyRound, ShieldAlert, Trash2, Upload, User as UserIcon, Wand2, X} from 'lucide-react';
 import { motion } from "framer-motion";
@@ -103,11 +104,13 @@ const Profile: React.FC = () => {
             // Handle avatar upload
             if (avatar) {
                 await uploadAvatar(avatar);
+                showSuccess("Profile updated successfully!");
             }
 
             // Handle description update
             if (description) {
                 await updateDescription(description);
+                showSuccess("Profile updated successfully!");
             }
 
             // Handle display name update

@@ -46,9 +46,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
 	implementation 'org.springframework.ai:spring-ai-ollama'
-
+	implementation 'org.seleniumhq.selenium:selenium-java:2.41.0'
+	implementation("io.github.bonigarcia:webdrivermanager:5.9.3")
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-
 }
 
 tasks.named('test') {
