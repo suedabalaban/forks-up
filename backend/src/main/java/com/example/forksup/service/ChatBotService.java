@@ -85,6 +85,9 @@ public class ChatBotService {
 
     public Flux<String> processRequest(String message, String sessionId, String userId) {
         String userName = getUsersName(userId);
+        if (userName == null) {
+            userName = "unknown";
+        }
         String formattedSystemPrompt = SYSTEM_PROMPT.replace("{}", userName);
 
 
@@ -101,9 +104,9 @@ public class ChatBotService {
         }
 
         Message userMessage = new UserMessage(message);
-//        synchronized (messages) {
-//            messages.addLast(userMessage);
-//        }
+        synchronized (messages) {
+            messages.addLast(userMessage);
+        }
 
         ChatOptions chatOptions = ToolCallingChatOptions.builder()
                 .toolContext(Map.of("sessionId", userId, "userId", userId))
@@ -119,11 +122,10 @@ public class ChatBotService {
                     long duration = endTime - startTime;
                     System.out.println("Geçen süre: " + duration + " ms");
                     if ("returnDirect".equals(chatResponse.getResult().getMetadata().getFinishReason())) {
-
                         return;
                     } else {
                         Message assistantMessage = new AssistantMessage(chatResponse.getResult().getOutput().getText());
-//                        messages.addLast(assistantMessage);
+                        messages.addLast(assistantMessage);
                     }
                 })
                 .map(chatResponse -> chatResponse.getResult().getOutput().getText());
