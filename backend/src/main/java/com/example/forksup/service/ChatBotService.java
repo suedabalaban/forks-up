@@ -72,7 +72,7 @@ public class ChatBotService {
                 .defaultOptions(
                         OllamaOptions.builder()
                                 .toolCallbacks(ToolCallbacks.from(new ChatBotTools(recipeService, userService)))
-                                .model(OllamaModel.QWEN_2_5_7B)
+                                .model("qwen2.5:7b")
                                 .temperature(0.5)
                                 .build())
                 .build();
@@ -116,19 +116,18 @@ public class ChatBotService {
 
         long startTime = System.currentTimeMillis();
 
-        return chatModel.stream(prompt)
-                .doOnNext(chatResponse -> {
-                    long endTime = System.currentTimeMillis();
-                    long duration = endTime - startTime;
-                    System.out.println("Geçen süre: " + duration + " ms");
-                    if ("returnDirect".equals(chatResponse.getResult().getMetadata().getFinishReason())) {
-                        return;
-                    } else {
-                        Message assistantMessage = new AssistantMessage(chatResponse.getResult().getOutput().getText());
-                        messages.addLast(assistantMessage);
-                    }
-                })
-                .map(chatResponse -> chatResponse.getResult().getOutput().getText());
+        String response = chatModel.call(prompt).getResult().getOutput().getText();
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        System.out.println("Geçen süre: " + duration + " ms");
+
+        Message assistantMessage = new AssistantMessage(response);
+        synchronized (messages) {
+            messages.addLast(assistantMessage);
+        }
+
+        return Flux.just(response);
     }
 
     static class ChatBotTools {
